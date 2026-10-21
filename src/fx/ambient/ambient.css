@@ -1,59 +1,72 @@
-/* Ambient magic. Rules (CLAUDE.md "Art direction"): slow loops of 3 s or more, small amplitude,
-   transform and opacity only, pointer-events none, static under reduced motion. */
+/* Ambient magic. Quiet, slow, low contrast; transform and opacity only; never takes taps.
+   See "Art direction" in CLAUDE.md. */
 
-/* ---------- sky ---------- */
-
-.night-sky {
+.scene {
   position: absolute;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
+}
+
+.scene > * {
+  position: absolute;
+  inset: 0;
+}
+
+/* ---------- sky ---------- */
+
+.scene-sky {
   background:
-    radial-gradient(120% 60% at 50% 115%, rgb(92 58 170 / 0.55), transparent 60%),
-    radial-gradient(80% 50% at 15% 0%, rgb(40 46 120 / 0.6), transparent 70%),
-    linear-gradient(180deg, var(--night) 0%, #141541 55%, var(--night-2) 100%);
+    radial-gradient(ellipse 70% 50% at 50% 30%, rgb(255 170 90 / 0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 120% 90% at 50% 25%, var(--dusk) 0%, var(--stone) 38%, var(--night) 78%);
+}
+
+.scene-stars {
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 40%, transparent 85%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 40%, transparent 85%);
 }
 
 .star {
   position: absolute;
   border-radius: 50%;
-  background: #fffbe9;
-  box-shadow: 0 0 4px rgb(255 246 214 / 0.8);
-  animation: star-twinkle 5s ease-in-out infinite;
+  background: #fff8e7;
+  box-shadow: 0 0 4px rgb(255 248 231 / 0.6);
+  opacity: 0.2;
+  animation: twinkle 5s ease-in-out infinite alternate;
 }
 
-@keyframes star-twinkle {
-  0%, 100% { opacity: 0.35; transform: scale(0.8); }
-  50% { opacity: 1; transform: scale(1.1); }
+@keyframes twinkle {
+  from { opacity: 0.15; }
+  to { opacity: var(--peak, 0.9); }
 }
 
 .shooting-star {
   position: absolute;
-  top: 9%;
-  left: 78%;
-  width: 90px;
-  height: 2px;
+  top: 11%;
+  left: 72%;
+  width: 110px;
+  height: 1.5px;
   border-radius: 2px;
-  background: linear-gradient(90deg, #fff8e1, rgb(255 248 225 / 0));
+  background: linear-gradient(90deg, rgb(255 248 225 / 0.95), rgb(255 248 225 / 0));
   opacity: 0;
-  transform: rotate(-24deg);
   transform-origin: left center;
-  animation: shooting-star 19s ease-out 6s infinite;
+  animation: shooting-star 23s ease-out 7s infinite;
 }
 
 @keyframes shooting-star {
-  0%, 93% { opacity: 0; transform: rotate(-24deg) translateX(0); }
-  94% { opacity: 1; }
-  98% { opacity: 0; transform: rotate(-24deg) translateX(-55vmax); }
-  100% { opacity: 0; transform: rotate(-24deg) translateX(-55vmax); }
+  0%, 94% { opacity: 0; transform: rotate(-22deg) translateX(0); }
+  95% { opacity: 0.9; }
+  99% { opacity: 0; transform: rotate(-22deg) translateX(-50vmax); }
+  100% { opacity: 0; transform: rotate(-22deg) translateX(-50vmax); }
 }
 
 .moon {
-  position: absolute;
-  top: calc(5% + env(safe-area-inset-top));
-  right: 9%;
-  width: clamp(34px, 8vmin, 72px);
+  inset: auto;
+  top: calc(7% + env(safe-area-inset-top));
+  right: 10%;
+  width: clamp(30px, 6.5vmin, 60px);
   aspect-ratio: 1;
+  opacity: 0.9;
 }
 
 .moon svg {
@@ -61,89 +74,162 @@
   display: block;
   width: 100%;
   height: 100%;
-  transform: rotate(-20deg);
+  transform: rotate(-18deg);
 }
 
 .moon-halo {
   position: absolute;
-  inset: -80%;
+  inset: -110%;
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgb(255 240 200 / 0.22), transparent);
+  background: radial-gradient(closest-side, rgb(245 230 190 / 0.13), transparent);
 }
 
-.mist {
-  position: absolute;
-  left: -10%;
-  right: -10%;
-  bottom: -6%;
-  height: 26%;
+/* ---------- mist ---------- */
+
+.scene > .scene-mist {
+  inset: auto -25% 0 -25%;
+  height: 45%;
   background:
-    radial-gradient(50% 60% at 30% 70%, rgb(170 150 255 / 0.16), transparent 70%),
-    radial-gradient(45% 55% at 75% 80%, rgb(140 200 230 / 0.12), transparent 70%);
+    radial-gradient(ellipse 30% 45% at 25% 85%, rgb(150 130 180 / 0.1), transparent 70%),
+    radial-gradient(ellipse 35% 40% at 70% 90%, rgb(150 130 180 / 0.08), transparent 70%);
+  animation: drift 60s ease-in-out infinite alternate;
 }
 
-/* ---------- candlelight ---------- */
-
-.svg-defs {
-  position: absolute;
+.scene > .scene-mist-front {
+  opacity: 0.8;
+  animation-duration: 44s;
+  animation-direction: alternate-reverse;
 }
 
-.candles {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
+@keyframes drift {
+  from { transform: translateX(-6%); }
+  to { transform: translateX(6%); }
 }
+
+/* ---------- candles ---------- */
 
 .candle {
   position: absolute;
-  width: calc(var(--s) * clamp(13px, 3.3vmin, 26px));
-  opacity: var(--o);
-  animation: candle-float var(--float) ease-in-out var(--delay) infinite alternate;
+  left: var(--x);
+  top: var(--y);
+  width: 16px;
+  height: 96px;
+  opacity: var(--o, 1);
+  scale: calc(var(--s, 1) * var(--candle-size, 1));
+  animation: bob var(--bob, 8s) ease-in-out var(--delay, 0s) infinite alternate;
 }
 
-.candle svg {
-  position: relative;
-  display: block;
-  width: 100%;
-  overflow: visible;
+@keyframes bob {
+  from { translate: 0 0; rotate: -1deg; }
+  to { translate: 0 -14px; rotate: 1deg; }
 }
 
-@keyframes candle-float {
-  from { transform: translateY(calc(var(--s) * -7px)) rotate(-1.5deg); }
-  to { transform: translateY(calc(var(--s) * 9px)) rotate(1.5deg); }
+.candle-wax {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 16px;
+  height: 68px;
+  border-radius: 3px 3px 2px 2px / 2px 2px 2px 2px;
+  background:
+    linear-gradient(180deg, rgb(255 196 120 / 0.55) 0%, transparent 28%),
+    linear-gradient(90deg, #a8936c 0%, #e9dcbc 30%, #fff8e6 50%, #e2d3b0 72%, #8f7a55 100%);
+}
+
+/* melted, lit top of the wax */
+.candle-wax::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 0;
+  right: 0;
+  height: 5px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 40%, #fff3d1 0%, #f1dfb5 60%, #c9b38a 100%);
+}
+
+/* one wax drip */
+.candle-wax::after {
+  content: '';
+  position: absolute;
+  top: 1px;
+  left: 2px;
+  width: 4px;
+  height: 18px;
+  border-radius: 0 0 3px 3px;
+  background: linear-gradient(90deg, #ede0c2, #fff8e6);
+}
+
+.candle-wick {
+  position: absolute;
+  left: 7px;
+  bottom: 67px;
+  width: 2px;
+  height: 7px;
+  border-radius: 1px;
+  background: #2a1a10;
+}
+
+.candle-flame {
+  position: absolute;
+  left: 50%;
+  bottom: 71px;
+  width: 10px;
+  height: 22px;
+  margin-left: -5px;
+  border-radius: 50% 50% 50% 50% / 65% 65% 35% 35%;
+  background: radial-gradient(ellipse 60% 70% at 50% 75%, #fff 0%, #fff4c9 22%, #ffd36b 48%, #ff9a3c 74%, rgb(255 120 40 / 0) 100%);
+  box-shadow: 0 0 10px 2px rgb(255 170 80 / 0.55);
+  transform-origin: 50% 90%;
+  animation: flicker var(--flick, 1.6s) linear var(--delay, 0s) infinite;
+}
+
+/* uneven steps make the flame feel alive rather than mechanical */
+@keyframes flicker {
+  0% { transform: scale(1, 1) skewX(0deg); opacity: 0.95; }
+  9% { transform: scale(0.94, 1.07) skewX(2deg); opacity: 1; }
+  23% { transform: scale(1.03, 0.93) skewX(-1.5deg); opacity: 0.87; }
+  31% { transform: scale(0.97, 1.04) skewX(1deg); opacity: 0.97; }
+  48% { transform: scale(1.02, 0.97) skewX(-2.5deg); opacity: 0.9; }
+  61% { transform: scale(0.95, 1.09) skewX(1.5deg); opacity: 1; }
+  77% { transform: scale(1.04, 0.95) skewX(-0.5deg); opacity: 0.85; }
+  88% { transform: scale(0.98, 1.02) skewX(1deg); opacity: 0.96; }
+  100% { transform: scale(1, 1) skewX(0deg); opacity: 0.95; }
 }
 
 .candle-halo {
   position: absolute;
   left: 50%;
-  top: 9%;
-  width: 480%;
-  aspect-ratio: 1;
+  bottom: 12px;
+  width: 140px;
+  height: 140px;
+  margin-left: -70px;
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgb(255 210 120 / 0.55), rgb(255 180 80 / 0.16) 50%, transparent);
-  transform: translate(-50%, -50%);
-  animation: halo-pulse 3.6s ease-in-out var(--delay) infinite;
+  background: radial-gradient(circle, rgb(255 196 120 / 0.32) 0%, rgb(255 150 60 / 0.12) 32%, rgb(255 150 60 / 0) 68%);
+  animation: halo calc(var(--flick, 1.6s) * 1.7) ease-in-out var(--delay, 0s) infinite alternate;
 }
 
-@keyframes halo-pulse {
-  0%, 100% { opacity: 0.75; }
-  40% { opacity: 1; }
-  70% { opacity: 0.85; }
+@keyframes halo {
+  0% { opacity: 0.7; }
+  40% { opacity: 0.95; }
+  65% { opacity: 0.75; }
+  100% { opacity: 1; }
 }
 
-.candle-flame {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation: flame-flicker 3.2s ease-in-out var(--delay) infinite;
+/* ---------- embers, vignette ---------- */
+
+.scene-embers {
+  width: 100%;
+  height: 100%;
 }
 
-@keyframes flame-flicker {
-  0%, 100% { transform: scale(1, 1); }
-  20% { transform: scale(0.94, 1.06) skewX(2deg); }
-  45% { transform: scale(1.04, 0.95); }
-  65% { transform: scale(0.97, 1.04) skewX(-2deg); }
-  85% { transform: scale(1.02, 0.98); }
+.scene-vignette {
+  background:
+    radial-gradient(ellipse 85% 75% at 50% 45%, transparent 55%, rgb(0 0 0 / 0.7) 100%),
+    linear-gradient(to bottom, transparent 70%, rgb(5 3 8 / 0.55) 100%);
 }
+
+/* ---------- pumpkin lanterns (autumn) ---------- */
 
 .pumpkin {
   position: absolute;
@@ -154,23 +240,39 @@
   position: relative;
   display: block;
   width: 100%;
+  overflow: visible;
+  /* sit back into the night instead of popping out of it */
+  filter: saturate(0.8) brightness(0.82);
 }
 
 .pumpkin-glow {
   position: absolute;
-  inset: -45% -35%;
+  inset: -55% -45% -20%;
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgb(255 170 70 / 0.38), transparent);
-  animation: halo-pulse 3.4s ease-in-out infinite;
+  background: radial-gradient(closest-side, rgb(255 160 70 / 0.26), rgb(255 140 50 / 0.08) 50%, transparent);
+  animation: halo 2.7s ease-in-out infinite alternate;
 }
 
 .pumpkin-face {
-  fill: #ffd56e;
-  animation: face-flicker 3.4s ease-in-out infinite;
+  animation: flicker-soft 2.3s linear infinite;
 }
 
-@keyframes face-flicker {
-  0%, 100% { opacity: 1; }
-  35% { opacity: 0.82; }
-  60% { opacity: 0.95; }
+@keyframes flicker-soft {
+  0%, 100% { opacity: 0.95; }
+  18% { opacity: 1; }
+  37% { opacity: 0.82; }
+  52% { opacity: 0.97; }
+  71% { opacity: 0.86; }
+}
+
+/* ---------- phones ---------- */
+
+@media (max-width: 600px), (max-height: 520px) {
+  .candle {
+    --candle-size: 0.7;
+  }
+
+  .candle-wide {
+    display: none;
+  }
 }

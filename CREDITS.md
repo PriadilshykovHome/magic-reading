@@ -5,4 +5,4 @@ Only free licences are allowed (CC0 preferred). Nothing from the Harry Potter bo
 
 | Asset | Source | Author | Licence |
 | --- | --- | --- | --- |
-| _none yet_ | | | |
+| Cormorant Garamond, Cormorant SC (fonts) | [Google Fonts](https://fonts.google.com/specimen/Cormorant) via Fontsource | Christian Thalmann | SIL Open Font License 1.1 |

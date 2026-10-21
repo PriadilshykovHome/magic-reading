@@ -1,14 +1,26 @@
+@import './fonts.css';
+
 :root {
-  --night: #0d1030;
-  --night-2: #1b1846;
-  --violet: #3b2577;
-  --gold: #f4c86a;
-  --teal: #4fd1c5;
-  --parchment: #fbf3dc;
-  --ink: #2b2118;
+  /* night */
+  --night: #0e0b14;
+  --stone: #1a1424;
+  --dusk: #2a2038;
+  /* light */
+  --gold: #c9a24a;
+  --gold-light: #f0d68a;
+  --gold-deep: #7c5a1e;
+  --ember: #ff9c48;
+  --teal: #7cc4bd;
+  /* reading */
+  --parchment: #ebddbf;
+  --parchment-light: #f6ecd4;
+  --ink: #2b1d10;
+
   --tap-min: 64px;
   --tap-gap: 16px;
   --font-reading: ui-rounded, 'SF Pro Rounded', 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-display-sc: 'Cormorant SC', 'Cormorant Garamond', Georgia, serif;
 
   color-scheme: dark;
   font-family: var(--font-reading);
@@ -72,12 +84,21 @@ svg {
   overflow: hidden;
 }
 
+/* Reading surface: warm parchment, dark ink, gently aged edges. */
 .parchment {
-  padding: clamp(16px, 4vmin, 40px);
-  border-radius: 24px;
-  background: var(--parchment);
+  position: relative;
+  padding: clamp(20px, 4.5vmin, 44px);
+  border-radius: 6px;
   color: var(--ink);
-  box-shadow: 0 0 0 4px rgb(244 200 106 / 0.6), 0 12px 40px rgb(0 0 0 / 0.45);
+  background:
+    radial-gradient(ellipse at 15% 20%, rgb(255 250 235 / 0.6), transparent 45%),
+    radial-gradient(ellipse at 85% 85%, rgb(176 130 70 / 0.22), transparent 50%),
+    radial-gradient(circle at 75% 15%, rgb(176 130 70 / 0.1), transparent 22%),
+    var(--parchment-light);
+  box-shadow:
+    inset 0 0 45px rgb(120 80 30 / 0.32),
+    inset 0 0 6px rgb(120 80 30 / 0.3),
+    0 18px 40px rgb(0 0 0 / 0.55);
 }
 
 .icon-button {
@@ -87,31 +108,37 @@ svg {
   width: var(--tap-min);
   height: var(--tap-min);
   border-radius: 50%;
-  background: rgb(251 243 220 / 0.12);
-  border: 3px solid var(--gold);
-  color: var(--gold);
+  background: rgb(26 20 36 / 0.75);
+  border: 1.5px solid rgb(201 162 74 / 0.6);
+  color: var(--gold-light);
   cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
 }
 
 .icon-button svg {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
+}
+
+.icon-button:active {
+  border-color: var(--gold-light);
+  background: rgb(42 32 56 / 0.9);
 }
 
 .icon-button:focus-visible {
-  outline: 4px solid var(--gold);
+  outline: 2px solid var(--gold-light);
   outline-offset: 4px;
 }
 
-/* Arriving through the magic door: the warm flash fades away. */
+/* Arriving through the magic door: the warm light fades away. */
 .screen-arrive::after {
   content: '';
   position: absolute;
   inset: 0;
   z-index: 10;
   pointer-events: none;
-  background: radial-gradient(closest-side, #fff8e4, rgb(255 226 160 / 0.85) 60%, rgb(255 214 140 / 0.7));
-  animation: arrive-fade 700ms ease-out forwards;
+  background: radial-gradient(circle at 50% 45%, #fff6dc, rgb(255 222 160 / 0.9) 45%, rgb(240 200 130 / 0.75));
+  animation: arrive-fade 900ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
 }
 
 @keyframes arrive-fade {

@@ -42,17 +42,18 @@ The setting is an original magic school with a cozy wizard feel. It must not use
 
 ### Art direction
 
-The look is cozy and sophisticated: a quiet, glowing night where magic moves slowly, and big motion is saved for his successes.
+The look is cozy and sophisticated: a quiet, candlelit night where magic moves slowly, and big motion is saved for his successes.
 
-- **Palette.** Deep night blue fading to velvet violet, warm candle gold, parchment cream for reading, and a cool teal for magic effects. In autumn, pumpkin amber joins. Reading content always sits on a light parchment card with dark text, because contrast matters more than atmosphere when he is reading.
-- **Ambient magic.** Floating candles drift at different depths (smaller, dimmer and slower when farther away), and their flames flicker inside a soft halo. Stars twinkle out of sync, a shooting star crosses the sky now and then, golden dust rises near light, and a thin mist drifts along the ground.
-- **Seasons.** Friendly carved pumpkin lanterns and the odd falling leaf from September to November, snow in winter, blossoms and pysanky in spring, fireflies on summer evenings.
+- **Palette.** Near-black aubergine night (#0E0B14) lifting to dusky plum near the top of the sky, antique gold (#C9A24A, highlights #F0D68A), warm candle and ember orange, and parchment cream for reading. No saturated blues, violets or oranges. Reading content always sits on a light parchment card with dark text, because contrast matters more than atmosphere when he is reading.
+- **Ambient magic.** Floating wax candles drift at different depths (smaller, dimmer and slower when farther away), and their flames flicker in uneven steps inside a soft halo. Stars twinkle out of sync and fade out toward the ground, a shooting star crosses the sky now and then, warm embers drift slowly upward, two layers of mist drift along the ground, and a vignette darkens the edges.
+- **Seasons.** Friendly carved pumpkin lanterns and the odd falling leaf from September to November, snow in winter, blossoms and pysanky in spring, fireflies on summer evenings. Seasonal pieces are shaded and toned down to sit in the night, not pop out of it.
 - **Restraint rules.**
-  - At most three kinds of ambient effect on screen at once.
-  - Ambient loops are slow (3 seconds or more per cycle) and small, with soft easing.
-  - Nothing ambient moves near the reading card. During tasks only two or three candles stay, at the screen edges.
+  - Ambient layers are quiet: low contrast, slow drift, small movements.
+  - One focal element per screen gets the only gentle pulse: the door on the start screen, the reading card in tasks.
+  - Candles stay at the sides. They never cross titles, the door or the reading card at any test viewport.
+  - Nothing ambient moves near the reading card. During tasks the embers thin out and the candles dim.
   - Fast, big motion is reserved for feedback and celebrations, so it keeps its meaning.
-- **Craft.** Three parallax depth layers, light made with soft radial glows rather than hard shadows, one consistent gold line weight, and rounded shapes. A storybook display font for titles only (free licence, full Cyrillic, nothing resembling the films' lettering).
+- **Craft.** Depth from scale, opacity and speed; shading with soft gradients and radial glows rather than flat fills; antique gold with light-to-dark gradients. Titles use Cormorant Garamond and Cormorant SC (free licence, full Cyrillic, self-hosted). Reading text always uses the rounded sans.
 - **No borrowed imagery.** Floating candles and pumpkins are classic fairy-tale and autumn motifs. Use them in our own style, with no house banners, crests or scenes copied from the films.
 
 **Mascot behaviour.** Соня blinks, tilts her head and ruffles her feathers when idle. She hops when he answers correctly, gives an encouraging shrug when he's wrong, and does a loop-the-loop at the celebration. The owl is purple, never white, to stay clear of the books.
@@ -259,7 +260,7 @@ The app is a static single-page site built with Vite, React and TypeScript, host
 | Build | Vite + TypeScript | Fast dev server, static output for GitHub Pages |
 | UI | React | Component per screen and per task type |
 | UI animation | Motion (`motion/react`) | Spring physics, layout and exit animations |
-| Particles | tsParticles (confetti and fireworks presets) on one canvas | Sparkles, fireworks, confetti without heavy DOM |
+| Particles | tsParticles (confetti and fireworks presets) on one canvas; ambient embers use a tiny custom canvas loop | Sparkles, fireworks, confetti without heavy DOM; embers stay light enough for the 3-second first load |
 | Audio | Howler.js | Sound sprites, separate channels, unlocks audio on iOS |
 | State | Zustand | Small stores for game, progress and settings |
 | Routing | React Router with hash URLs | GitHub Pages has no fallback for deep links |

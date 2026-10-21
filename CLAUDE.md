@@ -115,15 +115,22 @@ interface TaskType<Config> {
 
 ## Art direction (see "Art direction" in docs/PLAN.md)
 
-Cozy and sophisticated, never busy. Night blue → velvet violet, candle gold, parchment, teal
-for magic; pumpkin amber in autumn. Ambient magic: floating candles at three depths, out-of-sync
-stars, rising gold dust, ground mist, seasonal extras (pumpkins Sep–Nov, snow Dec–Feb).
+Cozy and sophisticated, never busy: a candlelit night. Use the tokens in `src/styles/global.css`
+(`--night` #0e0b14, `--stone`, `--dusk`, antique `--gold` #c9a24a / `--gold-light`, `--parchment`,
+`--ink`); don't introduce saturated blues, violets or oranges. The shared backdrop is
+`src/fx/ambient/Scene.tsx` (sky, stars, moon, floating candles, mist, embers, vignette).
 
-- At most three kinds of ambient effect on screen at once; ambient loops ≥ 3 s, small, eased.
-- Nothing ambient moves near the reading card; during tasks keep 2–3 candles at the edges.
+- Ambient layers are quiet: low contrast, slow drift, small amplitude; farther = smaller,
+  dimmer, slower. Flames may flicker faster, but in uneven steps and only slightly.
+- One focal element per screen gets the only gentle pulse (the door now; the card in tasks).
+- Candles stay at the sides, never over titles, the door or the reading card; check every
+  test viewport, both orientations.
+- Nothing ambient moves near the reading card; during tasks embers thin out and candles dim.
 - Big, fast motion is only for feedback and celebrations.
-- Light is soft radial glow, not hard shadows; one gold line weight; rounded shapes.
-- Ambient animation pauses when the tab is hidden and becomes static under reduced motion.
+- Shading with soft gradients and radial glows, not flat fills or hard shadows.
+- Titles: Cormorant Garamond / Cormorant SC (self-hosted in `src/assets/fonts`). Reading text:
+  the rounded sans (`--font-reading`), never the serif.
+- Ambient animation pauses when the tab is hidden and is off/static under reduced motion.
 
 ## Commands
 
