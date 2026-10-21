@@ -1,4 +1,4 @@
-import { expect, type Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
 
 /** Minimum reading text sizes from the plan (px). */
 const TEXT_MIN = { 'read-syllable': 64, 'read-word': 48, 'read-sentence': 32, 'bubble-inner': 64 } as const;
@@ -7,9 +7,9 @@ const TEXT_MIN = { 'read-syllable': 64, 'read-word': 48, 'read-sentence': 32, 'b
  * The layout rules, checked in the page: no scrolling, nothing cut off, every tap target at
  * least 64×64 with 16 px between neighbours, reading text never below its minimum.
  */
-export async function expectGoodLayout(page: Page, label: string) {
+export async function layoutProblems(page: Page): Promise<string[]> {
   await page.evaluate(() => document.fonts.ready);
-  const problems = await page.evaluate((textMin) => {
+  return page.evaluate((textMin) => {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     const out: string[] = [];
@@ -65,7 +65,6 @@ export async function expectGoodLayout(page: Page, label: string) {
     }
     return out;
   }, TEXT_MIN);
-  expect(problems, label).toEqual([]);
 }
 
 /** Every level open, so any screen can be visited directly. */

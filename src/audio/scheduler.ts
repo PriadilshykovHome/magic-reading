@@ -44,7 +44,7 @@ export class VoiceScheduler {
       this.dropWaiting();
       if (policy === 'interrupt' || !busy) {
         this.cutActive();
-        return this.start(request);
+        return this.start(request, busy); // an interruption is still the same stretch of talk
       }
       this.active!.winding = true;
       this.waiting = request;
@@ -68,8 +68,7 @@ export class VoiceScheduler {
     return () => this.listeners.delete(listener);
   }
 
-  private start(request: Request) {
-    const wasSpeaking = this.active !== null;
+  private start(request: Request, wasSpeaking = this.active !== null) {
     this.active = request;
     if (!wasSpeaking) this.emit(true);
     void this.run(request);

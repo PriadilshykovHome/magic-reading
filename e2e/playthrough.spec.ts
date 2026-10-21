@@ -1,7 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
 
-// The plan: every level played start to finish on iPhone-, iPad- (landscape) and laptop-sized viewports.
-const PLAYTHROUGH_PROJECTS = ['phone-390x844', 'tablet-landscape-1024x768', 'laptop-1366x768'];
 const LEVELS = ['tower-of-syllables/01', 'tower-of-syllables/02', 'tower-of-syllables/03'];
 const KEY = 'magic-reading:progress:guest';
 
@@ -31,8 +29,7 @@ async function playLevel(page: Page, levelId: string) {
   await expect(page).toHaveURL(/#\/map$/);
 }
 
-test('all three levels can be played start to finish, and progress survives a reload', async ({ page }, info) => {
-  test.skip(!PLAYTHROUGH_PROJECTS.includes(info.project.name), 'played on phone, iPad landscape and laptop only');
+test('all three levels can be played start to finish, and progress survives a reload', async ({ page }) => {
   test.setTimeout(300_000);
 
   await page.goto('#/');

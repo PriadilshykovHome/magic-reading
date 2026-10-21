@@ -186,7 +186,7 @@ npm run build             # typecheck + production build to dist/
 npm run lint              # ESLint
 npm run typecheck         # tsc --noEmit
 npm test                  # Vitest (engine, content, rules)
-npm run e2e               # Playwright: layout rules at all 8 test viewports + full play-throughs
+npm run e2e               # Playwright: layout rules at 4 viewports + one full play-through (6 tests)
 npm run check-prod-build  # dist/ must not contain data-correct, /dev routes or __audio
 npm run audio:generate    # regenerate effects sprite + music (WAV) from scripts/make-audio.ts
 npm run validate-content  # content checks; -- --strict (assets are errors), --verbose, --root <dir>
@@ -194,9 +194,12 @@ npm run validate-content  # content checks; -- --strict (assets are errors), --v
 
 ## Testing conventions
 
-- `e2e/checks.ts` (`expectGoodLayout`) enforces the layout rules on every screen: no page
-  scroll, nothing cut off, tap targets ≥ 64×64 with ≥ 16 px gaps, reading text minimums.
-  Add any new screen or task type to `e2e/layout.spec.ts`.
+- Keep the suite small: one test per rule that matters. Unit tests (Vitest, ~30) cover the
+  engine, content validator and audio scheduler; e2e (Playwright, 6) covers layout, one full
+  play-through and the celebration. Add a test only for a new rule, not for every case.
+- `e2e/checks.ts` (`layoutProblems`) enforces the layout rules: no page scroll, nothing cut off,
+  tap targets ≥ 64×64 with ≥ 16 px gaps, reading text minimums. It runs at the extremes
+  (360×640, 844×390, 768×1024, 1024×768). Add any new screen or task type to `e2e/layout.spec.ts`.
 - Test builds (`TEST_BUILD` in `src/testMode.ts`: dev server or `VITE_MARK_CORRECT=true`) mark
   correct answers with `data-correct` and add `#/dev/task/<world>/<num>/<type>?seed=N[&boss=1]`
   and `#/dev/celebration`. `VITE_E2E=true` silences speech and sound. Production strips all of it.
