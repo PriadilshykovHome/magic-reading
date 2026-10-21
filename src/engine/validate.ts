@@ -172,6 +172,8 @@ function checkWorld(content: Content, world: World, file: string, error: Report)
   }
 }
 
+const DEMO_KIND: Record<Level['intro']['demo']['type'], ItemKind> = { syllableMerge: 'syllable', wordMerge: 'word', readAlong: 'sentence' };
+
 function checkLevel(content: Content, level: Level, file: string, registry: TaskRegistry, error: Report) {
   const { config } = content;
   const order = content.levelOrder;
@@ -188,7 +190,7 @@ function checkLevel(content: Content, level: Level, file: string, registry: Task
   for (const id of level.reviewFrom) {
     if (!(order.indexOf(id) >= 0 && order.indexOf(id) < at)) error(file, `reviewFrom: ${id} must be an earlier level`);
   }
-  const demoKind: ItemKind = level.intro.demo.type === 'syllableMerge' ? 'syllable' : 'sentence';
+  const demoKind = DEMO_KIND[level.intro.demo.type];
   for (const id of level.intro.demo.items) if (!itemOfKind(content, id, demoKind)) error(file, `intro.demo: unknown ${demoKind} ${id}`);
   if (!content.voice.has(level.intro.voice)) error(file, `intro.voice: no voice line ${level.intro.voice}`);
   if (!content.cards.has(level.reward.card)) error(file, `reward.card: unknown card ${level.reward.card}`);
@@ -236,8 +238,12 @@ function checkLevel(content: Content, level: Level, file: string, registry: Task
     if (parsed.success) {
       if (inner.reading) readsAlone = true;
       const eligible = inner.eligible(ctx, parsed.data);
-      if (level.boss.item && !eligible.includes(level.boss.item)) error(file, `boss.item: ${level.boss.item} can't be used by ${inner.id} here`);
-      if (eligible.length === 0) error(file, `boss: ${inner.id} has nothing to ask about`);
+      if (level.boss.item) {
+        // A fixed door item may stay out of the pool (a surprise kept for the door), but must build.
+        if (!hasItem(content, level.boss.item)) error(file, `boss.item: unknown item ${level.boss.item}`);
+        else dryBuildOne(ctx, inner, parsed.data, level.boss.item, 'boss', file, error);
+      } else if (eligible.length === 0) error(file, `boss: ${inner.id} has nothing to ask about`);
+      if (level.boss.openedLine && !content.voice.has(level.boss.openedLine)) error(file, `boss.openedLine: no voice line ${level.boss.openedLine}`);
     }
   }
   if (tasksValid && !readsAlone) error(file, 'every level needs a reading task he can solve alone (reading vs listening rule)');
@@ -263,6 +269,23 @@ function dryBuild(
       if (e instanceof ShortageError) error(file, `${where}: ${e.message}`);
       else throw e;
     }
+  }
+}
+
+function dryBuildOne(
+  ctx: ReturnType<typeof createBuildContext>,
+  logic: TaskRegistry[string],
+  config: unknown,
+  target: string,
+  where: string,
+  file: string,
+  error: Report,
+) {
+  try {
+    logic.build(ctx, config, target);
+  } catch (e) {
+    if (e instanceof ShortageError) error(file, `${where}: ${e.message}`);
+    else throw e;
   }
 }
 

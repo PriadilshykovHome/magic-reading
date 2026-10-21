@@ -153,6 +153,10 @@ v1 uses only 5 consonants (М, Л, Н, Т, С) and 5 vowels (А, О, У, И, І)
 | 2 · Перші слова | Н, Т, С with the same vowels | НА…НІ, ТА…ТІ, СА…СІ; words МАМА, ТАТО, ЛИСА, МИЛО, НОТИ, САНИ, ЛАМА, ОСА, plus closed words ЛІС, НІС | Intro merge (НА, ТА, СА); readPickPicture ×3, buildWord ×3, hearPick ×1, readAloud ×1; Magic Door: buildWord |
 | 3 · Перші речення | Short sentences from known words | Тато тут. Мама там. Лама тут. Оса там. Лиса у лісі. Оса на носі. Мама і тато. У мами мило. У мами ноти. У тата ноти. | Intro: Соня reads a sentence while each word lights up; sentencePicture ×3, readPickPicture ×2 (review), buildWord ×1, readAloud ×2; Magic Door: sentencePicture |
 
+**Added after the first playtest (same 10 letters).** Level 4 · Довші слова (ЛИ-МОН, ТО-МАТ, СА-ЛАТ, МАС-ЛО, НА-МИС-ТО, МІСТ), Level 5 · Нові речення («Оса на лимоні.», «Лама на мосту.», «У мами намисто.» …), Level 6 · Велике повторення (mixed review). New intro demo `wordMerge`: syllables slide together into the word.
+
+**World 2 · Вежа Слів (new letters К Р, В Д, П Ш).** Five levels: К і Р (РУ-КА, КО-РО-НА, КО-МАР, КІТ…), В і Д (ВО-ДА, ДИ-ВАН, ДРА-КОН, ВИД-РА…), П і Ш (МИШ-КА, ПОШ-ТА, ШО-КО-ЛАД, КА-ПУС-ТА…), sentences («Кіт на дивані.», «У мишки шоколад.» …), and «Чарівне ім’я»: its Magic Door is his own name, МИШКО (with МИШКА as the look-alike), kept out of the level's pool so it stays a surprise, and Соня says "Це твоє ім’я, Мишку! Ти сам його прочитав!". Closed and cluster syllables (МИШ, ДРА, КОН) are hand-split for reading; please check them as a native speaker. The map shows one tower at a time, with arrows to switch.
+
 **Only v1 letters.** Every word in v1 uses only М, Л, Н, Т, С and А, О, У, И, І. The earlier "Ось лиса" and "Ось сани" were replaced because "Ось" needs Ь. Each `world.json` lists its `allowedLetters`, and the content validator rejects any word that uses other letters.
 
 **Closed words.** ЛІС and НІС are single closed syllables, so they appear only in `readPickPicture` and `hearPick`, never in `buildWord`.

@@ -1,8 +1,16 @@
 {
   "id": "tower-of-syllables",
+  "order": 1,
   "title": "Вежа Складів",
   "allowedLetters": "МЛНТСАОУИІ",
-  "levels": ["levels/01-syllables.json", "levels/02-words.json", "levels/03-sentences.json"],
+  "levels": [
+    "levels/01-syllables.json",
+    "levels/02-words.json",
+    "levels/03-sentences.json",
+    "levels/04-longer-words.json",
+    "levels/05-new-sentences.json",
+    "levels/06-review.json"
+  ],
   "map": {
     "art": "img/maps/tower-of-syllables.webp",
     "music": "music/tower-of-syllables.mp3"

@@ -38,7 +38,8 @@ export function indexContent(bundle: ContentBundle): Content {
   const levels = new Map<string, Level>();
   const worldOfLevel = new Map<string, World>();
   const levelOrder: string[] = [];
-  for (const { world, levels: worldLevels } of bundle.worlds) {
+  const worlds = [...bundle.worlds].sort((a, b) => a.world.order - b.world.order);
+  for (const { world, levels: worldLevels } of worlds) {
     for (const level of worldLevels) {
       levels.set(level.id, level);
       worldOfLevel.set(level.id, world);
@@ -53,7 +54,7 @@ export function indexContent(bundle: ContentBundle): Content {
     sentences: new Map(bundle.lexicon.sentences.map((s) => [s.id, s])),
     cards: new Map(bundle.cards.map((c) => [c.id, c])),
     voice: flattenVoice(bundle.voice),
-    worlds: bundle.worlds,
+    worlds,
     levels,
     levelOrder,
     worldOfLevel,

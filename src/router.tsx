@@ -11,6 +11,7 @@ import { TEST_BUILD } from './testMode';
 export const router = createHashRouter([
   { path: '/', element: <DoorScreen /> },
   { path: '/map', element: <MapScreen /> },
+  { path: '/map/:world', element: <MapScreen /> },
   { path: '/level/:world/:num', element: <LevelIntroScreen /> },
   { path: '/level/:world/:num/play', element: <TaskRunnerScreen /> },
   { path: '/level/:world/:num/done', element: <CelebrationScreen /> },

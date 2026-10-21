@@ -306,8 +306,8 @@
 .build-slot {
   display: grid;
   place-items: center;
-  width: clamp(104px, 24vmin, 170px);
-  height: clamp(84px, 18vmin, 130px);
+  min-width: var(--tile-w);
+  height: var(--tile-h);
   border: 2px dashed rgb(240 214 138 / 0.55);
   border-radius: 16px;
   background: rgb(26 20 36 / 0.45);
@@ -322,10 +322,17 @@
   box-shadow: 0 0 30px rgb(240 214 138 / 0.5);
 }
 
+/* Tiles size to their syllable (ЛАД is wider than МА), never below the minimums. */
+.build-work {
+  --tile-w: clamp(96px, 22vmin, 160px);
+  --tile-h: clamp(76px, 16vmin, 120px);
+}
+
 .tile,
 .tile-gap {
-  width: clamp(104px, 24vmin, 170px);
-  height: clamp(84px, 18vmin, 130px);
+  min-width: var(--tile-w);
+  height: var(--tile-h);
+  padding: 0 14px;
 }
 
 .build-slot .tile {
@@ -338,7 +345,21 @@
 }
 
 .tile .read-word {
-  font-size: clamp(48px, 10vmin, 80px);
+  font-size: clamp(48px, 9vmin, 72px);
+  white-space: nowrap;
+}
+
+/* Phones in landscape: everything a notch smaller so 3-syllable words fit the short screen. */
+@media (orientation: landscape) and (max-height: 520px) {
+  .build-work {
+    --tile-w: 80px;
+    --tile-h: 64px;
+    gap: 16px;
+  }
+
+  .build-picture {
+    min-height: 120px;
+  }
 }
 
 .tile.is-shaking {

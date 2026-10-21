@@ -1,0 +1,17 @@
+{
+  "id": "tower-of-words",
+  "order": 2,
+  "title": "Вежа Слів",
+  "allowedLetters": "МЛНТСАОУИІКРВДПШ",
+  "levels": [
+    "levels/01-k-r.json",
+    "levels/02-v-d.json",
+    "levels/03-p-sh.json",
+    "levels/04-sentences.json",
+    "levels/05-name.json"
+  ],
+  "map": {
+    "art": "img/maps/tower-of-words.webp",
+    "music": "music/tower-of-words.mp3"
+  }
+}

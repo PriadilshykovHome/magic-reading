@@ -33,10 +33,45 @@
   }
 }
 
+/* ---------- tower bar ---------- */
+
+.map-bar {
+  position: absolute;
+  top: calc(16px + env(safe-area-inset-top));
+  left: calc(16px + env(safe-area-inset-left));
+  right: calc(16px + env(safe-area-inset-right));
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.map-bar-gap {
+  width: var(--tap-min);
+}
+
+.map-next svg {
+  transform: scaleX(-1);
+}
+
+.map-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(22px, 5vmin, 40px);
+  text-align: center;
+  background: linear-gradient(180deg, #fff3cc, var(--gold-light) 45%, var(--gold));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 10px rgb(240 214 138 / 0.3));
+}
+
 /* ---------- level doors ---------- */
 
 .map-node {
-  --w: clamp(92px, 19vmin, 136px);
+  --w: clamp(64px, 15vmin, 116px);
   position: absolute;
   left: var(--px);
   top: var(--py);
@@ -53,6 +88,7 @@
 
 @media (orientation: landscape) {
   .map-node {
+    --w: clamp(64px, 13vmin, 104px); /* six doors side by side keep their 16 px gaps */
     left: var(--lx);
     top: var(--ly);
   }
@@ -156,11 +192,4 @@
   30% { transform: scale(1.15, 0.85); }
   60% { transform: translateY(-22%) scale(0.95, 1.08); }
   100% { transform: none; }
-}
-
-.map-fullscreen {
-  position: absolute;
-  top: calc(16px + env(safe-area-inset-top));
-  right: calc(16px + env(safe-area-inset-right));
-  z-index: 1;
 }

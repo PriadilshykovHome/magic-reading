@@ -1,0 +1,122 @@
+{
+  "id": "tower-of-syllables/06",
+  "title": "Велике повторення",
+  "unlockAfter": "tower-of-syllables/05",
+  "intro": {
+    "voice": "levelIntro.l06",
+    "demo": {
+      "type": "readAlong",
+      "items": [
+        "s-tomat-u-salati"
+      ]
+    }
+  },
+  "pool": {
+    "syllables": [
+      "syl-ma",
+      "syl-mo",
+      "syl-mu",
+      "syl-my",
+      "syl-mi",
+      "syl-la",
+      "syl-lo",
+      "syl-lu",
+      "syl-ly",
+      "syl-li",
+      "syl-na",
+      "syl-no",
+      "syl-nu",
+      "syl-ny",
+      "syl-ni",
+      "syl-ta",
+      "syl-to",
+      "syl-tu",
+      "syl-ty",
+      "syl-ti",
+      "syl-sa",
+      "syl-so",
+      "syl-su",
+      "syl-sy",
+      "syl-si"
+    ],
+    "words": [
+      "w-mama",
+      "w-tato",
+      "w-lysa",
+      "w-mylo",
+      "w-noty",
+      "w-sany",
+      "w-lama",
+      "w-osa",
+      "w-lis",
+      "w-nis",
+      "w-lymon",
+      "w-tomat",
+      "w-salat",
+      "w-maslo",
+      "w-namysto",
+      "w-mist"
+    ],
+    "sentences": [
+      "s-tato-tut",
+      "s-mama-tam",
+      "s-lama-tut",
+      "s-osa-tam",
+      "s-lysa-u-lisi",
+      "s-osa-na-nosi",
+      "s-mama-i-tato",
+      "s-u-mamy-mylo",
+      "s-u-mamy-noty",
+      "s-u-tata-noty",
+      "s-osa-na-lymoni",
+      "s-osa-na-tomati",
+      "s-u-tata-lymon",
+      "s-u-mamy-salat",
+      "s-u-mamy-namysto",
+      "s-lama-na-mostu",
+      "s-lysa-na-mostu",
+      "s-tomat-u-salati"
+    ]
+  },
+  "reviewFrom": [],
+  "tasks": [
+    {
+      "type": "hearPick",
+      "count": 2,
+      "itemKind": "syllable",
+      "choices": 3
+    },
+    {
+      "type": "bubblePop",
+      "count": 1
+    },
+    {
+      "type": "readPickPicture",
+      "count": 2,
+      "choices": 3
+    },
+    {
+      "type": "buildWord",
+      "count": 1,
+      "extraTiles": 1
+    },
+    {
+      "type": "sentencePicture",
+      "count": 2,
+      "choices": 3
+    },
+    {
+      "type": "readAloud",
+      "count": 1,
+      "itemKind": "word"
+    }
+  ],
+  "boss": {
+    "type": "magicDoor",
+    "inner": "readPickPicture",
+    "pick": "weakest"
+  },
+  "reward": {
+    "card": "card-frog"
+  }
+}

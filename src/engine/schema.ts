@@ -127,7 +127,8 @@ export const LevelSchema = z.strictObject({
   intro: z.strictObject({
     voice: z.string().min(1),
     demo: z.strictObject({
-      type: z.enum(['syllableMerge', 'readAlong']),
+      /** syllableMerge: letters fuse into syllables; wordMerge: syllables into a word; readAlong: a sentence word by word */
+      type: z.enum(['syllableMerge', 'wordMerge', 'readAlong']),
       items: z.array(z.string().min(1)).min(1),
     }),
   }),
@@ -143,12 +144,16 @@ export const LevelSchema = z.strictObject({
     inner: z.string().min(1),
     pick: z.enum(['weakest', 'newest']).default('weakest'),
     item: z.string().optional(),
+    /** Соня's line when this door opens (default: magicDoor.opened). */
+    openedLine: z.string().optional(),
   }),
   reward: z.strictObject({ card: CardId }),
 });
 
 export const WorldSchema = z.strictObject({
   id: z.string().regex(/^[a-z0-9-]+$/),
+  /** Towers are played in this order (1, 2, …). */
+  order: z.number().int().min(1),
   title: Text,
   allowedLetters: Text,
   levels: z.array(z.string().regex(/^levels\/[a-z0-9-]+\.json$/)).min(1),

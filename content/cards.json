@@ -1,9 +1,95 @@
 {
   "cards": [
-    { "id": "card-hedgehog", "name": "Їжачок Колючка", "emoji": "🦔", "art": "img/cards/hedgehog.webp", "sound": "sfx/cards/hedgehog.mp3" },
-    { "id": "card-squirrel", "name": "Білочка Руденька", "emoji": "🐿️", "art": "img/cards/squirrel.webp", "sound": "sfx/cards/squirrel.mp3" },
-    { "id": "card-bunny", "name": "Зайчик Стрибунець", "emoji": "🐰", "art": "img/cards/bunny.webp", "sound": "sfx/cards/bunny.mp3" },
-    { "id": "card-week", "name": "Тиждень чарів", "emoji": "🌟", "art": "img/cards/week.webp", "sound": "sfx/cards/week.mp3" },
-    { "id": "card-pysanka", "name": "Чарівна писанка", "emoji": "🥚", "art": "img/cards/pysanka.webp", "sound": "sfx/cards/pysanka.mp3" }
+    {
+      "id": "card-hedgehog",
+      "name": "Їжачок Колючка",
+      "emoji": "🦔",
+      "art": "img/cards/hedgehog.webp",
+      "sound": "sfx/cards/hedgehog.mp3"
+    },
+    {
+      "id": "card-squirrel",
+      "name": "Білочка Руденька",
+      "emoji": "🐿️",
+      "art": "img/cards/squirrel.webp",
+      "sound": "sfx/cards/squirrel.mp3"
+    },
+    {
+      "id": "card-bunny",
+      "name": "Зайчик Стрибунець",
+      "emoji": "🐰",
+      "art": "img/cards/bunny.webp",
+      "sound": "sfx/cards/bunny.mp3"
+    },
+    {
+      "id": "card-week",
+      "name": "Тиждень чарів",
+      "emoji": "🌟",
+      "art": "img/cards/week.webp",
+      "sound": "sfx/cards/week.mp3"
+    },
+    {
+      "id": "card-pysanka",
+      "name": "Чарівна писанка",
+      "emoji": "🥚",
+      "art": "img/cards/pysanka.webp",
+      "sound": "sfx/cards/pysanka.mp3"
+    },
+    {
+      "id": "card-turtle",
+      "name": "Черепашка Повзунка",
+      "emoji": "🐢",
+      "art": "img/cards/turtle.webp",
+      "sound": "sfx/cards/turtle.mp3"
+    },
+    {
+      "id": "card-butterfly",
+      "name": "Метелик Барвик",
+      "emoji": "🦋",
+      "art": "img/cards/butterfly.webp",
+      "sound": "sfx/cards/butterfly.mp3"
+    },
+    {
+      "id": "card-frog",
+      "name": "Жабка Квакуша",
+      "emoji": "🐸",
+      "art": "img/cards/frog.webp",
+      "sound": "sfx/cards/frog.mp3"
+    },
+    {
+      "id": "card-penguin",
+      "name": "Пінгвін Ковзанчик",
+      "emoji": "🐧",
+      "art": "img/cards/penguin.webp",
+      "sound": "sfx/cards/penguin.mp3"
+    },
+    {
+      "id": "card-bear",
+      "name": "Ведмедик Медок",
+      "emoji": "🐻",
+      "art": "img/cards/bear.webp",
+      "sound": "sfx/cards/bear.mp3"
+    },
+    {
+      "id": "card-unicorn",
+      "name": "Єдиноріг Сяйвик",
+      "emoji": "🦄",
+      "art": "img/cards/unicorn.webp",
+      "sound": "sfx/cards/unicorn.mp3"
+    },
+    {
+      "id": "card-fox",
+      "name": "Лисичка Хитринка",
+      "emoji": "🦊",
+      "art": "img/cards/fox.webp",
+      "sound": "sfx/cards/fox.mp3"
+    },
+    {
+      "id": "card-golden-dragon",
+      "name": "Золотий Дракон",
+      "emoji": "🐲",
+      "art": "img/cards/golden-dragon.webp",
+      "sound": "sfx/cards/golden-dragon.mp3"
+    }
   ]
 }

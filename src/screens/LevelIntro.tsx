@@ -4,7 +4,7 @@ import { sfx } from '../audio/sfx';
 import { useMusic } from '../audio/useMusic';
 import { preloadLevel, voice } from '../audio/voice';
 import { Sonya } from '../characters/Sonya';
-import { content, levelPath } from '../content/load';
+import { content, levelPath, mapPath } from '../content/load';
 import { itemText } from '../engine/content';
 import { isLevelUnlocked } from '../engine/rewards';
 import type { Level } from '../engine/schema';
@@ -32,7 +32,8 @@ function Intro({ level }: { level: Level }) {
   const { demo } = level.intro;
   const [talking, setTalking] = useState(false);
   // The demo card is never empty: first letters (or the sentence) show while Соня introduces it.
-  const [step, setStep] = useState(demo.type === 'syllableMerge' ? 0 : -1);
+  const [step, setStep] = useState(demo.type === 'readAlong' ? -1 : 0);
+  const [part, setPart] = useState(-1);
   const [merged, setMerged] = useState(false);
   useMusic('map');
   useEffect(() => preloadLevel(level), [level]);
@@ -55,6 +56,24 @@ function Intro({ level }: { level: Level }) {
           sfx.whoosh();
           await voice.item(demo.items[i]!);
           await wait(700);
+        }
+      } else if (demo.type === 'wordMerge') {
+        // ЛИ… МОН… ЛИМОН: each syllable read, then they slide together into the word.
+        for (let i = 0; i < demo.items.length && !cancelled; i++) {
+          setStep(i);
+          setMerged(false);
+          const syllables = content.words.get(demo.items[i]!)!.syllables;
+          for (let k = 0; k < syllables.length && !cancelled; k++) {
+            setPart(k);
+            await voice.item(syllables[k]!);
+            await wait(250);
+          }
+          if (cancelled) return;
+          setPart(-1);
+          setMerged(true);
+          sfx.whoosh();
+          await voice.item(demo.items[i]!);
+          await wait(800);
         }
       } else {
         const words = itemText(content, demo.items[0]!).split(/\s+/);
@@ -80,7 +99,7 @@ function Intro({ level }: { level: Level }) {
   return (
     <main className="screen intro-screen">
       <Scene moon={false} quiet />
-      <button type="button" className="icon-button intro-back" aria-label={t.map.backToDoor} onClick={() => navigate('/map')}>
+      <button type="button" className="icon-button intro-back" aria-label={t.map.backToDoor} onClick={() => navigate(mapPath(level.id))}>
         <BackIcon />
       </button>
 
@@ -90,7 +109,19 @@ function Intro({ level }: { level: Level }) {
         </div>
 
         <div className="intro-demo parchment">
-          {demo.type === 'syllableMerge' ? (
+          {demo.type === 'wordMerge' ? (
+            <div key={step} className={`intro-word-merge ${merged ? 'is-merged' : ''}`}>
+              {merged ? (
+                <span className="read-word intro-fused">{show(demo.items[step]!)}</span>
+              ) : (
+                content.words.get(demo.items[step]!)!.syllables.map((id, k) => (
+                  <span key={k} className={`read-word intro-syllable ${k === part ? 'is-reading' : ''}`}>
+                    {show(id)}
+                  </span>
+                ))
+              )}
+            </div>
+          ) : demo.type === 'syllableMerge' ? (
             step >= 0 && (
               <div key={step} className={`intro-merge ${merged ? 'is-merged' : ''} ${talking ? 'is-waiting' : ''}`}>
                 {merged ? (

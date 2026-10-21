@@ -17,7 +17,7 @@ test('the real content is valid; missing audio/pictures are warnings (errors wit
 
 test('a broken content file is caught, with a message pointing at the problem', () => {
   const cases: [string, (raw: RawBundle) => void, RegExp][] = [
-    ['unknown id', (r) => ((level(r, 0).pool as Json).syllables as string[]).push('syl-ka'), /pool: unknown syllable syl-ka/],
+    ['unknown id', (r) => ((level(r, 0).pool as Json).syllables as string[]).push('syl-zzz'), /pool: unknown syllable syl-zzz/],
     ['task type typo', (r) => ((level(r, 0).tasks as Json[])[1]!.type = 'hearPik'), /unknown task type/],
     ['too many choices', (r) => ((level(r, 1).tasks as Json[])[0]!.choices = 5), /choices/],
     ['pool too small', (r) => ((level(r, 0).pool as Json).words = ['w-mama', 'w-lama']), /only 1 usable wrong options/],
@@ -37,8 +37,7 @@ test('a broken content file is caught, with a message pointing at the problem', 
 
 test('words with letters not taught in the world are rejected', () => {
   const raw = rawBundle();
-  const lexicon = raw.lexicon.data as { words: Json[]; syllables: Json[] };
-  lexicon.syllables.push({ id: 'syl-ka', text: 'КА', parts: ['К', 'А'], audio: 'voice/syl/ka.mp3' });
+  const lexicon = raw.lexicon.data as { words: Json[] }; // syl-ka exists (World 2); КА is not taught in World 1
   lexicon.words.push({ id: 'w-kama', text: 'КАМА', syllables: ['syl-ka', 'syl-ma'], audio: 'voice/words/kama.mp3', picture: 'img/words/kama.webp', emoji: '🪨' });
   ((level(raw, 1).pool as Json).words as string[]).push('w-kama');
   expect(errorsOf(raw)).toMatch(/w-kama "КАМА" uses letters not taught in this world: К/);

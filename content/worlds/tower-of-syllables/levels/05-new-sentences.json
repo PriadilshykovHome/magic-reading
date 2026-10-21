@@ -1,0 +1,69 @@
+{
+  "id": "tower-of-syllables/05",
+  "title": "Нові речення",
+  "unlockAfter": "tower-of-syllables/04",
+  "intro": {
+    "voice": "levelIntro.l05",
+    "demo": {
+      "type": "readAlong",
+      "items": [
+        "s-osa-na-lymoni"
+      ]
+    }
+  },
+  "pool": {
+    "syllables": [],
+    "words": [
+      "w-lymon",
+      "w-tomat",
+      "w-salat",
+      "w-maslo",
+      "w-namysto",
+      "w-mist"
+    ],
+    "sentences": [
+      "s-osa-na-lymoni",
+      "s-osa-na-tomati",
+      "s-u-tata-lymon",
+      "s-u-mamy-salat",
+      "s-u-mamy-namysto",
+      "s-lama-na-mostu",
+      "s-lysa-na-mostu",
+      "s-tomat-u-salati"
+    ]
+  },
+  "reviewFrom": [
+    "tower-of-syllables/03",
+    "tower-of-syllables/04"
+  ],
+  "tasks": [
+    {
+      "type": "sentencePicture",
+      "count": 3,
+      "choices": 3
+    },
+    {
+      "type": "readPickPicture",
+      "count": 2,
+      "choices": 3
+    },
+    {
+      "type": "buildWord",
+      "count": 1,
+      "extraTiles": 1
+    },
+    {
+      "type": "readAloud",
+      "count": 2,
+      "itemKind": "sentence"
+    }
+  ],
+  "boss": {
+    "type": "magicDoor",
+    "inner": "sentencePicture",
+    "pick": "weakest"
+  },
+  "reward": {
+    "card": "card-butterfly"
+  }
+}

@@ -13,7 +13,7 @@ export function DevTaskScreen() {
   const level = content.levels.get(`${world}/${num}`);
   if (!level || !type) return <Navigate to="/map" replace />;
   const seed = Number(search.get('seed') ?? 1);
-  return <Runner key={`${level.id}:${type}:${seed}`} level={level} seed={seed} startAt={{ type, boss: search.get('boss') === '1' }} />;
+  return <Runner key={`${level.id}:${type}:${seed}`} level={level} seed={seed} startAt={{ type, boss: search.get('boss') === '1', target: search.get('target') ?? undefined }} />;
 }
 
 const SAMPLE: { summary: LevelSummary; steps: CelebrationStep[] } = {

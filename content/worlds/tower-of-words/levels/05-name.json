@@ -1,0 +1,121 @@
+{
+  "id": "tower-of-words/05",
+  "title": "Чарівне ім’я",
+  "unlockAfter": "tower-of-words/04",
+  "intro": {
+    "voice": "levelIntro.w2l05",
+    "demo": {
+      "type": "readAlong",
+      "items": [
+        "s-kit-i-myshka"
+      ]
+    }
+  },
+  "pool": {
+    "syllables": [
+      "syl-ka",
+      "syl-ko",
+      "syl-ku",
+      "syl-ky",
+      "syl-ki",
+      "syl-ra",
+      "syl-ro",
+      "syl-ru",
+      "syl-ry",
+      "syl-ri",
+      "syl-va",
+      "syl-vo",
+      "syl-vu",
+      "syl-vy",
+      "syl-vi",
+      "syl-da",
+      "syl-do",
+      "syl-du",
+      "syl-dy",
+      "syl-di",
+      "syl-pa",
+      "syl-po",
+      "syl-pu",
+      "syl-py",
+      "syl-pi",
+      "syl-sha",
+      "syl-sho",
+      "syl-shu",
+      "syl-shy",
+      "syl-shi"
+    ],
+    "words": [
+      "w-ruka",
+      "w-korona",
+      "w-komar",
+      "w-kit",
+      "w-rak",
+      "w-syr",
+      "w-rot",
+      "w-rys",
+      "w-voda",
+      "w-dim",
+      "w-dyvan",
+      "w-vovk",
+      "w-drakon",
+      "w-vydra",
+      "w-radio",
+      "w-myshka",
+      "w-pavuk",
+      "w-kasha",
+      "w-poshta",
+      "w-panda",
+      "w-lapa",
+      "w-shokolad",
+      "w-kapusta"
+    ],
+    "sentences": [
+      "s-kit-na-dyvani",
+      "s-panda-na-dyvani",
+      "s-vovk-u-lisi",
+      "s-vydra-u-vodi",
+      "s-u-myshky-shokolad",
+      "s-u-drakona-shokolad",
+      "s-u-drakona-kasha",
+      "s-kit-i-myshka"
+    ]
+  },
+  "reviewFrom": [],
+  "tasks": [
+    {
+      "type": "hearPick",
+      "count": 1,
+      "itemKind": "syllable",
+      "choices": 3
+    },
+    {
+      "type": "readPickPicture",
+      "count": 3,
+      "choices": 3
+    },
+    {
+      "type": "buildWord",
+      "count": 2,
+      "extraTiles": 1
+    },
+    {
+      "type": "sentencePicture",
+      "count": 2,
+      "choices": 3
+    },
+    {
+      "type": "readAloud",
+      "count": 1,
+      "itemKind": "word"
+    }
+  ],
+  "boss": {
+    "type": "magicDoor",
+    "inner": "readPickPicture",
+    "item": "w-myshko",
+    "openedLine": "magicDoor.ownName"
+  },
+  "reward": {
+    "card": "card-golden-dragon"
+  }
+}

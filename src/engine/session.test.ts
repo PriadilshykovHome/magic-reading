@@ -5,7 +5,7 @@ import { taskLogics } from '../tasks/logicRegistry';
 import { emptyProgress, type Progress } from './progress';
 import { seededRandom } from './rng';
 import { buildSession } from './session';
-import { LEVEL_IDS, testContent } from './testContent';
+import { testContent } from './testContent';
 
 const content = testContent();
 const session = (levelId: string, seed: number, parentNearby = true, progress: Progress = emptyProgress()) =>
@@ -13,7 +13,7 @@ const session = (levelId: string, seed: number, parentNearby = true, progress: P
 const exists = (id: string) => content.syllables.has(id) || content.words.has(id) || content.sentences.has(id);
 
 test('every level builds valid sessions, with or without a parent nearby', () => {
-  for (const levelId of LEVEL_IDS) {
+  for (const levelId of content.levelOrder) {
     for (let seed = 1; seed <= 25; seed++) {
       for (const parentNearby of [true, false]) {
         const { tasks } = session(levelId, seed, parentNearby);
@@ -42,7 +42,7 @@ test('reshuffled each time, repeatable per seed', () => {
   expect(new Set([1, 2, 3, 4, 5, 6].map(order)).size).toBeGreaterThan(4);
 });
 
-test('task contents: МАМА door, build-a-word tiles, bubbles, sentence scenes', () => {
+test('task contents: МАМА and МИШКО doors, build-a-word tiles, bubbles, sentence scenes', () => {
   for (let seed = 1; seed <= 25; seed++) {
     const l1 = session('tower-of-syllables/01', seed).tasks;
     expect(l1[0]!.type).toBe('syllableMerge');
@@ -57,6 +57,9 @@ test('task contents: МАМА door, build-a-word tiles, bubbles, sentence scenes
       expect(slots.length).toBeGreaterThanOrEqual(2); // never ЛІС / НІС
       expect(tiles).toHaveLength(slots.length + 1);
     }
+    const finale = session('tower-of-words/05', seed).tasks;
+    expect(finale.at(-1)).toMatchObject({ boss: true, target: 'w-myshko' }); // his name, behind the last door…
+    expect(finale.slice(0, -1).some((t) => t.target === 'w-myshko' || t.options.includes('w-myshko'))).toBe(false); // …and nowhere before
     for (const t of session('tower-of-syllables/03', seed).tasks.filter((x) => x.type === 'sentencePicture')) {
       const target = content.sentences.get(t.target)!;
       for (const id of t.options.filter((o) => o !== t.target)) {

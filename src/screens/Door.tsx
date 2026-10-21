@@ -5,6 +5,7 @@ import { currentSeason } from '../fx/currentSeason';
 import { Pumpkin } from '../fx/ambient/Pumpkin';
 import { Scene, type CandleSpot } from '../fx/ambient/Scene';
 import { t } from '../strings';
+import { FullscreenIcon } from '../ui/Icons';
 import { DoorArt } from './DoorArt';
 import './Door.css';
 
@@ -80,10 +81,26 @@ export function DoorScreen() {
         </div>
       </div>
 
+      {canGoFullscreen() && (
+        <button
+          type="button"
+          className="icon-button door-fullscreen"
+          aria-label={t.map.fullscreen}
+          onClick={() => void document.documentElement.requestFullscreen?.().catch(() => {})}
+        >
+          <FullscreenIcon />
+        </button>
+      )}
+
       <span className="door-flash" aria-hidden="true" />
       <p className="build-id">
         v{__APP_VERSION__} · {__BUILD_ID__}
       </p>
     </main>
   );
+}
+
+/** Installed apps already open full screen; elsewhere offer it where the browser supports it (not iPhone). */
+function canGoFullscreen(): boolean {
+  return document.fullscreenEnabled && !window.matchMedia('(display-mode: standalone)').matches && !document.fullscreenElement;
 }

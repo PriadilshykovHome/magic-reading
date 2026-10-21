@@ -41,7 +41,7 @@ test('all three levels can be played start to finish, and progress survives a re
 
   const before = await page.evaluate((key) => localStorage.getItem(key), KEY);
   await page.reload();
-  await expect(page.locator('.map-node.is-locked')).toHaveCount(0);
+  await expect(page.locator('[data-level="tower-of-syllables/04"]')).not.toHaveClass(/is-locked/); // next level open
   for (const levelId of LEVELS) {
     await expect(page.locator(`[data-level="${levelId}"] .map-stars path[fill^="url"]`)).toHaveCount(3);
   }

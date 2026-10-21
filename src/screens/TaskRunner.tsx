@@ -4,13 +4,13 @@ import { sfx } from '../audio/sfx';
 import { useMusic } from '../audio/useMusic';
 import { voice, type Policy } from '../audio/voice';
 import { Sonya, type SonyaMood } from '../characters/Sonya';
-import { content, levelPath } from '../content/load';
+import { content, levelPath, mapPath } from '../content/load';
 import { sparkBalance } from '../engine/progress';
 import { isLevelUnlocked } from '../engine/rewards';
 import { seededRandom } from '../engine/rng';
 import { completeTask, registerMiss, startRun } from '../engine/run';
 import type { Level } from '../engine/schema';
-import { buildSession } from '../engine/session';
+import { buildSession, createBuildContext } from '../engine/session';
 import { Scene, type CandleSpot } from '../fx/ambient/Scene';
 import { particles } from '../fx/particles';
 import { SparkFlights, type Flight } from '../fx/SparkFlight';
@@ -47,6 +47,8 @@ type Effect = { kind: 'wand' | 'wave' | 'golden'; id: number };
 export interface StartAt {
   type: string;
   boss: boolean;
+  /** Ask about this item (layout checks force the longest words). */
+  target?: string;
 }
 
 export function Runner({ level, startAt, seed }: { level: Level; startAt?: StartAt; seed?: number }) {
@@ -62,7 +64,7 @@ export function Runner({ level, startAt, seed }: { level: Level; startAt?: Start
   // A fresh, reshuffled session every time the level starts.
   const [session] = useState(() => {
     const { progress } = useProgress.getState();
-    return buildSession({
+    const built = buildSession({
       content,
       level,
       progress,
@@ -71,6 +73,15 @@ export function Runner({ level, startAt, seed }: { level: Level; startAt?: Start
       rng: seededRandom(seed ?? randomSeed()),
       now: new Date(),
     });
+    const at = startAt?.target ? built.tasks.findIndex((x) => x.type === startAt.type && x.boss === startAt.boss) : -1;
+    if (at >= 0) {
+      const task = built.tasks[at]!;
+      const logic = taskLogics[task.type]!;
+      const entry = level.tasks.find((e) => e.type === task.type) ?? { type: task.type, count: 1 };
+      const rebuilt = logic.build(createBuildContext(content, level, seededRandom(seed ?? 1)), logic.configSchema.parse(entry), startAt!.target!);
+      built.tasks[at] = { ...task, target: startAt!.target!, options: rebuilt.options, data: rebuilt.data };
+    }
+    return built;
   });
   const [rng] = useState(() => seededRandom(seed !== undefined ? seed + 1 : randomSeed()));
   const run = useRef(startRun(config, rng));
@@ -258,11 +269,11 @@ export function Runner({ level, startAt, seed }: { level: Level; startAt?: Start
       await wait(250);
       await voice.item(task.target); // the answer is always confirmed out loud
       if (extraLine) await voice.say(extraLine);
-      if (door) await voice.say('magicDoor.opened');
+      if (door) await voice.say(level.boss.openedLine ?? 'magicDoor.opened');
       await wait(Math.max(0, 1000 - (Date.now() - started)));
       advance();
     })();
-  }, [task, config, rng, recordTask, advance, flashMood, launchSpark]);
+  }, [task, config, rng, recordTask, advance, flashMood, launchSpark, level]);
 
   const lit = index + (solved ? 1 : 0);
   const body = <Component key={task.key} task={task} hint={hint} onMiss={onMiss} onComplete={onComplete} />;
@@ -272,7 +283,7 @@ export function Runner({ level, startAt, seed }: { level: Level; startAt?: Start
       <Scene candles={CANDLES} moon={false} quiet />
 
       <header className="runner-bar">
-        <HoldButton holdMs={1000} onHold={() => navigate('/map')} label={t.play.home}>
+        <HoldButton holdMs={1000} onHold={() => navigate(mapPath(level.id))} label={t.play.home}>
           <HomeIcon />
         </HoldButton>
         <CandleRow total={session.tasks.length} lit={lit} label={fmt(t.play.progress, { done: lit, total: session.tasks.length })} />
