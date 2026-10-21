@@ -1,14 +1,13 @@
-// Placeholder voice: the browser's Ukrainian speech (Phase 5 swaps in recorded clips).
-// Speaking always cancels what was playing, so lines never stack.
+// Fallback voice: the browser's Ukrainian speech, for every line or item that has no recording
+// yet. The voice scheduler decides when it plays; this only knows how.
 import { SILENT } from '../testMode';
+import type { Playback } from './scheduler';
 
 const supported = !SILENT && typeof window !== 'undefined' && 'speechSynthesis' in window;
 let voice: SpeechSynthesisVoice | null = null;
-let generation = 0;
 
 function pickVoice() {
-  const voices = speechSynthesis.getVoices();
-  voice = voices.find((v) => v.lang.toLowerCase().startsWith('uk')) ?? null;
+  voice = speechSynthesis.getVoices().find((v) => v.lang.toLowerCase().startsWith('uk')) ?? null;
 }
 
 if (supported) {
@@ -20,45 +19,31 @@ export function hasUkrainianVoice(): boolean {
   return voice !== null;
 }
 
-export function stopSpeech(): void {
-  generation++;
-  if (supported) speechSynthesis.cancel();
-}
-
-function utter(text: string, rate: number): Promise<void> {
-  return new Promise((resolve) => {
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'uk-UA';
-    if (voice) u.voice = voice;
-    u.rate = rate;
-    u.pitch = 1.1;
-    // Never hang the game on a silent or broken speech engine.
-    const timer = window.setTimeout(() => resolve(), 1200 + text.length * 110);
-    const done = () => {
+export function speechPlayback(text: string, rate: number, volume: number): Playback {
+  if (!supported || !text.trim()) return { done: Promise.resolve(), stop() {} };
+  let finish = () => {};
+  const done = new Promise<void>((resolve) => (finish = resolve));
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'uk-UA';
+  if (voice) u.voice = voice;
+  u.rate = rate;
+  u.pitch = 1.1;
+  u.volume = volume;
+  // Never hang the game on a silent or broken speech engine.
+  const timer = window.setTimeout(finish, 1500 + text.length * 120);
+  u.onend = u.onerror = () => {
+    window.clearTimeout(timer);
+    finish();
+  };
+  speechSynthesis.speak(u);
+  return {
+    done,
+    stop() {
       window.clearTimeout(timer);
-      resolve();
-    };
-    u.onend = done;
-    u.onerror = done;
-    speechSynthesis.speak(u);
-  });
-}
-
-/**
- * Speaks the parts one after another (a short pause between them). Resolves when finished, or
- * early with `false` if something else started speaking meanwhile.
- */
-export async function speak(parts: string | string[], opts: { rate?: number; gapMs?: number } = {}): Promise<boolean> {
-  const list = (Array.isArray(parts) ? parts : [parts]).filter((p) => p.trim().length > 0);
-  stopSpeech();
-  const mine = generation;
-  if (!supported || list.length === 0) return true;
-  for (let i = 0; i < list.length; i++) {
-    if (mine !== generation) return false;
-    await utter(list[i]!, opts.rate ?? 0.9);
-    if (i < list.length - 1 && opts.gapMs) await new Promise((r) => window.setTimeout(r, opts.gapMs));
-  }
-  return mine === generation;
+      speechSynthesis.cancel();
+      finish();
+    },
+  };
 }
 
 /** iOS only lets speech start from a tap: call this from the first one. */

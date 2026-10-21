@@ -11,7 +11,7 @@ export function HearPick({ task, hint, onMiss, onComplete }: TaskProps) {
   return (
     <div className="task-layout">
       <div className="task-prompt is-listen">
-        <button type="button" className="listen-button" aria-label={t.play.repeat} onClick={() => voice.item(task.target)}>
+        <button type="button" className="listen-button" aria-label={t.play.repeat} onClick={() => voice.item(task.target, 'interrupt')}>
           <SpeakerIcon />
         </button>
       </div>

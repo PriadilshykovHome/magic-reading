@@ -72,7 +72,7 @@ export function BubblePop({ task, hint, onMiss, onComplete }: TaskProps<BubblePo
 
   return (
     <div className="bubble-task">
-      <button type="button" className="listen-chip" aria-label={t.play.repeat} onClick={() => voice.item(task.target)}>
+      <button type="button" className="listen-chip" aria-label={t.play.repeat} onClick={() => voice.item(task.target, 'interrupt')}>
         <SpeakerIcon />
         <span className="bubble-count">
           {Array.from({ length: needed }, (_, i) => (

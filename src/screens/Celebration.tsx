@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { Navigate, useNavigate } from 'react-router';
 import { sfx } from '../audio/sfx';
+import { useMusic } from '../audio/useMusic';
 import { voice } from '../audio/voice';
 import { Iskryk } from '../characters/Iskryk';
 import { content, levelPath } from '../content/load';
@@ -58,6 +59,7 @@ export function Celebration({
   const card = summary.card ? content.cards.get(summary.card) : undefined;
   const weekly = summary.weeklyCard ? content.cards.get(summary.weeklyCard) : undefined;
   const started = useRef(false);
+  useMusic(null); // the fanfare takes over
 
   // Opening fanfare, once.
   useEffect(() => {

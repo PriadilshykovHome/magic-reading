@@ -31,7 +31,7 @@ export function BuildWord({ task, hint, onMiss, onComplete }: TaskProps<BuildWor
     if (slot < 0 || placed[slot] !== null) return;
     if (text(tiles[tile]!) !== text(slots[slot]!)) return reject(tile);
     sfx.place();
-    void voice.item(tiles[tile]!);
+    void voice.item(tiles[tile]!, 'interrupt');
     const next = placed.map((p, i) => (i === slot ? tile : p));
     setPlaced(next);
     if (next.every((p) => p !== null)) onComplete();
@@ -45,7 +45,7 @@ export function BuildWord({ task, hint, onMiss, onComplete }: TaskProps<BuildWor
   return (
     <div className="task-layout is-build">
       <div className="task-prompt parchment build-picture">
-        <button type="button" className="picture-button" aria-label={t.play.repeat} onClick={() => voice.item(task.target)}>
+        <button type="button" className="picture-button" aria-label={t.play.repeat} onClick={() => voice.item(task.target, 'interrupt')}>
           <span className="emoji-picture">{pictureOf(task.target)}</span>
         </button>
       </div>

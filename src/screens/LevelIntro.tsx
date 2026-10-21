@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router';
 import { sfx } from '../audio/sfx';
-import { voice } from '../audio/voice';
+import { useMusic } from '../audio/useMusic';
+import { preloadLevel, voice } from '../audio/voice';
 import { Sonya } from '../characters/Sonya';
 import { content, levelPath } from '../content/load';
 import { itemText } from '../engine/content';
@@ -33,6 +34,8 @@ function Intro({ level }: { level: Level }) {
   // The demo card is never empty: first letters (or the sentence) show while Соня introduces it.
   const [step, setStep] = useState(demo.type === 'syllableMerge' ? 0 : -1);
   const [merged, setMerged] = useState(false);
+  useMusic('map');
+  useEffect(() => preloadLevel(level), [level]);
 
   useEffect(() => {
     let cancelled = false;

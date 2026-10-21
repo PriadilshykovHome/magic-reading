@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Navigate, useNavigate } from 'react-router';
 import { sfx } from '../audio/sfx';
-import { voice } from '../audio/voice';
+import { useMusic } from '../audio/useMusic';
+import { voice, type Policy } from '../audio/voice';
 import { Sonya, type SonyaMood } from '../characters/Sonya';
 import { content, levelPath } from '../content/load';
 import { sparkBalance } from '../engine/progress';
@@ -53,6 +54,8 @@ export function Runner({ level, startAt, seed }: { level: Level; startAt?: Start
   const finishLevel = useProgress((s) => s.finishLevel);
   const balance = useProgress((s) => sparkBalance(s.progress));
   const setLastResult = useGame((s) => s.setLastResult);
+  const musicInTasks = useProgress((s) => s.progress.settings.musicInTasks);
+  useMusic(musicInTasks ? 'tasks' : null); // reading needs focus: off unless the parent turns it on
 
   // A fresh, reshuffled session every time the level starts.
   const [session] = useState(() => {
@@ -92,14 +95,20 @@ export function Runner({ level, startAt, seed }: { level: Level; startAt?: Start
   const clearEffect = useCallback(() => setEffect(null), []);
 
   /** Соня's instruction; listening tasks then say the target. Reading tasks never do (until answered). */
-  const instruct = useCallback(() => {
+  const instruct = useCallback(
+    (policy: Policy = 'after') => {
     setMood('talk');
-    const said = task.reading || task.type === 'syllableMerge' ? voice.say(task.instruction) : voice.lineThenItem(task.instruction, task.target);
+    const said =
+      task.reading || task.type === 'syllableMerge'
+        ? voice.say(task.instruction, policy)
+        : voice.lineThenItem(task.instruction, task.target, policy);
     void said.then(() => setMood((m) => (m === 'talk' ? 'idle' : m)));
-  }, [task]);
+    },
+    [task],
+  );
 
   useEffect(() => {
-    const timer = window.setTimeout(instruct, 550);
+    const timer = window.setTimeout(() => instruct('after'), 550);
     return () => window.clearTimeout(timer);
   }, [instruct]);
 
@@ -108,7 +117,7 @@ export function Runner({ level, startAt, seed }: { level: Level; startAt?: Start
     const onKey = (e: KeyboardEvent) => {
       if (e.key === ' ') {
         e.preventDefault();
-        instruct();
+        instruct('interrupt');
         return;
       }
       const n = Number(e.key);
@@ -142,7 +151,7 @@ export function Runner({ level, startAt, seed }: { level: Level; startAt?: Start
         setHint(true);
         void voice.say('hint');
       } else {
-        void voice.say('retry');
+        void voice.say('retry', 'ifIdle'); // quick second misses don't pile up
       }
     }
   }, [config, flashMood]);
@@ -225,7 +234,7 @@ export function Runner({ level, startAt, seed }: { level: Level; startAt?: Start
         </HoldButton>
         <CandleRow total={session.tasks.length} lit={lit} label={fmt(t.play.progress, { done: lit, total: session.tasks.length })} />
         <SparkJar count={balance} label={fmt(t.map.sparks, { n: balance })} golden={effect?.kind === 'golden'} />
-        <button type="button" className="runner-sonya" aria-label={t.play.repeat} onClick={instruct}>
+        <button type="button" className="runner-sonya" aria-label={t.play.repeat} onClick={() => instruct('interrupt')}>
           <Sonya mood={mood} />
           <span className="runner-sonya-badge">
             <SpeakerIcon />

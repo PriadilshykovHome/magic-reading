@@ -469,7 +469,7 @@ A script (`npm run audio:prepare`) then uses ffmpeg to normalise loudness so eve
 - If a clip is missing during development, the browser's Ukrainian speech voice reads it, where the device has one. The content validator warns about every missing clip.
 - A cloud text-to-speech service with Ukrainian neural voices can pre-generate words, sentences and Соня's lines as a stopgap. Check each one by ear.
 
-**Effects and music.** Use only free-licensed sources such as Kenney.nl (CC0), Freesound (filtered to CC0) and Pixabay's sound library. Keep `CREDITS.md` listing every asset and its licence, and never use music or sounds from the Harry Potter films.
+**Effects and music.** v1's effects and music are synthesised from code by `npm run audio:generate` (original, CC0), so nothing needs licensing; the one gap is real kids' cheers, which a bell shimmer stands in for until a CC0 recording is added. Any added assets use only free-licensed sources such as Kenney.nl (CC0), Freesound (filtered to CC0) and Pixabay's sound library. Keep `CREDITS.md` listing every asset and its licence, and never use music or sounds from the Harry Potter films.
 
 ## Parent area
 

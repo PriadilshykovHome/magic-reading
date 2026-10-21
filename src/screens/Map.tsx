@@ -1,6 +1,7 @@
 import { useEffect, useState, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router';
 import { sfx } from '../audio/sfx';
+import { useMusic } from '../audio/useMusic';
 import { voice } from '../audio/voice';
 import { Iskryk } from '../characters/Iskryk';
 import { content, levelPath } from '../content/load';
@@ -33,6 +34,7 @@ export function MapScreen() {
   const progress = useProgress((s) => s.progress);
   const { greeted, setGreeted } = useGame();
   const [bounce, setBounce] = useState(0);
+  useMusic('map');
   const [shaking, setShaking] = useState<string | null>(null);
 
   useEffect(() => {
@@ -128,7 +130,7 @@ export function MapScreen() {
           className="map-iskryk"
           aria-label={t.map.companion}
           onClick={() => {
-            sfx.tap();
+            sfx.chirp();
             setBounce((b) => b + 1);
           }}
         >

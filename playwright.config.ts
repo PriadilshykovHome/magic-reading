@@ -16,6 +16,7 @@ export const VIEWPORTS = {
 
 export default defineConfig({
   testDir: 'e2e',
+  testIgnore: 'audio.spec.ts', // needs sound: run with --config e2e/audio.config.ts
   fullyParallel: true,
   workers: process.env.CI ? 2 : 4,
   retries: process.env.CI ? 1 : 0,

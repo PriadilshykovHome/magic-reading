@@ -1,5 +1,6 @@
 import react from '@vitejs/plugin-react';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join, relative } from 'node:path';
 import type { Plugin } from 'vite';
 import { defineConfig } from 'vitest/config';
 
@@ -23,9 +24,36 @@ function htmlStrings(): Plugin {
   };
 }
 
+/** `virtual:audio-manifest`: every audio file under public/audio, so the game knows which
+ *  recordings exist (and falls back to speech for the rest) without probing the network. */
+function audioManifest(): Plugin {
+  const id = 'virtual:audio-manifest';
+  const resolved = `\0${id}`;
+  const root = join(process.cwd(), 'public', 'audio');
+  const walk = (dir: string): string[] =>
+    readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
+      e.isDirectory() ? walk(join(dir, e.name)) : /\.(mp3|wav|ogg|m4a|webm)$/.test(e.name) ? [relative(root, join(dir, e.name))] : [],
+    );
+  return {
+    name: 'audio-manifest',
+    resolveId: (source) => (source === id ? resolved : undefined),
+    load: (source) => (source === resolved ? `export default ${JSON.stringify(walk(root).sort())};` : undefined),
+    configureServer(server) {
+      server.watcher.add(root);
+      const refresh = (file: string) => {
+        if (!file.startsWith(root)) return;
+        const mod = server.moduleGraph.getModuleById(resolved);
+        if (mod) server.moduleGraph.invalidateModule(mod);
+      };
+      server.watcher.on('add', refresh);
+      server.watcher.on('unlink', refresh);
+    },
+  };
+}
+
 export default defineConfig({
   base: REPO_BASE,
-  plugins: [react(), htmlStrings()],
+  plugins: [react(), htmlStrings(), audioManifest()],
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
     __BUILD_ID__: JSON.stringify(process.env.GITHUB_SHA?.slice(0, 7) ?? 'dev'),
