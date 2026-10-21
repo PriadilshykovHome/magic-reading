@@ -1,4 +1,4 @@
-# Чарівне Читання
+# Чарівні пригоди Мишка
 
 A Ukrainian reading game for a 5-year-old: syllables → words → sentences.
 Live at <https://priadilshykovhome.github.io/magic-reading/>.

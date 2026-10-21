@@ -1,12 +1,12 @@
-# Magic Reading Game — Implementation Plan
+# Чарівні пригоди Мишка — Implementation Plan
 
 Oct 21, 2026 · @Oleksandr
 
 ## Overview & goals
 
-Build a browser game, working title **Чарівне Читання** (Magic Reading), that teaches an almost-5-year-old to read Ukrainian. He starts with syllables, then words, then short sentences, all in an original magic-school world. It runs on phone, tablet and laptop, is hosted free on GitHub Pages, and saves progress to a free Firebase account so play continues on any device.
+Build a browser game, **Чарівні пригоди Мишка** (Mishko's Magic Adventures), that teaches Михайло (Мишко), almost 5, to read Ukrainian. He starts with syllables, then words, then short sentences, all in an original magic-school world. It runs on phone, tablet and laptop, is hosted free on GitHub Pages, and saves progress to a free Firebase account so play continues on any device.
 
-**Player.** One child, almost 5. He knows the letters and their sounds but cannot read instructions yet, so every instruction is spoken and the UI is icon-driven.
+**Player.** One child: Михайло, called Мишко, almost 5, born in Kharkiv. He knows the letters and their sounds but cannot read instructions yet, so every instruction is spoken and the UI is icon-driven. The game is made for him personally; see Personal touches.
 
 **v1 scope (start small).**
 
@@ -40,11 +40,51 @@ The setting is an original magic school with a cozy wizard feel. It must not use
 | Collection | Книга Чар (Book of Spells) | One glowing page per mastered syllable or word |
 | Rewards | Чарівні картки | Collectible creature cards, one per finished level |
 
-**Visual style.** Night-blue and violet backgrounds, warm gold accents, stars and soft glows, and rounded friendly shapes. Reading content always sits on a light parchment card with dark text, because contrast matters more than atmosphere when he is reading.
+### Art direction
+
+The look is cozy and sophisticated: a quiet, glowing night where magic moves slowly, and big motion is saved for his successes.
+
+- **Palette.** Deep night blue fading to velvet violet, warm candle gold, parchment cream for reading, and a cool teal for magic effects. In autumn, pumpkin amber joins. Reading content always sits on a light parchment card with dark text, because contrast matters more than atmosphere when he is reading.
+- **Ambient magic.** Floating candles drift at different depths (smaller, dimmer and slower when farther away), and their flames flicker inside a soft halo. Stars twinkle out of sync, a shooting star crosses the sky now and then, golden dust rises near light, and a thin mist drifts along the ground.
+- **Seasons.** Friendly carved pumpkin lanterns and the odd falling leaf from September to November, snow in winter, blossoms and pysanky in spring, fireflies on summer evenings.
+- **Restraint rules.**
+  - At most three kinds of ambient effect on screen at once.
+  - Ambient loops are slow (3 seconds or more per cycle) and small, with soft easing.
+  - Nothing ambient moves near the reading card. During tasks only two or three candles stay, at the screen edges.
+  - Fast, big motion is reserved for feedback and celebrations, so it keeps its meaning.
+- **Craft.** Three parallax depth layers, light made with soft radial glows rather than hard shadows, one consistent gold line weight, and rounded shapes. A storybook display font for titles only (free licence, full Cyrillic, nothing resembling the films' lettering).
+- **No borrowed imagery.** Floating candles and pumpkins are classic fairy-tale and autumn motifs. Use them in our own style, with no house banners, crests or scenes copied from the films.
 
 **Mascot behaviour.** Соня blinks, tilts her head and ruffles her feathers when idle. She hops when he answers correctly, gives an encouraging shrug when he's wrong, and does a loop-the-loop at the celebration. The owl is purple, never white, to stay clear of the books.
 
 All names are placeholders you can change later in one strings file.
+
+## Personal touches
+
+The game is made for one boy, Михайло, called Мишко, and it should feel that way.
+
+**Privacy.** The repo and the website are public. Only first names may appear in code or content: Михайло and Мишко (with their Ukrainian case forms), мама Аліна and тато Олександр, plus the Kharkiv connection in the art. His surname, patronymic and birthday are entered once in the parent area and kept only on the device and in his private Firestore document.
+
+**Everyday.**
+
+- The title is **Чарівні пригоди Мишка**. Соня greets him by name ("Привіт, Мишку!") and now and then praises him by name ("Мишку, ти справжній чарівник!").
+- Ceremonial moments use the full name. His first 3-star level brings "Великий чарівник Михайло!", and the first page of the Book of Spells carries his name in gold.
+- The card album is "Колекція Мишка".
+- Ukrainian changes names by case, so every form lives in `content/strings.uk.json`: Мишко, Мишку, Мишка, Михайло, Михайле.
+
+**Family magic.**
+
+- **Чарівна пошта (owl post).** Mum and Dad record short voice messages in the recording studio. After some levels Соня flies in with a sealed letter. The envelope says МАМА or ТАТО, both readable with v1 letters, so he reads who it is from, taps the wax seal and hears the message.
+- **Family portraits.** Two magic frames hang on the map, signed МАМА and ТАТО. Tapping one plays that parent's recorded hello. After Level 2 a third frame is signed АЛІНА: Mum's name uses only v1 letters (А-ЛІ-НА), so he reads it himself, and Соня says "Аліна — це мама!".
+- **His own name as a goal.** МИШКО needs Ш and К, so it can't be read in v1. When a later world teaches them, that world's last Magic Door is his own name. ОЛЕКСАНДР unlocks the same way as a bonus word once Е, К, Д and Р are learned.
+
+**Personal Easter eggs.**
+
+- **Very formal Соня.** Tap her glasses 3 times and she bows and addresses him very formally by first name and patronymic ("Шановний Михайле …, прошу до читання!"), then giggles. The patronymic comes from the private profile at runtime; without it she says "Шановний чарівнику Михайле!".
+- **Kharkiv on the horizon.** Far behind the tower glows a small night city inspired by Kharkiv's skyline (Держпром and a Ferris wheel). Tap it and its windows light up while Соня says "Це Харків — місто, де народився Мишко!".
+- **Ukrainian touches.** Sunflowers along the tower path, and a вишиванка pattern on Соня's tiny scarf.
+- **Quiet family nods.** A little синичка (blue tit), Соня's friend, sometimes lands on the tower and chirps, and a magic spinning wheel spins the golden thread for the celebration stars. The game never explains these; the family will know.
+- **Birthday.** On his birthday the start screen has as many floating candles as his new age, Соня wears a party hat, and she says "З днем народження, Мишку!".
 
 ## Screens & core game loop
 
@@ -54,7 +94,7 @@ One play session is: magic door → castle map → level (intro, 8 to 10 tasks, 
 
 A wrong answer loops back inside the task step with a hint, so the only way out of a level is forward to the celebration.
 
-1. **Magic door (start).** A big glowing door with the instruction "tap to enter". The tap also unlocks audio, which iPhones and iPads require. Соня greets him by name.
+1. **Magic door (start).** A big glowing door with the instruction "tap to enter". The tap also unlocks audio, which iPhones and iPads require. Соня greets him by name ("Привіт, Мишку!").
 2. **Login (parent, once per device).** Username and password, remembered on that device after the first login. A "play without cloud" link lets him play locally if you're offline; that progress merges into the account after the next login.
 3. **Castle map (home).** Level doors sit along a winding path up the tower.
    - Locked doors show a padlock, and finished doors show their 1 to 3 stars.
@@ -71,6 +111,10 @@ A wrong answer loops back inside the task step with a hint, so the only way out 
 9. **Parent area.** Behind a gate, described in its own section.
 
 **Scoring.** Stars come from first-try accuracy: 90% or more earns 3 stars, 70% or more earns 2, and anything else earns 1. Finishing a level with any number of stars unlocks the next one. Answers already given are saved even if he leaves mid-level, but the level itself restarts next time.
+
+- The Magic Door counts as one more scored task.
+- In `buildWord`, first try means every tile placed correctly with no wrong tile.
+- Unscored types (`syllableMerge`) don't count toward stars.
 
 ## Task types (mechanics)
 
@@ -90,31 +134,33 @@ The mini-boss **Magic Door** (`magicDoor`) is a wrapper. It takes any scored typ
 
 **Rules shared by all types.**
 
-- Reading tasks never play the target audio before he answers, otherwise they turn into listening tasks. After the answer, the audio always plays as confirmation.
+- **Reading vs listening.** Reading tasks (`readPickPicture`, `sentencePicture`, `readAloud`, and `magicDoor` around any of them) never play the target audio before he answers, otherwise they turn into listening tasks. After the answer, the audio always plays as confirmation. Listening tasks (`hearPick`, `bubblePop`, `buildWord`, `syllableMerge`) speak the target first, because that is their point.
+- **He reads alone in every level.** Every level includes reading tasks he can solve without anyone reading to him, and every Magic Door is one of them.
 - Never more than 3 options, with big tap targets.
 - Distractors are chosen to be confusable on purpose: same consonant (МА / МО) or same vowel (МА / ЛА).
 - A wrong option wobbles, dims and becomes disabled, with a soft "hmm" and Соня saying "Спробуй ще!". After 2 misses the correct option gently pulses as a hint.
 - Every drag also works as tap-to-place: tap a tile and it jumps to the next empty slot; tap a placed tile to send it back.
-- `readAloud` appears only when the "parent nearby" setting is on; otherwise it is skipped.
+- `readAloud` appears only when the "parent nearby" setting is on. Otherwise each one is replaced by another scored task from the level's mix, so a level always has 8 to 10 tasks.
 
 ## Starter content (v1 levels)
 
-v1 uses only 5 consonants (М, Л, Н, Т, С) and 5 vowels (А, О, У, И, І). That is enough for 25 syllables, 10 picture words and 9 sentences, and it puts the И / І contrast in from day one. Please check the word list as a native speaker before building.
+v1 uses only 5 consonants (М, Л, Н, Т, С) and 5 vowels (А, О, У, И, І). That is enough for 25 syllables (plus vowel-only syllables such as the О in О-СА), 10 picture words and 10 sentences, and it puts the И / І contrast in from day one.
 
 | Level | New material | Items | Task mix (about 9 tasks) |
 | --- | --- | --- | --- |
-| 1 · Перші склади | М, Л with А О У И І | МА МО МУ МИ МІ, ЛА ЛО ЛУ ЛИ ЛІ | Intro merge (МА, ЛА); hearPick ×3, bubblePop ×2, syllableMerge ×1, readAloud ×2; Magic Door: the first real word, МАМА |
+| 1 · Перші склади | М, Л with А О У И І | МА МО МУ МИ МІ, ЛА ЛО ЛУ ЛИ ЛІ; first words МАМА, ЛАМА, МИЛО (М and Л only) | Intro merge (МА, ЛА); hearPick ×3, bubblePop ×2, syllableMerge ×1, readPickPicture ×1 (МАМА / ЛАМА / МИЛО), readAloud ×2; Magic Door: readPickPicture with МАМА, the first word he reads alone |
 | 2 · Перші слова | Н, Т, С with the same vowels | НА…НІ, ТА…ТІ, СА…СІ; words МАМА, ТАТО, ЛИСА, МИЛО, НОТИ, САНИ, ЛАМА, ОСА, plus closed words ЛІС, НІС | Intro merge (НА, ТА, СА); readPickPicture ×3, buildWord ×3, hearPick ×1, readAloud ×1; Magic Door: buildWord |
-| 3 · Перші речення | Short sentences from known words | Тато тут. Мама там. Ось лиса. Ось сани. Лама тут. Оса там. У мами мило. У мами ноти. У тата ноти. | Intro: Соня reads a sentence while each word lights up; sentencePicture ×3, readPickPicture ×2 (review), buildWord ×1, readAloud ×2; Magic Door: sentencePicture |
+| 3 · Перші речення | Short sentences from known words | Тато тут. Мама там. Лама тут. Оса там. Лиса у лісі. Оса на носі. Мама і тато. У мами мило. У мами ноти. У тата ноти. | Intro: Соня reads a sentence while each word lights up; sentencePicture ×3, readPickPicture ×2 (review), buildWord ×1, readAloud ×2; Magic Door: sentencePicture |
+
+**Only v1 letters.** Every word in v1 uses only М, Л, Н, Т, С and А, О, У, И, І. The earlier "Ось лиса" and "Ось сани" were replaced because "Ось" needs Ь. Each `world.json` lists its `allowedLetters`, and the content validator rejects any word that uses other letters.
+
+**Closed words.** ЛІС and НІС are single closed syllables, so they appear only in `readPickPicture` and `hearPick`, never in `buildWord`.
 
 **How sentence choices are built.** The 2 or 3 scenes differ in exactly what he must read, never in things like тут / там that a picture can't show. For example, "У мами мило", "У мами ноти" and "У тата ноти" differ by who and what.
 
-**Letter case.** Levels 1 and 2 show UPPERCASE, like a children's alphabet. Level 3 uses normal sentence case, with a parent setting to force UPPERCASE everywhere.
+**Letter case.** Everything is shown in UPPERCASE by default, like a children's alphabet book. A parent setting, "Show lowercase in sentences", switches Level 3 to normal sentence case once he recognises the small letters too (м, л, н, т, с, а, о, у, и, і).
 
 **Pictures needed (v1).** 10 word pictures, 9 sentence scenes, and art for Соня, Іскрик (4 growth stages), the castle map and 3 creature cards. Use one consistent illustration style. For prototyping, open-licensed emoji sets such as OpenMoji or Twemoji are fine placeholders, with their attribution kept in the credits.
-
-**Open question.** Does he know lowercase letters yet? If not, keep Level 3 in UPPERCASE for now.
-
 ## Rewards, animations, sound & Easter eggs
 
 Rewards come in three layers: instant feedback on every answer, a big celebration at the end of each level, and long-term collections that make him want to come back. Mistakes are never punished with sound or loss, only with a gentle retry.
@@ -140,7 +186,7 @@ Rewards come in three layers: instant feedback on every answer, a big celebratio
 6. Іскрик dances. If he reached a growth stage, he evolves (the egg wobbles, cracks and hatches in a flash of light).
 7. The buttons pop in: play again, or back to the map.
 
-One-time extras: the egg hatches after the very first level, and his first ever 3-star level brings a golden confetti rain.
+One-time extras: the egg hatches after the very first level, and his first ever 3-star level brings a golden confetti rain and Соня's ceremonial "Великий чарівник Михайло!".
 
 ### Long-term collections
 
@@ -157,7 +203,8 @@ One-time extras: the egg hatches after the very first level, and his first ever 
 - A small cat sometimes peeks out of a castle window and giggles when tapped.
 - Time of day: after 19:00 the castle windows glow and fireflies appear; mornings use a sunrise palette.
 - Birthday (date set in the parent area): Соня wears a party hat and confetti falls on the start screen.
-- Seasons: snow from December to January. Around Великдень (Orthodox Easter, calculated each year), 5 pysanky hide on the map, and finding all 5 gives a special card.
+- Personal Easter eggs are listed under Personal touches.
+- Seasons: pumpkin lanterns and falling leaves from September to November, snow from December to February. Around Великдень (Orthodox Easter, calculated each year), 5 pysanky hide on the map, and finding all 5 gives a special card.
 - Parent secret: tapping the 4 map corners clockwise launches a fireworks show over the castle.
 
 ### Sound design
@@ -220,6 +267,7 @@ The app is a static single-page site built with Vite, React and TypeScript, host
 | Login + cloud save | Firebase Auth (email/password) + Firestore | Free tier, works from a static site |
 | Offline + install | vite-plugin-pwa | Installable, caches app and audio |
 | Tests | Vitest (logic), Playwright (screens on phone/tablet/laptop sizes) | Catch layout and flow regressions |
+| Scripts | Node 24's built-in TypeScript support | Runs `scripts/*.ts` such as `validate-content` with no extra tool |
 
 **Layers.** Content (JSON) feeds a pure TypeScript engine. The engine feeds stores, which feed the UI. Audio, sync and effects are services the UI calls. The engine has no React and no browser APIs, so it is fully unit-tested.
 
@@ -295,11 +343,11 @@ service cloud.firestore {
 {
   "schemaVersion": 1,
   "updatedAt": "<server timestamp>",
-  "profile":  { "name": "Сашко", "birthday": "YYYY-MM-DD" },
-  "settings": { "parentNearby": true, "forceUppercase": false, "music": 0.3, "sfx": 0.8, "voice": 1.0 },
+  "profile":  { "surname": "…", "patronymic": "…", "birthday": "YYYY-MM-DD" },
+  "settings": { "parentNearby": true, "lowercaseSentences": false, "music": 0.3, "sfx": 0.8, "voice": 1.0 },
   "levels":   { "tower-of-syllables/01": { "bestStars": 3, "plays": 4, "completedAt": "…" } },
   "items":    { "syl-ma": { "box": 3, "seen": 12, "firstTryOk": 9, "wrong": 3, "lastSeen": "…", "okDays": ["…"] } },
-  "rewards":  { "sparks": 137, "cards": ["owl-01"], "creatureStage": 2, "litWindows": ["…"] },
+  "rewards":  { "sparksEarned": 152, "sparksSpent": 15, "cards": ["owl-01"], "creatureStage": 2, "litWindows": ["…"] },
   "easterEggs": { "found": ["moon-star"] }
 }
 ```
@@ -309,7 +357,8 @@ service cloud.firestore {
 1. **Local first.** Every answer updates the progress store and is written to local storage immediately, so nothing is lost offline or if the tab closes.
 2. **Cloud write, batched.** The cloud copy is written after each task (debounced to at most one write per 5 seconds) and at level end. Firestore's offline cache queues writes made without internet.
 3. **Merge on login and app start.** Load the cloud and local copies and merge them field by field:
-   - Counters take the higher value (sparks, plays, best stars).
+   - Counters only ever go up and take the higher value (sparksEarned, sparksSpent, plays, best stars). The spark balance he sees is sparksEarned − sparksSpent, so spending sparks later (hats, wand colours) still merges safely.
+   - The private profile (surname, patronymic, birthday) keeps the most recently edited version.
    - Lists take the union (cards, lit windows, found eggs, okDays).
    - Each item keeps the version with the later `lastSeen`.
    - The merged result is written back.
@@ -382,7 +431,7 @@ All learning content lives in JSON under `content/`. A new level is a new JSON f
 
 **Adding a task type.** Create a folder in `src/tasks/` that implements the plug-in contract and register it. Level files can then use its id.
 
-**Content roadmap (later worlds).** New consonants Р, В, К, Д, П with closed syllables, then Я, Ю, Є, Ї, then Ь, the apostrophe and Ґ, then a Library of Tales with short stories and a picture question after each.
+**Content roadmap (later worlds).** New consonants Р, В, К, Д, П with closed syllables, then Я, Ю, Є, Ї, then Ь, the apostrophe and Ґ, then a Library of Tales with short stories and a picture question after each. When Ш and К arrive, that world's final Magic Door is his own name, МИШКО; ОЛЕКСАНДР unlocks as a bonus word once Е, К, Д and Р are learned.
 
 ## Audio production
 
@@ -395,7 +444,8 @@ Record the voice yourself with a recording studio built into the parent area. Sy
 | Syllables | 25 normal + 25 stretched | Stretched version for the merge demo: "М-м-м… А-а… МА" |
 | Words | 10 normal + 10 by syllables | By syllables: "МА… МА", used in buildWord hints |
 | Sentences | 9 | Steady pace; word start times noted for highlighting |
-| Соня's lines | about 40 | Greeting, 1 instruction per task type, 8 praise lines, 4 retry lines, level intros, celebration, goodbye |
+| Соня's lines | about 45 | Greeting by name, 1 instruction per task type, 8 praise lines (some with his name), 4 retry lines, level intros, celebration, goodbye, personal Easter egg lines |
+| Family messages | as many as you like | Short messages from Mum and Dad for Чарівна пошта and the portrait frames |
 
 Example lines for Соня, to adjust in your own words: "Привіт! Готовий до чарів?", "Послухай і знайди склад", "Прочитай слово і знайди картинку", "Склади слово з частинок", "Щоб відчинити двері, прочитай чарівне слово!".
 
@@ -432,11 +482,11 @@ The parent area holds progress, settings, the recording studio and the account. 
 **Settings.**
 
 - **Parent nearby:** turns `readAloud` tasks on or off.
-- **Force UPPERCASE everywhere.**
+- **Show lowercase in sentences** (off by default).
 - **Volumes:** voice, effects and music, plus a switch for music during tasks.
 - **Session limit:** off, 1 level, 2 levels or 15 minutes. When it's reached, Соня yawns and says it's time to rest until tomorrow.
 - **Reduced effects:** for older tablets, or if the fireworks are too exciting before bed.
-- **Child:** name and birthday (used for greetings and the birthday surprise).
+- **Child (private):** surname, patronymic and birthday, used for the formal-Соня Easter egg and the birthday surprise. They are stored only on the device and in his Firestore document, never in the repo. First names live in `content/strings.uk.json`.
 - **Testing:** unlock all levels, and reset progress (asks twice).
 
 **Recording studio.** As described in Audio production.
@@ -457,19 +507,19 @@ Build in 9 phases, each ending in something you can open and try on a real devic
    - Done when: a push to `main` deploys automatically and the page opens on a phone.
 2. **Content model & engine.** Write the Zod schemas, the lexicon and the 3 v1 level files, and the `validate-content` script. Build the pure engine: session builder, item picker with boxes 1 to 5, distractor picker, scoring, stars and sparks.
    - Done when: unit tests pass, the validator passes, and it catches a deliberately broken level file.
-3. **Screens & task types (plain visuals).** Build the magic door, map, level intro, task runner and a simple celebration screen. Implement all 7 task types plus the Magic Door wrapper, with tap-to-place for drags. Save progress locally. Use browser speech and emoji placeholders for audio and pictures.
+3. **Screens & task types (plain visuals).** Build the magic door, map, level intro, task runner and a simple celebration screen. Implement all 7 task types plus the Magic Door wrapper, with tap-to-place for drags. Save progress locally. Use browser speech and emoji placeholders for audio and pictures. Соня greets and praises him by name.
    - Done when: all 3 levels can be played start to finish, and progress survives a page reload.
 4. **Responsive & input hardening.** Apply the layout rules for portrait and landscape, the minimum sizes, the touch protections and the keyboard shortcuts.
    - Done when: Playwright screenshots at every test viewport show no overflow or scrolling, and an automated check finds no tap target under 64 px.
 5. **Audio system.** Build the audio manager with channels, ducking, preloading per level, iOS unlock on the door tap, effects, music and rotating praise lines.
    - Done when: sounds never stack or cut each other off, and audio works on an iPhone after tapping the door.
-6. **Characters, animation & celebration.** Animate Соня and Іскрик with their states. Add the particle layer, answer feedback, streak effects and card transitions. Build the full celebration sequence with card reveal and creature growth, plus reduced-motion mode.
+6. **Characters, animation & celebration.** Animate Соня and Іскрик with their states. Add the particle layer, the ambient magic layer (floating candles, stars, dust, mist, seasonal pumpkins) under the Art direction restraint rules, answer feedback, streak effects and card transitions. Build the full celebration sequence with card reveal and creature growth, plus reduced-motion mode.
    - Done when: animations hold 60 fps on a mid-range phone and the celebration can be skipped after 2 seconds.
 7. **Login & cloud sync.** Write step-by-step Firebase setup notes for you. Build the login screen, the security rules file and the sync engine with merge and play-without-cloud mode, and show sync status.
    - Done when: progress made on the laptop appears on the phone after login, offline play uploads once back online, and a rules test in the Firebase emulator shows another user can't read the document.
-8. **Parent area & recording studio.** Build the gate, progress views and settings. Add the recording studio with zip export, JSON export/import, and the `audio:prepare` script.
+8. **Parent area & recording studio.** Build the gate, progress views and settings, including the private child profile. Add the recording studio (with family messages) with zip export, JSON export/import, and the `audio:prepare` script.
    - Done when: dropping your recorded zip into the project replaces the placeholder voice with no code change.
-9. **Collections, Easter eggs & PWA.** Build the Book of Spells, card album, castle windows and every Easter egg, including the seasonal ones with the Orthodox Easter date calculation. Make the app installable and offline-capable.
+9. **Collections, Easter eggs & PWA.** Build the Book of Spells, card album, castle windows and every Easter egg, including the seasonal ones with the Orthodox Easter date calculation and all Personal touches (Чарівна пошта, family portraits, Kharkiv on the horizon, formal Соня). Make the app installable and offline-capable.
    - Done when: it installs on a tablet and phone and launches offline, and a debug date override can trigger each seasonal surprise.
 
 After phase 9, run a final check: a Playwright playthrough of every level at phone, tablet and laptop sizes, a Lighthouse audit, credits complete, and a real session with your son.
@@ -510,7 +560,7 @@ Test builds mark the correct option with a `data-correct` attribute so Playwrigh
 Export this doc as Markdown and save it in a new repo as `docs/PLAN.md`. Then open Claude Code in that repo and paste the prompt below.
 
 ```text
-Read docs/PLAN.md fully. It is the implementation plan for "Чарівне Читання", a Ukrainian
+Read docs/PLAN.md fully. It is the implementation plan for "Чарівні пригоди Мишка", a Ukrainian
 reading game for a 5-year-old (syllables → words → sentences), hosted on GitHub Pages with
 Firebase login and cloud save.
 

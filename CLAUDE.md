@@ -1,7 +1,7 @@
-# Чарівне Читання (Magic Reading)
+# Чарівні пригоди Мишка (Mishko's Magic Adventures)
 
-A Ukrainian reading game for one almost-5-year-old: syllables → words → sentences, set in an
-original magic school. Static SPA on GitHub Pages, Firebase Auth + Firestore for cloud save.
+A Ukrainian reading game made personally for one almost-5-year-old, Михайло (Мишко):
+syllables → words → sentences, set in an original magic school. Static SPA on GitHub Pages, Firebase Auth + Firestore for cloud save.
 The full spec is `docs/PLAN.md`. Build it phase by phase (section "Build phases"). Finish one
 phase, run its "Done when" checks, then stop and wait for the go-ahead.
 
@@ -21,6 +21,7 @@ phase, run its "Done when" checks, then stop and wait for the go-ahead.
 | Offline + install | vite-plugin-pwa |
 | Tests | Vitest (logic), Playwright (screens at the plan's test viewports) |
 | Lint | ESLint (flat config, typescript-eslint, react-hooks) |
+| Scripts | `scripts/*.ts` run with Node 24's built-in type stripping (no tsx); use `.ts` import extensions there |
 
 ## Folder structure
 
@@ -65,6 +66,9 @@ docs/PLAN.md
 - Adding a level or world means content and assets only. If a level needs a code change,
   the engine or a task type is missing something; fix that rather than special-casing the level.
 - Syllable splits are written by hand in the lexicon, never auto-hyphenated.
+- Every word in a world uses only that world's `allowedLetters` (v1: М Л Н Т С + А О У И І);
+  the validator enforces it. Text is shown in UPPERCASE unless the parent turns on lowercase
+  sentences.
 
 ## Task plug-in contract
 
@@ -89,6 +93,11 @@ interface TaskType<Config> {
   listening tasks). After the answer, the target audio always plays as confirmation.
   Reading tasks: `readPickPicture`, `sentencePicture`, `readAloud`, and `magicDoor` around any
   of them. Listening is the point of `hearPick`, `bubblePop`, `buildWord` and `syllableMerge`.
+  Every level must include reading tasks he can solve alone, and every Magic Door is one.
+- **Personal data:** only first names (Михайло, Мишко and their case forms, мама Аліна,
+  тато Олександр) and the Kharkiv connection may appear in code, content, tests or commits.
+  Surname, patronymic and birthday come only from the private profile at runtime (device +
+  Firestore). Never commit them, not even in fixtures.
 - **Every tap target is at least 64×64 CSS px, with 16 px gaps.** Never more than 3 answer
   options (`bubblePop` bubbles are the one exception).
 - Reading text never goes below: syllables 64 px, words 48 px, sentences 32 px (use `clamp()`).
@@ -103,6 +112,18 @@ interface TaskType<Config> {
   music or sounds from the books or films. The owl Соня is purple, never white.
 - Assets use free licences only (CC0 preferred); every asset is listed in `CREDITS.md`.
 - Test builds mark the correct option with `data-correct`; production builds strip it.
+
+## Art direction (see "Art direction" in docs/PLAN.md)
+
+Cozy and sophisticated, never busy. Night blue → velvet violet, candle gold, parchment, teal
+for magic; pumpkin amber in autumn. Ambient magic: floating candles at three depths, out-of-sync
+stars, rising gold dust, ground mist, seasonal extras (pumpkins Sep–Nov, snow Dec–Feb).
+
+- At most three kinds of ambient effect on screen at once; ambient loops ≥ 3 s, small, eased.
+- Nothing ambient moves near the reading card; during tasks keep 2–3 candles at the edges.
+- Big, fast motion is only for feedback and celebrations.
+- Light is soft radial glow, not hard shadows; one gold line weight; rounded shapes.
+- Ambient animation pauses when the tab is hidden and becomes static under reduced motion.
 
 ## Commands
 

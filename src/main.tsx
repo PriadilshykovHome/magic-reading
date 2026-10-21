@@ -7,6 +7,11 @@ import './styles/global.css';
 
 document.title = t.app.title;
 
+// Pause all ambient animation while the tab is hidden.
+document.addEventListener('visibilitychange', () => {
+  document.documentElement.classList.toggle('is-hidden', document.hidden);
+});
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <RouterProvider router={router} />

@@ -72,23 +72,6 @@ svg {
   overflow: hidden;
 }
 
-.sky {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(1.5px 1.5px at 12% 18%, #fff 50%, transparent 51%),
-    radial-gradient(1px 1px at 28% 72%, #fff 50%, transparent 51%),
-    radial-gradient(2px 2px at 44% 12%, #fff6d6 50%, transparent 51%),
-    radial-gradient(1px 1px at 63% 38%, #fff 50%, transparent 51%),
-    radial-gradient(1.5px 1.5px at 78% 22%, #fff 50%, transparent 51%),
-    radial-gradient(1px 1px at 88% 64%, #fff 50%, transparent 51%),
-    radial-gradient(2px 2px at 8% 88%, #fff6d6 50%, transparent 51%),
-    radial-gradient(1px 1px at 54% 90%, #fff 50%, transparent 51%),
-    radial-gradient(ellipse at 50% 120%, var(--violet), transparent 65%),
-    linear-gradient(180deg, var(--night) 0%, var(--night-2) 100%);
-  pointer-events: none;
-}
-
 .parchment {
   padding: clamp(16px, 4vmin, 40px);
   border-radius: 24px;
@@ -118,6 +101,29 @@ svg {
 .icon-button:focus-visible {
   outline: 4px solid var(--gold);
   outline-offset: 4px;
+}
+
+/* Arriving through the magic door: the warm flash fades away. */
+.screen-arrive::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  background: radial-gradient(closest-side, #fff8e4, rgb(255 226 160 / 0.85) 60%, rgb(255 214 140 / 0.7));
+  animation: arrive-fade 700ms ease-out forwards;
+}
+
+@keyframes arrive-fade {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Pause every loop while the tab is hidden (class set in main.tsx). */
+.is-hidden *,
+.is-hidden *::before,
+.is-hidden *::after {
+  animation-play-state: paused !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

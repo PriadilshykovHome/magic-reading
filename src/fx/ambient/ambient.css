@@ -1,0 +1,176 @@
+/* Ambient magic. Rules (CLAUDE.md "Art direction"): slow loops of 3 s or more, small amplitude,
+   transform and opacity only, pointer-events none, static under reduced motion. */
+
+/* ---------- sky ---------- */
+
+.night-sky {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 60% at 50% 115%, rgb(92 58 170 / 0.55), transparent 60%),
+    radial-gradient(80% 50% at 15% 0%, rgb(40 46 120 / 0.6), transparent 70%),
+    linear-gradient(180deg, var(--night) 0%, #141541 55%, var(--night-2) 100%);
+}
+
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: #fffbe9;
+  box-shadow: 0 0 4px rgb(255 246 214 / 0.8);
+  animation: star-twinkle 5s ease-in-out infinite;
+}
+
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.35; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+.shooting-star {
+  position: absolute;
+  top: 9%;
+  left: 78%;
+  width: 90px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #fff8e1, rgb(255 248 225 / 0));
+  opacity: 0;
+  transform: rotate(-24deg);
+  transform-origin: left center;
+  animation: shooting-star 19s ease-out 6s infinite;
+}
+
+@keyframes shooting-star {
+  0%, 93% { opacity: 0; transform: rotate(-24deg) translateX(0); }
+  94% { opacity: 1; }
+  98% { opacity: 0; transform: rotate(-24deg) translateX(-55vmax); }
+  100% { opacity: 0; transform: rotate(-24deg) translateX(-55vmax); }
+}
+
+.moon {
+  position: absolute;
+  top: calc(5% + env(safe-area-inset-top));
+  right: 9%;
+  width: clamp(34px, 8vmin, 72px);
+  aspect-ratio: 1;
+}
+
+.moon svg {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-20deg);
+}
+
+.moon-halo {
+  position: absolute;
+  inset: -80%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 240 200 / 0.22), transparent);
+}
+
+.mist {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: -6%;
+  height: 26%;
+  background:
+    radial-gradient(50% 60% at 30% 70%, rgb(170 150 255 / 0.16), transparent 70%),
+    radial-gradient(45% 55% at 75% 80%, rgb(140 200 230 / 0.12), transparent 70%);
+}
+
+/* ---------- candlelight ---------- */
+
+.svg-defs {
+  position: absolute;
+}
+
+.candles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.candle {
+  position: absolute;
+  width: calc(var(--s) * clamp(13px, 3.3vmin, 26px));
+  opacity: var(--o);
+  animation: candle-float var(--float) ease-in-out var(--delay) infinite alternate;
+}
+
+.candle svg {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+
+@keyframes candle-float {
+  from { transform: translateY(calc(var(--s) * -7px)) rotate(-1.5deg); }
+  to { transform: translateY(calc(var(--s) * 9px)) rotate(1.5deg); }
+}
+
+.candle-halo {
+  position: absolute;
+  left: 50%;
+  top: 9%;
+  width: 480%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 210 120 / 0.55), rgb(255 180 80 / 0.16) 50%, transparent);
+  transform: translate(-50%, -50%);
+  animation: halo-pulse 3.6s ease-in-out var(--delay) infinite;
+}
+
+@keyframes halo-pulse {
+  0%, 100% { opacity: 0.75; }
+  40% { opacity: 1; }
+  70% { opacity: 0.85; }
+}
+
+.candle-flame {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: flame-flicker 3.2s ease-in-out var(--delay) infinite;
+}
+
+@keyframes flame-flicker {
+  0%, 100% { transform: scale(1, 1); }
+  20% { transform: scale(0.94, 1.06) skewX(2deg); }
+  45% { transform: scale(1.04, 0.95); }
+  65% { transform: scale(0.97, 1.04) skewX(-2deg); }
+  85% { transform: scale(1.02, 0.98); }
+}
+
+.pumpkin {
+  position: absolute;
+  pointer-events: none;
+}
+
+.pumpkin svg {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.pumpkin-glow {
+  position: absolute;
+  inset: -45% -35%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 170 70 / 0.38), transparent);
+  animation: halo-pulse 3.4s ease-in-out infinite;
+}
+
+.pumpkin-face {
+  fill: #ffd56e;
+  animation: face-flicker 3.4s ease-in-out infinite;
+}
+
+@keyframes face-flicker {
+  0%, 100% { opacity: 1; }
+  35% { opacity: 0.82; }
+  60% { opacity: 0.95; }
+}
