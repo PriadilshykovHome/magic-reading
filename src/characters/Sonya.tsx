@@ -1,6 +1,6 @@
 import './characters.css';
 
-export type SonyaMood = 'idle' | 'happy' | 'shrug' | 'talk';
+export type SonyaMood = 'idle' | 'happy' | 'shrug' | 'talk' | 'celebrate';
 
 /**
  * Сова Соня: a small round purple owl with glasses and a tiny hat (never white). A layered SVG

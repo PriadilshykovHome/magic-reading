@@ -107,6 +107,17 @@ interface TaskLogic<Config, Data> {
 `magicDoor` is a wrapper around any scored type, not a separate mechanic: the session builder
 builds the level's `boss.inner` type on the weakest/newest (or fixed) item and marks it `boss`.
 
+## Animation
+
+- UI motion: Motion via `LazyMotion` + `strict`, so use `m.div` (not `motion.div`); springs for
+  anything that lands or pops. Simple loops stay in CSS. `MotionConfig reducedMotion="user"`.
+- Particles: `particles` in `src/fx/particles.ts` (tsParticles on one tap-through canvas, loaded
+  lazily, ~150 alive on phones, off under reduced motion / "reduced effects"). Sparks flying to
+  the jar: `SparkFlights`. Never add another canvas or particle loop.
+- Characters: `Sonya` (moods idle/happy/shrug/talk/celebrate) and `Iskryk` (stages 0–3, moods
+  idle/dance, `cracking`) are layered SVGs animated in CSS; animate parts, not the whole SVG.
+- Frame budget: keep 60 fps on a 4×-throttled phone (see the FPS check in the Phase 6 notes).
+
 ## Audio
 
 - Everything goes through `src/audio/`: `voice` (Соня's lines and items), `sfx` (effects by

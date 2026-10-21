@@ -134,7 +134,7 @@ export function MapScreen() {
             setBounce((b) => b + 1);
           }}
         >
-          <Iskryk key={bounce} stage={creatureStage(progress, content.config)} className={bounce ? 'is-bouncing' : ''} />
+          <Iskryk key={bounce} stage={creatureStage(progress, content.config)} mood={bounce ? 'dance' : 'idle'} />
         </button>
       </div>
     </main>

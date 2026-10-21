@@ -12,6 +12,8 @@ import { completeTask, registerMiss, startRun } from '../engine/run';
 import type { Level } from '../engine/schema';
 import { buildSession } from '../engine/session';
 import { Scene, type CandleSpot } from '../fx/ambient/Scene';
+import { particles } from '../fx/particles';
+import { SparkFlights, type Flight } from '../fx/SparkFlight';
 import { useGame } from '../store/game';
 import { useProgress } from '../store/progress';
 import { fmt, t } from '../strings';
@@ -83,6 +85,38 @@ export function Runner({ level, startAt, seed }: { level: Level; startAt?: Start
   const [doorOpen, setDoorOpen] = useState(false);
   const busy = useRef(false);
   const moodTimer = useRef<number | undefined>(undefined);
+  const jar = useRef<HTMLDivElement>(null);
+  const lastTap = useRef<{ x: number; y: number; at: number } | null>(null);
+  const [flights, setFlights] = useState<(Flight & { sparks: number })[]>([]);
+  const inFlight = flights.reduce((n, f) => n + f.sparks, 0);
+
+  useEffect(() => particles.prewarm(), []);
+
+  // Where he tapped, so the sparkles and the spark start from his finger.
+  useEffect(() => {
+    const onDown = (e: PointerEvent) => (lastTap.current = { x: e.clientX, y: e.clientY, at: performance.now() });
+    window.addEventListener('pointerdown', onDown);
+    return () => window.removeEventListener('pointerdown', onDown);
+  }, []);
+
+  const launchSpark = useCallback((sparks: number, golden: boolean) => {
+    const tap = lastTap.current;
+    let from = tap && performance.now() - tap.at < 1500 ? { x: tap.x, y: tap.y } : null;
+    if (!from) {
+      const el = document.querySelector('.runner-stage .is-correct, .runner-stage .task-prompt, .runner-stage');
+      const r = el?.getBoundingClientRect();
+      from = r ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    }
+    const r = jar.current?.getBoundingClientRect();
+    const to = r ? { x: r.left + 22, y: r.top + r.height / 2 } : { x: window.innerWidth - 120, y: 40 };
+    particles.sparkle(from.x, from.y);
+    setFlights((f) => [...f, { id: Date.now() + Math.random(), from, to, golden, sparks }]);
+  }, []);
+
+  const landSpark = useCallback((id: number) => {
+    sfx.clink();
+    setFlights((f) => f.filter((x) => x.id !== id));
+  }, []);
 
   const task = session.tasks[index]!;
   const { Component } = taskTypes[task.type]!;
@@ -188,6 +222,7 @@ export function Runner({ level, startAt, seed }: { level: Level; startAt?: Start
     let door = false;
     for (const e of events) {
       if (e.type === 'correct') {
+        launchSpark(e.sparks, e.golden);
         if (e.golden) {
           sfx.golden();
           setEffect({ kind: 'golden', id: Date.now() });
@@ -200,6 +235,14 @@ export function Runner({ level, startAt, seed }: { level: Level; startAt?: Start
       }
       if (e.type === 'streak') {
         setEffect({ kind: e.effect, id: Date.now() });
+        if (e.effect === 'wand') {
+          const w = window.innerWidth;
+          const h = window.innerHeight;
+          particles.trail(Array.from({ length: 7 }, (_, i) => ({ x: w * (0.05 + i * 0.15), y: h * (0.32 - i * 0.022) })));
+          sfx.whoosh();
+        } else {
+          sfx.sparkle();
+        }
         extraLine = `streak.${e.effect}`;
       }
       if (e.type === 'doorOpen') door = true;
@@ -219,7 +262,7 @@ export function Runner({ level, startAt, seed }: { level: Level; startAt?: Start
       await wait(Math.max(0, 1000 - (Date.now() - started)));
       advance();
     })();
-  }, [task, config, rng, recordTask, advance, flashMood]);
+  }, [task, config, rng, recordTask, advance, flashMood, launchSpark]);
 
   const lit = index + (solved ? 1 : 0);
   const body = <Component key={task.key} task={task} hint={hint} onMiss={onMiss} onComplete={onComplete} />;
@@ -233,7 +276,10 @@ export function Runner({ level, startAt, seed }: { level: Level; startAt?: Start
           <HomeIcon />
         </HoldButton>
         <CandleRow total={session.tasks.length} lit={lit} label={fmt(t.play.progress, { done: lit, total: session.tasks.length })} />
-        <SparkJar count={balance} label={fmt(t.map.sparks, { n: balance })} golden={effect?.kind === 'golden'} />
+        <div ref={jar} className="runner-jar">
+          {/* the jar counts each spark as it lands */}
+          <SparkJar count={balance - inFlight} label={fmt(t.map.sparks, { n: balance })} golden={effect?.kind === 'golden'} />
+        </div>
         <button type="button" className="runner-sonya" aria-label={t.play.repeat} onClick={() => instruct('interrupt')}>
           <Sonya mood={mood} />
           <span className="runner-sonya-badge">
@@ -246,6 +292,7 @@ export function Runner({ level, startAt, seed }: { level: Level; startAt?: Start
         {task.boss ? <MagicDoorFrame open={doorOpen}>{body}</MagicDoorFrame> : body}
       </section>
 
+      <SparkFlights flights={flights} onArrive={landSpark} />
       {effect && <ScreenEffect key={effect.id} kind={effect.kind} onDone={clearEffect} />}
     </main>
   );

@@ -2,6 +2,56 @@
   justify-content: center;
 }
 
+/* ---------- 1. the door swings open with light rays ---------- */
+
+.celebration-door {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: rgb(5 3 8 / 0.78);
+}
+
+.celebration-rays {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 170vmax;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: repeating-conic-gradient(from 0deg, rgb(255 230 170 / 0.16) 0deg 6deg, transparent 6deg 20deg);
+  -webkit-mask-image: radial-gradient(circle, #000 0%, transparent 55%);
+  mask-image: radial-gradient(circle, #000 0%, transparent 55%);
+  animation: rays-turn 14s linear infinite, rays-in 0.9s ease-out both;
+}
+
+@keyframes rays-turn {
+  to { rotate: 360deg; }
+}
+
+@keyframes rays-in {
+  from { opacity: 0; scale: 0.6; }
+  to { opacity: 1; scale: 1; }
+}
+
+.celebration-door-art {
+  position: relative;
+  width: clamp(150px, 40vmin, 280px);
+  filter: drop-shadow(0 0 40px rgb(255 214 140 / 0.45));
+}
+
+.celebration-door-art .door-leaf {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: leaf-open 0.9s cubic-bezier(0.55, 0, 0.25, 1) 0.25s forwards;
+}
+
+@keyframes leaf-open {
+  to { transform: scaleX(0.08); opacity: 0.5; }
+}
+
 .celebration-light {
   position: absolute;
   left: 50%;
@@ -9,15 +59,55 @@
   width: 140vmin;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: radial-gradient(circle, rgb(255 230 170 / 0.28), rgb(240 214 138 / 0.08) 35%, transparent 65%);
+  background: radial-gradient(circle, rgb(255 230 170 / 0.26), rgb(240 214 138 / 0.08) 35%, transparent 65%);
   translate: -50% -50%;
-  animation: light-in 1.2s ease-out both;
 }
 
-@keyframes light-in {
-  from { opacity: 0; transform: scale(0.4); }
-  to { opacity: 1; transform: scale(1); }
+/* ---------- corners: Соня and the card album ---------- */
+
+.celebration-sonya {
+  position: absolute;
+  top: calc(16px + env(safe-area-inset-top));
+  left: calc(16px + env(safe-area-inset-left));
+  width: clamp(60px, 13vmin, 110px);
 }
+
+.celebration-album {
+  position: absolute;
+  top: calc(20px + env(safe-area-inset-top));
+  right: calc(20px + env(safe-area-inset-right));
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  color: rgb(240 214 138 / 0.55);
+  transition: color 0.4s;
+}
+
+.celebration-album svg {
+  width: 40px;
+  height: 40px;
+}
+
+.celebration-album.has-cards {
+  color: var(--gold-light);
+  filter: drop-shadow(0 0 12px rgb(240 214 138 / 0.6));
+}
+
+.celebration-album-count {
+  position: absolute;
+  right: -6px;
+  bottom: -4px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--gold);
+  color: var(--ink);
+  font-family: var(--font-reading);
+  font-weight: 800;
+  font-size: 15px;
+}
+
+/* ---------- the column ---------- */
 
 .celebration-column {
   position: relative;
@@ -26,8 +116,6 @@
   align-items: center;
   gap: clamp(12px, 3vmin, 28px);
 }
-
-/* ---------- stars land one by one ---------- */
 
 .celebration-stars {
   display: flex;
@@ -38,7 +126,6 @@
 .celebration-star {
   width: clamp(72px, 18vmin, 140px);
   aspect-ratio: 1;
-  opacity: 0.35;
 }
 
 .celebration-star:nth-child(2) {
@@ -52,16 +139,14 @@
 }
 
 .celebration-star.is-earned {
-  opacity: 1;
   filter: drop-shadow(0 0 16px rgb(240 214 138 / 0.7));
-  animation: star-land 0.6s cubic-bezier(0.3, 1.6, 0.5, 1) both;
-  animation-delay: calc(0.4s + var(--i) * 0.55s);
 }
 
-@keyframes star-land {
-  0% { opacity: 0; transform: translateY(-60%) scale(1.8) rotate(-30deg); }
-  60% { opacity: 1; transform: translateY(4%) scale(0.92) rotate(4deg); }
-  100% { opacity: 1; transform: none; }
+.celebration-sparks-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-height: var(--tap-min);
 }
 
 .celebration-sparks {
@@ -72,10 +157,9 @@
   font-family: var(--font-reading);
   font-weight: 800;
   font-variant-numeric: lining-nums tabular-nums;
-  font-size: clamp(36px, 8vmin, 64px);
+  font-size: clamp(34px, 7.5vmin, 60px);
   color: var(--gold-light);
   text-shadow: 0 0 18px rgb(240 214 138 / 0.5);
-  animation: spring-up 0.6s cubic-bezier(0.3, 1.5, 0.5, 1);
 }
 
 .celebration-spark-icon {
@@ -87,26 +171,20 @@
   align-items: center;
   justify-content: center;
   gap: clamp(16px, 4vmin, 40px);
-  min-height: clamp(150px, 30vmin, 240px);
+  min-height: clamp(150px, 30vmin, 230px);
 }
 
-/* ---------- creature card: tap to flip ---------- */
+/* ---------- creature cards: spin in, tap to flip ---------- */
 
 .magic-card {
   position: relative;
-  width: clamp(110px, 24vmin, 180px);
+  width: clamp(110px, 24vmin, 170px);
   aspect-ratio: 5 / 7;
   padding: 0;
   border: 0;
   background: none;
   cursor: pointer;
   perspective: 800px;
-  animation: card-in 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-}
-
-@keyframes card-in {
-  from { opacity: 0; transform: translateY(-40px) rotate(-200deg) scale(0.4); }
-  to { opacity: 1; transform: none; }
 }
 
 .magic-card-back,
@@ -127,7 +205,10 @@
     repeating-linear-gradient(45deg, #2a2038 0 10px, #1a1424 10px 20px);
   color: var(--gold-light);
   font-size: clamp(40px, 9vmin, 70px);
-  animation: focal-pulse 2.4s ease-in-out infinite;
+}
+
+.magic-card.is-waiting .magic-card-back {
+  animation: focal-pulse 1.6s ease-in-out infinite;
 }
 
 .magic-card-front {
@@ -164,61 +245,33 @@
   cursor: default;
 }
 
-/* ---------- Іскрик evolves ---------- */
+/* ---------- Іскрик ---------- */
 
 .celebration-creature {
-  --iskryk-size: clamp(110px, 24vmin, 180px);
-  width: var(--iskryk-size);
+  position: relative;
+  width: clamp(110px, 24vmin, 180px);
 }
 
-.creature-change.is-wobbling .iskryk-body {
-  animation: iskryk-wobble 0.5s ease-in-out infinite;
-}
-
-.creature-change.is-evolved .iskryk {
-  animation: evolve-flash 0.9s ease-out;
+.evolve-flash {
+  position: absolute;
+  inset: -45%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0%, rgb(255 240 200 / 0.9) 25%, rgb(255 214 140 / 0.4) 45%, transparent 70%);
+  pointer-events: none;
+  animation: evolve-flash 1s ease-out forwards;
 }
 
 @keyframes evolve-flash {
-  0% { transform: scale(0.4); opacity: 0; filter: brightness(3); }
-  60% { transform: scale(1.15); opacity: 1; filter: brightness(1.6); }
-  100% { transform: none; filter: none; }
-}
-
-/* ---------- golden confetti (first ever 3 stars) ---------- */
-
-.confetti {
-  position: fixed;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.confetti span {
-  position: absolute;
-  top: -5%;
-  width: 8px;
-  height: 14px;
-  border-radius: 2px;
-  background: linear-gradient(180deg, #fff3cc, var(--gold));
-  animation: confetti-fall linear infinite;
-}
-
-.confetti span:nth-child(3n) {
-  background: linear-gradient(180deg, #f6e2a0, #c9a24a);
-  width: 6px;
-}
-
-@keyframes confetti-fall {
-  from { transform: translateY(0) rotate(0); }
-  to { transform: translateY(115vh) rotate(720deg); }
+  0% { opacity: 0; transform: scale(0.3); }
+  25% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.4); }
 }
 
 .celebration-actions {
   display: flex;
   gap: clamp(24px, 6vmin, 56px);
+  min-height: clamp(80px, 18vmin, 112px);
   margin-top: 8px;
-  animation: spring-up 0.6s cubic-bezier(0.3, 1.5, 0.5, 1);
 }
 
 /* Phones in landscape: stars, sparks and buttons on the left; the rewards on the right. */
@@ -237,9 +290,9 @@
   }
 
   .celebration-stars { grid-area: stars; }
-  .celebration-sparks { grid-area: sparks; }
+  .celebration-sparks-row { grid-area: sparks; }
   .celebration-rewards { grid-area: rewards; }
-  .celebration-actions { grid-area: actions; }
+  .celebration-actions { grid-area: actions; min-height: 80px; }
 
   .celebration-star {
     width: clamp(64px, 16vmin, 90px);

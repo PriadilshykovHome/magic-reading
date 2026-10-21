@@ -36,7 +36,9 @@ const SAMPLE: { summary: LevelSummary; steps: CelebrationStep[] } = {
   steps: ['stars', 'sparks', 'card', 'creature', 'firstThreeStars', 'weeklyCard'],
 };
 
+/** `#/dev/celebration` shows the final state; `?live=1` plays the whole sequence. */
 export function DevCelebrationScreen() {
+  const [search] = useSearchParams();
   const [sample] = useState(SAMPLE);
-  return <Celebration summary={sample.summary} steps={sample.steps} startFinished />;
+  return <Celebration summary={sample.summary} steps={sample.steps} startFinished={search.get('live') !== '1'} />;
 }

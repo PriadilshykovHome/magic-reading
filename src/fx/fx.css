@@ -1,0 +1,22 @@
+.spark-flights {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  pointer-events: none;
+}
+
+.spark-flight {
+  position: absolute;
+  left: -9px;
+  top: -9px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0%, #ffe9a6 30%, #ffb347 60%, rgb(255 150 60 / 0) 72%);
+  box-shadow: 0 0 14px 4px rgb(255 190 90 / 0.65);
+}
+
+.spark-flight.is-golden {
+  background: radial-gradient(circle, #fff 0%, #fff3cc 30%, #f0d68a 55%, rgb(201 162 74 / 0) 72%);
+  box-shadow: 0 0 22px 8px rgb(255 214 107 / 0.85);
+}

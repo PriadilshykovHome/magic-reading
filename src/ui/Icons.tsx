@@ -75,3 +75,10 @@ export const FullscreenIcon = () => (
     <path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" />
   </svg>
 );
+
+export const BookIcon = () => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" {...common}>
+    <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5zM4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5" />
+    <path d="M12 7l1 2 2 .3-1.5 1.4.4 2.1L12 11.8l-1.9 1 .4-2.1L9 9.3l2-.3z" fill="currentColor" stroke="none" />
+  </svg>
+);

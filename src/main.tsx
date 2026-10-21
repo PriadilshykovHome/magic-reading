@@ -1,3 +1,4 @@
+import { LazyMotion, MotionConfig } from 'motion/react';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router';
@@ -10,6 +11,8 @@ import './styles/global.css';
 import './ui/ui.css';
 
 document.title = t.app.title;
+
+const motionFeatures = () => import('./fx/motionFeatures').then((m) => m.default);
 
 // Sound may only start after a tap on iPhone/iPad: the magic door does it, or any first tap.
 window.addEventListener('pointerdown', unlockAudio, { once: true });
@@ -32,6 +35,11 @@ document.addEventListener('visibilitychange', () => {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    {/* Spring physics for UI motion; animation features load after the first paint. Respects reduced motion. */}
+    <MotionConfig reducedMotion="user">
+      <LazyMotion features={motionFeatures} strict>
+        <RouterProvider router={router} />
+      </LazyMotion>
+    </MotionConfig>
   </StrictMode>,
 );
