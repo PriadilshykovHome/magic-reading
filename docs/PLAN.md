@@ -348,7 +348,7 @@ service cloud.firestore {
   "settings": { "parentNearby": true, "lowercaseSentences": false, "music": 0.3, "sfx": 0.8, "voice": 1.0 },
   "levels":   { "tower-of-syllables/01": { "bestStars": 3, "plays": 4, "completedAt": "…" } },
   "items":    { "syl-ma": { "box": 3, "seen": 12, "firstTryOk": 9, "wrong": 3, "lastSeen": "…", "okDays": ["…"] } },
-  "rewards":  { "sparksEarned": 152, "sparksSpent": 15, "cards": ["owl-01"], "creatureStage": 2, "litWindows": ["…"] },
+  "rewards":  { "sparksEarned": 152, "sparksSpent": 15, "cards": ["card-hedgehog"], "litWindows": ["…"], "milestones": ["firstThreeStars"] },
   "easterEggs": { "found": ["moon-star"] }
 }
 ```
@@ -365,13 +365,15 @@ service cloud.firestore {
    - The merged result is written back.
 4. **Play without cloud.** Progress is kept under a local guest key and merged into the account at the next login.
 
-These merge rules are enough because one child plays on one device at a time. A `schemaVersion` field lets later versions migrate old saves.
+These merge rules are enough because one child plays on one device at a time. A `schemaVersion` field lets later versions migrate old saves. Іскрик's growth stage is derived from completed levels and `sparksEarned`, never stored, so devices can't disagree about it.
 
 ## Content format & adding levels
 
 All learning content lives in JSON under `content/`. A new level is a new JSON file plus its audio and pictures. A new world is a folder. Neither needs code changes.
 
-**Lexicon (`content/lexicon.json`).** Every syllable, word and sentence is defined once, with its audio and picture. Syllable splits are written by hand, never auto-hyphenated.
+**Lexicon (`content/lexicon.json`).** Every syllable, word and sentence is defined once, with its audio and picture (and an emoji placeholder until the art exists). Syllable splits are written by hand, never auto-hyphenated. Each sentence lists what its scene `depicts`, so a wrong scene can never also fit the sentence.
+
+**Other content files.** `config.json` holds every tunable number (boxes, stars, sparks, streaks, Іскрик's thresholds, Easter egg dates). `voice.uk.json` holds all of Соня's lines, with placeholders such as `{nameVoc}` filled from `strings.uk.json` and the private profile. `cards.json` lists the creature cards.
 
 ```json
 {

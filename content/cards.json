@@ -1,0 +1,9 @@
+{
+  "cards": [
+    { "id": "card-hedgehog", "name": "Їжачок Колючка", "emoji": "🦔", "art": "img/cards/hedgehog.webp", "sound": "sfx/cards/hedgehog.mp3" },
+    { "id": "card-squirrel", "name": "Білочка Руденька", "emoji": "🐿️", "art": "img/cards/squirrel.webp", "sound": "sfx/cards/squirrel.mp3" },
+    { "id": "card-bunny", "name": "Зайчик Стрибунець", "emoji": "🐰", "art": "img/cards/bunny.webp", "sound": "sfx/cards/bunny.mp3" },
+    { "id": "card-week", "name": "Тиждень чарів", "emoji": "🌟", "art": "img/cards/week.webp", "sound": "sfx/cards/week.mp3" },
+    { "id": "card-pysanka", "name": "Чарівна писанка", "emoji": "🥚", "art": "img/cards/pysanka.webp", "sound": "sfx/cards/pysanka.mp3" }
+  ]
+}

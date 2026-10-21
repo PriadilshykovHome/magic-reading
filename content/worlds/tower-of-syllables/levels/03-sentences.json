@@ -1,0 +1,25 @@
+{
+  "id": "tower-of-syllables/03",
+  "title": "Перші речення",
+  "unlockAfter": "tower-of-syllables/02",
+  "intro": {
+    "voice": "levelIntro.l03",
+    "demo": { "type": "readAlong", "items": ["s-mama-i-tato"] }
+  },
+  "pool": {
+    "sentences": [
+      "s-tato-tut", "s-mama-tam", "s-lama-tut", "s-osa-tam", "s-lysa-u-lisi",
+      "s-osa-na-nosi", "s-mama-i-tato", "s-u-mamy-mylo", "s-u-mamy-noty", "s-u-tata-noty"
+    ],
+    "words": ["w-mama", "w-tato", "w-lysa", "w-mylo", "w-noty", "w-sany", "w-lama", "w-osa"]
+  },
+  "reviewFrom": ["tower-of-syllables/02"],
+  "tasks": [
+    { "type": "sentencePicture", "count": 3, "choices": 3 },
+    { "type": "readPickPicture", "count": 2, "choices": 3 },
+    { "type": "buildWord", "count": 1, "extraTiles": 1 },
+    { "type": "readAloud", "count": 2, "itemKind": "sentence" }
+  ],
+  "boss": { "type": "magicDoor", "inner": "sentencePicture", "pick": "weakest" },
+  "reward": { "card": "card-bunny" }
+}

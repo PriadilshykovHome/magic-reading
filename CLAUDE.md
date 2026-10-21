@@ -57,12 +57,25 @@ docs/PLAN.md
 - **The progress store is the single source of truth.** The sync service mirrors it to
   localStorage and Firestore (`players/{uid}`); components never talk to Firebase directly.
 - Items are keyed by lexicon id (`syl-ma`), never by Cyrillic text.
+- **The engine decides, the UI choreographs.** In-level feedback comes from `src/engine/run.ts`
+  as `FeedbackEvent`s (wrong + hint, correct with chime pitch / sparks / golden spark / praise,
+  streak wand / wave, door open) and the celebration's running order from `finishLevel` in
+  `src/engine/rewards.ts` (`CelebrationStep`s). Animations, sounds and Соня's lines react to
+  those events; never re-derive game rules in components.
+- Code that Node runs directly (`src/engine/`, `src/tasks/*/logic.ts`, `scripts/`) uses explicit
+  `.ts` import extensions and only erasable TypeScript; it must not import JSON, CSS or React.
 
 ## Content
 
-- All learning content lives in `content/*.json` and is validated by Zod schemas.
-  `npm run validate-content` checks schemas, referenced ids, audio and picture files, task
-  configs and pool sizes. A broken content file must fail the build, not the game.
+- All learning content lives in `content/*.json` and is validated by Zod schemas
+  (`src/engine/schema.ts`): `lexicon.json`, `worlds/<world>/world.json` + `levels/*.json`,
+  `cards.json`, `config.json` (every tunable number: boxes, stars, sparks, streaks, creature
+  thresholds, Easter egg dates), `voice.uk.json` (Соня's lines, with `{nameVoc}`-style
+  placeholders filled from `strings.uk.json` and the private profile) and `strings.uk.json`.
+- `npm run validate-content` checks schemas, referenced ids, hand-written splits, allowed
+  letters, task configs, pool sizes (it dry-builds every possible task), voice lines and assets.
+  Missing audio/pictures are warnings (`--strict` makes them errors). A broken content file
+  must fail the build, not the game.
 - Adding a level or world means content and assets only. If a level needs a code change,
   the engine or a task type is missing something; fix that rather than special-casing the level.
 - Syllable splits are written by hand in the lexicon, never auto-hyphenated.
@@ -72,20 +85,27 @@ docs/PLAN.md
 
 ## Task plug-in contract
 
-Every task type lives in `src/tasks/<typeId>/` and is registered in `src/tasks/registry.ts`.
-The game loop only talks to this interface:
+Every task type lives in `src/tasks/<typeId>/`. Its pure half, `logic.ts`, implements
+`TaskLogic` (`src/engine/taskLogic.ts`) and is listed in `src/tasks/logicRegistry.ts`; from
+Phase 3 its React `Component` sits next to it and `src/tasks/registry.ts` pairs the two.
+The engine, session builder and validator only talk to the logic:
 
 ```ts
-interface TaskType<Config> {
-  id: string;                                   // e.g. 'readPickPicture'
-  configSchema: ZodType<Config>;                // validates its entry in a level file
-  scored: boolean;
-  build(ctx: BuildContext, config: Config): TaskInstance;  // target + distractors
-  Component: React.FC<TaskProps>;               // renders it, reports onAnswer(result)
+interface TaskLogic<Config, Data> {
+  id: string;                         // e.g. 'readPickPicture'
+  configSchema: ZodType<Config>;      // validates its entry in a level file
+  scored: boolean;                    // counts toward stars
+  reading: boolean;                   // target audio only after the answer
+  needsParent: boolean;               // readAloud: replaced when no parent is nearby
+  instruction(config): string;        // voice line id for Соня's instruction
+  eligible(ctx, config): string[];    // every item it could ask about
+  build(ctx, config, target): { target; options; data: Data };  // ctx.distractors() etc.
 }
+// Phase 3 adds: Component: React.FC<TaskProps>  (renders it, reports misses and completion)
 ```
 
-`magicDoor` is a wrapper around any scored type, not a separate mechanic.
+`magicDoor` is a wrapper around any scored type, not a separate mechanic: the session builder
+builds the level's `boss.inner` type on the weakest/newest (or fixed) item and marks it `boss`.
 
 ## Hard rules
 
@@ -106,8 +126,9 @@ interface TaskType<Config> {
 - Every drag also works as tap-to-place. Use Pointer Events only.
 - Mistakes are never punished: no red crosses, no buzzers; a level can never be failed.
 - Animate only `transform` and `opacity`. Respect `prefers-reduced-motion`.
-- **No Ukrainian (or any user-facing) text hard-coded in components.** It goes in
-  `content/strings.uk.json` or other `content/` files.
+- **No Ukrainian (or any user-facing) text hard-coded in code.** It goes in
+  `content/strings.uk.json` or other `content/` files. Comments may quote Ukrainian examples;
+  `src/no-hardcoded-text.test.ts` checks everything else.
 - **No Harry Potter anything:** no names, characters, places, logos, fonts, house colours,
   music or sounds from the books or films. The owl Соня is purple, never white.
 - Assets use free licences only (CC0 preferred); every asset is listed in `CREDITS.md`.
@@ -140,7 +161,7 @@ npm run build             # typecheck + production build to dist/
 npm run lint              # ESLint
 npm run typecheck         # tsc --noEmit
 npm test                  # Vitest
-npm run validate-content  # (Phase 2+) content checks
+npm run validate-content  # content checks; -- --strict (assets are errors), --verbose, --root <dir>
 ```
 
 ## Deployment

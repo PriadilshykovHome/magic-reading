@@ -1,0 +1,56 @@
+{
+  "letters": {
+    "vowels": "АОУИІЕЄЮЯЇ"
+  },
+  "session": {
+    "minTasks": 8,
+    "maxTasks": 10,
+    "reviewShare": 0.25
+  },
+  "answers": {
+    "maxChoices": 3,
+    "hintAfterMisses": 2
+  },
+  "boxes": {
+    "max": 5,
+    "weights": [5, 4, 3, 2, 1]
+  },
+  "stars": {
+    "three": 0.9,
+    "two": 0.7
+  },
+  "sparks": {
+    "perCorrect": 1,
+    "goldenChance": 0.0333,
+    "goldenValue": 5,
+    "praiseEvery": [2, 3]
+  },
+  "streaks": {
+    "wand": 3,
+    "wave": 5
+  },
+  "mastery": {
+    "firstTryOk": 3,
+    "distinctDays": 2
+  },
+  "creature": {
+    "hatchAfterLevel": "tower-of-syllables/01",
+    "youngAtSparks": 150,
+    "bigAtSparks": 400
+  },
+  "windows": {
+    "surpriseEvery": 7,
+    "surpriseCard": "card-week"
+  },
+  "eggs": {
+    "pysankyDaysBefore": 3,
+    "pysankyDaysAfter": 7,
+    "pysankyCount": 5,
+    "pysankyCard": "card-pysanka",
+    "eveningFromHour": 19,
+    "morningUntilHour": 10
+  },
+  "grammar": {
+    "patronymicVocative": [["ович", "овичу"], ["івна", "івно"], ["ївна", "ївно"]]
+  }
+}

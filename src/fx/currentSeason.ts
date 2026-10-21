@@ -1,4 +1,4 @@
-import { parseSeason, seasonFor, type Season } from './season';
+import { parseSeason, seasonFor, type Season } from '../engine/calendar';
 
 // `?season=winter` in the URL previews another season (before the #/ part of the address).
 export function currentSeason(): Season {

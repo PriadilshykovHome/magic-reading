@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import { seededRandom } from '../random';
+import { seededRandom } from '../../engine/rng';
 import { Embers } from './Embers';
 import './ambient.css';
 
