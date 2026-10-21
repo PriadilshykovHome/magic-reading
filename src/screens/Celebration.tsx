@@ -38,10 +38,19 @@ export function CelebrationScreen() {
   return <Celebration summary={result.summary} steps={result.steps} />;
 }
 
-function Celebration({ summary, steps }: { summary: LevelSummary; steps: CelebrationStep[] }) {
+export function Celebration({
+  summary,
+  steps,
+  startFinished = false,
+}: {
+  summary: LevelSummary;
+  steps: CelebrationStep[];
+  /** Everything revealed at once (used by the layout checks). */
+  startFinished?: boolean;
+}) {
   const navigate = useNavigate();
-  const [step, setStep] = useState(0);
-  const [cardFlipped, setCardFlipped] = useState(false);
+  const [step, setStep] = useState(startFinished ? steps.length : 0);
+  const [cardFlipped, setCardFlipped] = useState(startFinished);
   const [canSkip, setCanSkip] = useState(false);
   const finished = step >= steps.length;
   const current = steps[step];

@@ -157,3 +157,10 @@
   60% { transform: translateY(-22%) scale(0.95, 1.08); }
   100% { transform: none; }
 }
+
+.map-fullscreen {
+  position: absolute;
+  top: calc(16px + env(safe-area-inset-top));
+  right: calc(16px + env(safe-area-inset-right));
+  z-index: 1;
+}

@@ -1,10 +1,12 @@
 // Placeholder sound effects, synthesised with Web Audio: soft bells and pops, never a buzzer.
 // Phase 5 replaces these with recorded, free-licensed effects through the audio manager.
+import { SILENT } from '../testMode';
+
 let ctx: AudioContext | null = null;
-let volume = 0.8;
+let volume = SILENT ? 0 : 0.8;
 
 function audio(): AudioContext | null {
-  if (typeof window === 'undefined' || !('AudioContext' in window)) return null;
+  if (SILENT || typeof window === 'undefined' || !('AudioContext' in window)) return null;
   ctx ??= new AudioContext();
   return ctx;
 }

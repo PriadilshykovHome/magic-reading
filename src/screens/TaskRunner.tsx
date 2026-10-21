@@ -40,7 +40,13 @@ export function TaskRunnerScreen() {
 
 type Effect = { kind: 'wand' | 'wave' | 'golden'; id: number };
 
-function Runner({ level }: { level: Level }) {
+/** Test routes start at the first task of a given type (or the Magic Door). */
+export interface StartAt {
+  type: string;
+  boss: boolean;
+}
+
+export function Runner({ level, startAt, seed }: { level: Level; startAt?: StartAt; seed?: number }) {
   const navigate = useNavigate();
   const { config } = content;
   const recordTask = useProgress((s) => s.recordTask);
@@ -57,13 +63,15 @@ function Runner({ level }: { level: Level }) {
       progress,
       settings: progress.settings,
       registry: taskLogics,
-      rng: seededRandom(randomSeed()),
+      rng: seededRandom(seed ?? randomSeed()),
       now: new Date(),
     });
   });
-  const [rng] = useState(() => seededRandom(randomSeed()));
+  const [rng] = useState(() => seededRandom(seed !== undefined ? seed + 1 : randomSeed()));
   const run = useRef(startRun(config, rng));
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(() =>
+    startAt ? Math.max(0, session.tasks.findIndex((x) => x.type === startAt.type && x.boss === startAt.boss)) : 0,
+  );
   const [solved, setSolved] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [hint, setHint] = useState(false);
@@ -93,6 +101,25 @@ function Runner({ level }: { level: Level }) {
   useEffect(() => {
     const timer = window.setTimeout(instruct, 550);
     return () => window.clearTimeout(timer);
+  }, [instruct]);
+
+  // On a laptop: keys 1, 2, 3 pick options (or tiles), Space repeats the instruction.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === ' ') {
+        e.preventDefault();
+        instruct();
+        return;
+      }
+      const n = Number(e.key);
+      if (!Number.isInteger(n) || n < 1 || n > 9) return;
+      const targets = document.querySelectorAll<HTMLElement>(
+        '.runner-stage .choices .option:not(:disabled), .runner-stage .build-tray .tile, .runner-stage .merge-consonant, .runner-stage .parent-button:not(:disabled)',
+      );
+      targets[n - 1]?.click();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
   }, [instruct]);
 
   useEffect(

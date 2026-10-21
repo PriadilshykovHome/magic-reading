@@ -6,3 +6,4 @@ Only free licences are allowed (CC0 preferred). Nothing from the Harry Potter bo
 | Asset | Source | Author | Licence |
 | --- | --- | --- | --- |
 | Cormorant Garamond, Cormorant SC (fonts) | [Google Fonts](https://fonts.google.com/specimen/Cormorant) via Fontsource | Christian Thalmann | SIL Open Font License 1.1 |
+| Nunito (font) | [Google Fonts](https://fonts.google.com/specimen/Nunito) via Fontsource | Vernon Adams, Cyreal, Jacques Le Bailly | SIL Open Font License 1.1 |

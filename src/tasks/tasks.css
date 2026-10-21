@@ -54,7 +54,7 @@
 }
 
 .choices.is-picture .option {
-  width: clamp(92px, 25vmin, 190px);
+  width: clamp(92px, 22vmin, 180px);
   aspect-ratio: 1;
 }
 
@@ -209,10 +209,9 @@
 }
 
 .bubble {
-  --size: clamp(84px, 17vmin, 124px);
   position: absolute;
   top: 100%;
-  left: calc(4% + var(--lane) * 24%);
+  left: calc(var(--lane) * (100% - var(--size)) / (var(--lanes) - 1));
   width: var(--size);
   height: var(--size);
   padding: 0;
@@ -223,12 +222,13 @@
   animation: rise var(--rise) linear var(--delay) infinite;
 }
 
+/* Rises during the first 60% of the cycle, then waits hidden above (see RISE_SHARE). */
 @keyframes rise {
-  from { transform: translate(0, 0); }
-  25% { transform: translate(10px, calc(-25cqh - 25%)); }
-  50% { transform: translate(-8px, calc(-50cqh - 50%)); }
-  75% { transform: translate(8px, calc(-75cqh - 75%)); }
-  to { transform: translate(0, calc(-100cqh - 110%)); }
+  0% { transform: translate(0, 0); }
+  15% { transform: translate(10px, calc(-25cqh - 27.5%)); }
+  30% { transform: translate(-10px, calc(-50cqh - 55%)); }
+  45% { transform: translate(10px, calc(-75cqh - 82.5%)); }
+  60%, 100% { transform: translate(0, calc(-100cqh - 110%)); }
 }
 
 .bubble-inner {
@@ -243,8 +243,9 @@
   box-shadow: inset 0 0 18px rgb(255 255 255 / 0.25), 0 0 18px rgb(124 196 189 / 0.25);
   color: var(--parchment-light);
   font-family: var(--font-reading);
-  font-size: clamp(30px, 7vmin, 48px);
+  font-size: 64px; /* a syllable: never below 64 px */
   font-weight: 800;
+  letter-spacing: -0.02em;
   text-shadow: 0 2px 6px rgb(0 0 0 / 0.6);
 }
 
@@ -277,6 +278,11 @@
 }
 
 .picture-button {
+  display: grid;
+  place-items: center;
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+  padding: 8px;
   border: 0;
   background: none;
   cursor: pointer;

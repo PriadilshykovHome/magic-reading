@@ -6,7 +6,7 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig([
-  globalIgnores(['dist', 'coverage']),
+  globalIgnores(['dist', 'dist-e2e', 'coverage', 'e2e-report', 'test-results']),
   {
     files: ['src/**/*.{ts,tsx}'],
     extends: [
@@ -18,7 +18,7 @@ export default defineConfig([
     languageOptions: { globals: globals.browser },
   },
   {
-    files: ['src/**/*.test.ts', '*.config.{js,ts}', 'scripts/**/*.ts'],
+    files: ['src/**/*.test.ts', '*.config.{js,ts}', 'scripts/**/*.ts', 'e2e/**/*.ts'],
     extends: [js.configs.recommended, tseslint.configs.recommended],
     languageOptions: { globals: globals.node },
   },

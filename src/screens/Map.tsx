@@ -11,7 +11,7 @@ import { useGame } from '../store/game';
 import { useProgress } from '../store/progress';
 import { fmt, t } from '../strings';
 import { SparkJar } from '../ui/Candles';
-import { LockIcon, StarIcon } from '../ui/Icons';
+import { FullscreenIcon, LockIcon, StarIcon } from '../ui/Icons';
 import './Map.css';
 
 const CANDLES: CandleSpot[] = [
@@ -23,7 +23,7 @@ const CANDLES: CandleSpot[] = [
 
 // Where each level door sits, in % of the map: portrait winds upward, landscape left to right.
 const SPOTS = [
-  { px: 28, py: 74, lx: 20, ly: 66 },
+  { px: 28, py: 72, lx: 24, ly: 50 },
   { px: 70, py: 50, lx: 50, ly: 40 },
   { px: 32, py: 25, lx: 80, ly: 62 },
 ];
@@ -43,6 +43,7 @@ export function MapScreen() {
   }, [greeted, setGreeted]);
 
   const levels = content.levelOrder.map((id) => content.levels.get(id)!);
+
   const nextId = levels.find((l) => isLevelUnlocked(progress, l) && !progress.levels[l.id]?.bestStars)?.id;
 
   const open = (levelId: string, unlocked: boolean) => {
@@ -56,15 +57,25 @@ export function MapScreen() {
     navigate(levelPath(levelId));
   };
 
+  // On a laptop, keys 1, 2, 3 open the level doors.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const level = levels[Number(e.key) - 1];
+      if (level) open(level.id, isLevelUnlocked(useProgress.getState().progress, level));
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  });
+
   return (
     <main className="screen map-screen">
       <Scene candles={CANDLES} />
 
       <svg className="map-path is-portrait" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-        <path d="M28 96 C 10 86, 20 78, 28 74 S 80 62, 70 50 S 20 38, 32 25 S 60 8, 52 0" />
+        <path d="M28 96 C 10 86, 20 76, 28 72 S 80 62, 70 50 S 20 38, 32 25 S 60 8, 52 0" />
       </svg>
       <svg className="map-path is-landscape" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-        <path d="M0 80 C 10 74, 14 70, 20 66 S 40 38, 50 40 S 70 66, 80 62 S 96 40, 100 30" />
+        <path d="M0 74 C 10 64, 16 54, 24 50 S 40 38, 50 40 S 70 66, 80 62 S 96 40, 100 30" />
       </svg>
 
       {levels.map((level, i) => {
@@ -99,6 +110,17 @@ export function MapScreen() {
         );
       })}
 
+      {canGoFullscreen() && (
+        <button
+          type="button"
+          className="icon-button map-fullscreen"
+          aria-label={t.map.fullscreen}
+          onClick={() => void document.documentElement.requestFullscreen?.().catch(() => {})}
+        >
+          <FullscreenIcon />
+        </button>
+      )}
+
       <div className="map-corner">
         <SparkJar count={sparkBalance(progress)} label={fmt(t.map.sparks, { n: sparkBalance(progress) })} />
         <button
@@ -115,4 +137,9 @@ export function MapScreen() {
       </div>
     </main>
   );
+}
+
+/** Installed apps already open full screen; elsewhere offer it where the browser supports it (not iPhone). */
+function canGoFullscreen(): boolean {
+  return document.fullscreenEnabled && !window.matchMedia('(display-mode: standalone)').matches && !document.fullscreenElement;
 }

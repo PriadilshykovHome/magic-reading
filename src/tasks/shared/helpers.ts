@@ -4,6 +4,7 @@ import { itemText, kindOf } from '../../engine/content';
 import type { TaskInstance } from '../../engine/taskLogic';
 import { displayText } from '../../engine/text';
 import { useProgress } from '../../store/progress';
+import { TEST_BUILD } from '../../testMode';
 
 /** Reading text as shown to him: UPPERCASE unless the parent turned on lowercase sentences. */
 export function useDisplayText(): (id: string) => string {
@@ -19,11 +20,10 @@ export function pictureOf(id: string): string {
   return content.words.get(id)?.emoji ?? content.sentences.get(id)?.emoji ?? '';
 }
 
-const MARK_CORRECT = import.meta.env.DEV || import.meta.env.VITE_MARK_CORRECT === 'true';
 
 /** Test builds mark the correct option for automated play-throughs; production builds strip it. */
 export function correctMark(isCorrect: boolean): { 'data-correct'?: 'true' } {
-  return MARK_CORRECT && isCorrect ? { 'data-correct': 'true' } : {};
+  return TEST_BUILD && isCorrect ? { 'data-correct': 'true' } : {};
 }
 
 /** Pick-one-of-N: wrong picks wobble, dim and disable; the right one springs up. */

@@ -1,6 +1,8 @@
 // Placeholder voice: the browser's Ukrainian speech (Phase 5 swaps in recorded clips).
 // Speaking always cancels what was playing, so lines never stack.
-const supported = typeof window !== 'undefined' && 'speechSynthesis' in window;
+import { SILENT } from '../testMode';
+
+const supported = !SILENT && typeof window !== 'undefined' && 'speechSynthesis' in window;
 let voice: SpeechSynthesisVoice | null = null;
 let generation = 0;
 

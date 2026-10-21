@@ -1,4 +1,4 @@
-import { useRef, useState, type PointerEvent } from 'react';
+import { useRef, useState, type MouseEvent, type PointerEvent } from 'react';
 
 const TAP_SLOP = 8;
 
@@ -38,6 +38,10 @@ export function useDrag({ onTap, onDrop, disabled = false }: { onTap: () => void
     onPointerCancel() {
       start.current = null;
       setOffset(null);
+    },
+    /** Keyboard (Enter/Space, or the 1-2-3 shortcuts) produces a click with no pointer: treat it as a tap. */
+    onClick(e: MouseEvent<HTMLElement>) {
+      if (e.detail === 0 && !disabled) onTap();
     },
   };
 

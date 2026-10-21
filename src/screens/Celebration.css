@@ -217,5 +217,40 @@
 .celebration-actions {
   display: flex;
   gap: clamp(24px, 6vmin, 56px);
+  margin-top: 8px;
   animation: spring-up 0.6s cubic-bezier(0.3, 1.5, 0.5, 1);
+}
+
+/* Phones in landscape: stars, sparks and buttons on the left; the rewards on the right. */
+@media (orientation: landscape) and (max-height: 520px) {
+  .celebration-column {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-areas:
+      'stars rewards'
+      'sparks rewards'
+      'actions rewards';
+    align-items: center;
+    justify-items: center;
+    column-gap: clamp(24px, 6vw, 64px);
+    row-gap: 10px;
+  }
+
+  .celebration-stars { grid-area: stars; }
+  .celebration-sparks { grid-area: sparks; }
+  .celebration-rewards { grid-area: rewards; }
+  .celebration-actions { grid-area: actions; }
+
+  .celebration-star {
+    width: clamp(64px, 16vmin, 90px);
+  }
+
+  .celebration-star:nth-child(2) {
+    width: clamp(72px, 19vmin, 104px);
+  }
+
+  .celebration-actions .big-button {
+    width: 80px;
+    height: 80px;
+  }
 }
