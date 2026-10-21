@@ -1,0 +1,26 @@
+.map-screen {
+  justify-content: center;
+}
+
+.map-back {
+  position: absolute;
+  top: calc(16px + env(safe-area-inset-top));
+  left: calc(16px + env(safe-area-inset-left));
+}
+
+.map-card {
+  position: relative;
+  max-width: min(90vw, 640px);
+  text-align: center;
+}
+
+.map-title {
+  margin: 0 0 12px;
+  font-size: clamp(32px, 7vmin, 64px);
+  font-weight: 800;
+}
+
+.map-text {
+  margin: 0;
+  font-size: clamp(20px, 4vmin, 32px);
+}
