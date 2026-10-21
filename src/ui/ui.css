@@ -1,0 +1,265 @@
+/* Shared game UI: buttons, option cards, candles, the spark jar. */
+
+/* ---------- hold button ---------- */
+
+.hold-button {
+  position: relative;
+}
+
+.hold-ring {
+  position: absolute;
+  inset: -3px;
+  width: calc(100% + 6px) !important;
+  height: calc(100% + 6px) !important;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+
+.hold-ring circle {
+  fill: none;
+  stroke: var(--gold-light);
+  stroke-width: 3;
+  stroke-dasharray: 182.2;
+  stroke-dashoffset: 182.2;
+  opacity: 0;
+}
+
+.hold-button.is-holding .hold-ring circle {
+  opacity: 1;
+  transition: stroke-dashoffset var(--hold-ms) linear;
+  stroke-dashoffset: 0;
+}
+
+/* ---------- big round action buttons ---------- */
+
+.big-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(80px, 18vmin, 112px);
+  height: clamp(80px, 18vmin, 112px);
+  padding: 0;
+  border: 2px solid var(--gold);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #f6e2a0, var(--gold) 55%, var(--gold-deep));
+  color: var(--ink);
+  box-shadow: 0 0 30px rgb(240 214 138 / 0.35), 0 8px 18px rgb(0 0 0 / 0.5);
+  cursor: pointer;
+  animation: focal-pulse 3.2s ease-in-out infinite;
+}
+
+.big-button svg {
+  width: 46%;
+  height: 46%;
+}
+
+.big-button.is-ghost {
+  background: rgb(26 20 36 / 0.8);
+  color: var(--gold-light);
+  animation: none;
+}
+
+@keyframes focal-pulse {
+  0%, 100% { box-shadow: 0 0 18px rgb(240 214 138 / 0.25), 0 8px 18px rgb(0 0 0 / 0.5); }
+  50% { box-shadow: 0 0 40px rgb(240 214 138 / 0.55), 0 8px 18px rgb(0 0 0 / 0.5); }
+}
+
+/* ---------- option cards ---------- */
+
+.option {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 14px;
+  background:
+    radial-gradient(ellipse at 20% 15%, rgb(255 250 235 / 0.7), transparent 50%),
+    var(--parchment-light);
+  color: var(--ink);
+  box-shadow: inset 0 0 22px rgb(120 80 30 / 0.28), 0 8px 18px rgb(0 0 0 / 0.45);
+  cursor: pointer;
+  transition: transform 0.18s ease, opacity 0.3s ease, box-shadow 0.3s ease;
+}
+
+.option:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.option:focus-visible {
+  outline: 3px solid var(--gold-light);
+  outline-offset: 3px;
+}
+
+.option.is-wrong {
+  opacity: 0.4;
+  animation: wobble 0.3s ease-in-out;
+  cursor: default;
+}
+
+.option.is-correct {
+  z-index: 1;
+  box-shadow: inset 0 0 22px rgb(120 80 30 / 0.2), 0 0 0 4px var(--gold-light), 0 0 36px rgb(240 214 138 / 0.7);
+  animation: spring-up 0.55s cubic-bezier(0.3, 1.5, 0.5, 1);
+}
+
+.option.is-faded {
+  opacity: 0.35;
+}
+
+.option.is-hint {
+  animation: hint-pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes wobble {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-9px) rotate(-2deg); }
+  45% { transform: translateX(8px) rotate(2deg); }
+  70% { transform: translateX(-5px); }
+}
+
+@keyframes spring-up {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.12) translateY(-6px); }
+  70% { transform: scale(0.98); }
+  100% { transform: scale(1.04); }
+}
+
+@keyframes hint-pulse {
+  0%, 100% { box-shadow: inset 0 0 22px rgb(120 80 30 / 0.28), 0 0 0 0 rgb(240 214 138 / 0); transform: scale(1); }
+  50% { box-shadow: inset 0 0 22px rgb(120 80 30 / 0.28), 0 0 0 6px rgb(240 214 138 / 0.75); transform: scale(1.05); }
+}
+
+/* Reading text: the clear rounded sans, never below the plan's minimums. */
+.read-syllable {
+  font-family: var(--font-reading);
+  font-weight: 800;
+  font-size: clamp(64px, 15vmin, 120px);
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
+
+.read-word {
+  font-family: var(--font-reading);
+  font-weight: 800;
+  font-size: clamp(48px, 11vmin, 96px);
+  line-height: 1.05;
+  letter-spacing: 0.04em;
+}
+
+.read-sentence {
+  font-family: var(--font-reading);
+  font-weight: 700;
+  font-size: clamp(32px, 7.5vmin, 64px);
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.emoji-picture {
+  font-size: clamp(48px, 12vmin, 104px);
+  line-height: 1;
+}
+
+/* ---------- candles row ---------- */
+
+.candle-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: clamp(6px, 2vw, 18px);
+  height: 34px;
+}
+
+.mini-candle {
+  position: relative;
+  width: 7px;
+  height: 18px;
+  border-radius: 2px 2px 1px 1px;
+  background: linear-gradient(90deg, #a8936c, #fff8e6 50%, #8f7a55);
+  opacity: 0.45;
+  transition: opacity 0.4s ease;
+}
+
+.mini-candle::before {
+  content: '';
+  position: absolute;
+  left: 2.75px;
+  top: -4px;
+  width: 1.5px;
+  height: 4px;
+  background: #2a1a10;
+}
+
+.mini-candle::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -15px;
+  width: 7px;
+  height: 12px;
+  margin-left: -3.5px;
+  border-radius: 50% 50% 50% 50% / 65% 65% 35% 35%;
+  background: radial-gradient(ellipse 60% 70% at 50% 75%, #fff 0%, #fff4c9 22%, #ffd36b 48%, #ff9a3c 74%, rgb(255 120 40 / 0) 100%);
+  box-shadow: 0 0 10px 2px rgb(255 170 80 / 0.55);
+  transform-origin: 50% 90%;
+  opacity: 0;
+  transform: scale(0.2);
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.3, 1.5, 0.5, 1);
+}
+
+.mini-candle.is-lit {
+  opacity: 1;
+}
+
+.mini-candle.is-lit::after {
+  opacity: 1;
+  transform: scale(1);
+  animation: flicker 1.5s linear 0.4s infinite;
+}
+
+.mini-candle.is-door {
+  width: 9px;
+  height: 22px;
+  background: linear-gradient(90deg, #8a6526, #f0d68a 50%, #7c5a1e);
+}
+
+/* ---------- spark jar ---------- */
+
+.spark-jar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--tap-min);
+  padding: 0 14px 0 8px;
+  border: 1.5px solid rgb(201 162 74 / 0.5);
+  border-radius: 999px;
+  background: rgb(26 20 36 / 0.75);
+  color: var(--gold-light);
+}
+
+.spark-jar svg {
+  width: 30px;
+  height: 36px;
+}
+
+.spark-jar-count {
+  min-width: 2ch;
+  font-family: var(--font-reading);
+  font-size: 22px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  animation: jar-bump 0.45s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+.spark-jar.is-golden {
+  box-shadow: 0 0 24px rgb(255 214 107 / 0.8);
+}
+
+@keyframes jar-bump {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}

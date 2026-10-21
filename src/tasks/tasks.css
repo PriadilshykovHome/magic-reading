@@ -1,0 +1,340 @@
+/* Task layouts: the reading card on top and choices below in portrait; side by side in landscape.
+   Every tap target ≥ 64 px with ≥ 16 px gaps; reading text never below the plan's minimums. */
+
+.task-layout {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  align-items: center;
+  justify-items: center;
+  gap: clamp(16px, 3.5vmin, 36px);
+  width: 100%;
+  height: 100%;
+}
+
+@media (orientation: landscape) {
+  .task-layout {
+    grid-template-rows: none;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  }
+}
+
+.task-prompt {
+  display: grid;
+  place-items: center;
+  max-width: 100%;
+  min-width: min(100%, 260px);
+  min-height: clamp(120px, 26vmin, 260px);
+  text-align: center;
+}
+
+.task-prompt.parchment {
+  padding: clamp(20px, 5vmin, 48px) clamp(24px, 6vmin, 64px);
+}
+
+.task-prompt.is-glowing {
+  box-shadow: inset 0 0 45px rgb(120 80 30 / 0.32), 0 0 0 4px var(--gold-light), 0 0 40px rgb(240 214 138 / 0.6);
+}
+
+.choices {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--tap-gap);
+  max-width: 100%;
+}
+
+.choices.is-text .option {
+  min-width: clamp(96px, 27vmin, 220px);
+  min-height: clamp(88px, 19vmin, 150px);
+}
+
+.choices.is-text.is-word .option {
+  min-width: clamp(150px, 40vmin, 320px);
+}
+
+.choices.is-picture .option {
+  width: clamp(92px, 25vmin, 190px);
+  aspect-ratio: 1;
+}
+
+.choices.is-scene .emoji-picture {
+  font-size: clamp(38px, 9vmin, 80px);
+  letter-spacing: -0.05em;
+}
+
+/* ---------- listening prompt ---------- */
+
+.listen-button {
+  display: grid;
+  place-items: center;
+  width: clamp(110px, 26vmin, 190px);
+  aspect-ratio: 1;
+  border: 2px solid rgb(240 214 138 / 0.6);
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, rgb(240 214 138 / 0.22), rgb(26 20 36 / 0.85) 70%);
+  color: var(--gold-light);
+  box-shadow: 0 0 40px rgb(240 214 138 / 0.25);
+  cursor: pointer;
+}
+
+.listen-button svg {
+  width: 48%;
+  height: 48%;
+}
+
+/* ---------- read aloud ---------- */
+
+.parent-controls {
+  display: flex;
+  gap: 24px;
+}
+
+.parent-button {
+  display: grid;
+  place-items: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: 1.5px solid rgb(201 162 74 / 0.55);
+  border-radius: 50%;
+  background: rgb(26 20 36 / 0.8);
+  color: var(--parchment);
+  cursor: pointer;
+}
+
+.parent-button svg {
+  width: 30px;
+  height: 30px;
+}
+
+.parent-button.is-yes {
+  color: var(--teal);
+}
+
+.parent-button:disabled {
+  opacity: 0.4;
+}
+
+/* ---------- syllable merge ---------- */
+
+.merge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(40px, 12vmin, 120px);
+  width: 100%;
+  height: 100%;
+}
+
+.merge-card {
+  width: clamp(110px, 26vmin, 200px);
+  aspect-ratio: 1;
+  touch-action: none;
+}
+
+.merge-consonant {
+  cursor: grab;
+  animation: hint-pulse 2.2s ease-in-out 1.5s infinite;
+}
+
+.merge-flying .merge-consonant {
+  animation: none;
+  transform: translateX(calc(100% + clamp(40px, 12vmin, 120px))) scale(0.9);
+  opacity: 0;
+  transition: transform 0.5s cubic-bezier(0.5, 0, 0.3, 1), opacity 0.2s ease 0.35s;
+}
+
+.merge-flying .merge-vowel {
+  box-shadow: inset 0 0 22px rgb(120 80 30 / 0.2), 0 0 0 4px var(--gold-light), 0 0 40px rgb(240 214 138 / 0.7);
+  transition: box-shadow 0.3s ease 0.3s;
+}
+
+.merge-fused {
+  width: clamp(170px, 40vmin, 320px);
+}
+
+/* ---------- bubbles ---------- */
+
+.bubble-task {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: 100%;
+}
+
+.listen-chip {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: var(--tap-min);
+  padding: 0 22px;
+  border: 1.5px solid rgb(240 214 138 / 0.6);
+  border-radius: 999px;
+  background: rgb(26 20 36 / 0.8);
+  color: var(--gold-light);
+  cursor: pointer;
+}
+
+.listen-chip svg {
+  width: 30px;
+  height: 30px;
+}
+
+.bubble-count {
+  display: flex;
+  gap: 8px;
+}
+
+.bubble-dot {
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid var(--gold-light);
+  border-radius: 50%;
+  transition: background-color 0.3s;
+}
+
+.bubble-dot.is-on {
+  background: var(--gold-light);
+  box-shadow: 0 0 10px var(--gold-light);
+}
+
+.bubble-field {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  overflow: hidden;
+  container-type: size;
+}
+
+.bubble {
+  --size: clamp(84px, 17vmin, 124px);
+  position: absolute;
+  top: 100%;
+  left: calc(4% + var(--lane) * 24%);
+  width: var(--size);
+  height: var(--size);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  animation: rise var(--rise) linear var(--delay) infinite;
+}
+
+@keyframes rise {
+  from { transform: translate(0, 0); }
+  25% { transform: translate(10px, calc(-25cqh - 25%)); }
+  50% { transform: translate(-8px, calc(-50cqh - 50%)); }
+  75% { transform: translate(8px, calc(-75cqh - 75%)); }
+  to { transform: translate(0, calc(-100cqh - 110%)); }
+}
+
+.bubble-inner {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 28%, rgb(255 255 255 / 0.75) 0 8%, transparent 9%),
+    radial-gradient(circle at 50% 50%, rgb(124 196 189 / 0.08) 55%, rgb(124 196 189 / 0.35) 70%, rgb(240 214 138 / 0.5) 100%);
+  box-shadow: inset 0 0 18px rgb(255 255 255 / 0.25), 0 0 18px rgb(124 196 189 / 0.25);
+  color: var(--parchment-light);
+  font-family: var(--font-reading);
+  font-size: clamp(30px, 7vmin, 48px);
+  font-weight: 800;
+  text-shadow: 0 2px 6px rgb(0 0 0 / 0.6);
+}
+
+.bubble-inner.is-wobbling {
+  animation: wobble 0.3s ease-in-out;
+}
+
+.bubble.is-hint .bubble-inner {
+  box-shadow: inset 0 0 18px rgb(255 255 255 / 0.3), 0 0 0 4px var(--gold-light), 0 0 26px rgb(240 214 138 / 0.8);
+}
+
+.bubble.is-popped {
+  pointer-events: none;
+}
+
+.bubble.is-popped .bubble-inner {
+  animation: pop 0.35s ease-out forwards;
+}
+
+@keyframes pop {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.7; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+/* ---------- build a word ---------- */
+
+.build-picture {
+  min-width: clamp(140px, 32vmin, 260px);
+}
+
+.picture-button {
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.build-work {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(18px, 4vmin, 36px);
+}
+
+.build-slots,
+.build-tray {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--tap-gap);
+}
+
+.build-slot {
+  display: grid;
+  place-items: center;
+  width: clamp(104px, 24vmin, 170px);
+  height: clamp(84px, 18vmin, 130px);
+  border: 2px dashed rgb(240 214 138 / 0.55);
+  border-radius: 16px;
+  background: rgb(26 20 36 / 0.45);
+}
+
+.build-slot.is-filled {
+  border-style: solid;
+}
+
+.build-slots.is-done .build-slot {
+  border-color: var(--gold-light);
+  box-shadow: 0 0 30px rgb(240 214 138 / 0.5);
+}
+
+.tile,
+.tile-gap {
+  width: clamp(104px, 24vmin, 170px);
+  height: clamp(84px, 18vmin, 130px);
+}
+
+.build-slot .tile {
+  width: 100%;
+  height: 100%;
+}
+
+.tile {
+  touch-action: none;
+}
+
+.tile .read-word {
+  font-size: clamp(48px, 10vmin, 80px);
+}
+
+.tile.is-shaking {
+  animation: wobble 0.3s ease-in-out;
+}

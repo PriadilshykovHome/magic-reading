@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
+import { unlockAudio } from '../audio/voice';
 import { currentSeason } from '../fx/currentSeason';
 import { Pumpkin } from '../fx/ambient/Pumpkin';
 import { Scene, type CandleSpot } from '../fx/ambient/Scene';
@@ -26,8 +27,8 @@ const CANDLES: CandleSpot[] = [
   { x: 18, y: 84, scale: 0.5, wide: true },
 ];
 
-// Placeholder magic door (Phase 1 + art direction). Later phases add the audio unlock,
-// the owl's spoken greeting and login.
+// The magic door: tapping it unlocks sound (iPhones need a tap first) and enters the castle.
+// Phase 7 adds the login in between.
 export function DoorScreen() {
   const navigate = useNavigate();
   const [opening, setOpening] = useState(false);
@@ -35,6 +36,7 @@ export function DoorScreen() {
 
   function enter() {
     if (opening) return;
+    unlockAudio();
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       navigate('/map');
       return;

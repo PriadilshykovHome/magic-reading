@@ -216,6 +216,11 @@
   100% { opacity: 1; }
 }
 
+/* during tasks */
+.scene.is-quiet .scene-candles {
+  opacity: 0.55;
+}
+
 /* ---------- embers, vignette ---------- */
 
 .scene-embers {

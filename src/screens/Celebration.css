@@ -1,0 +1,221 @@
+.celebration-screen {
+  justify-content: center;
+}
+
+.celebration-light {
+  position: absolute;
+  left: 50%;
+  top: 38%;
+  width: 140vmin;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(255 230 170 / 0.28), rgb(240 214 138 / 0.08) 35%, transparent 65%);
+  translate: -50% -50%;
+  animation: light-in 1.2s ease-out both;
+}
+
+@keyframes light-in {
+  from { opacity: 0; transform: scale(0.4); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.celebration-column {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(12px, 3vmin, 28px);
+}
+
+/* ---------- stars land one by one ---------- */
+
+.celebration-stars {
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(8px, 3vmin, 24px);
+}
+
+.celebration-star {
+  width: clamp(72px, 18vmin, 140px);
+  aspect-ratio: 1;
+  opacity: 0.35;
+}
+
+.celebration-star:nth-child(2) {
+  width: clamp(88px, 22vmin, 170px);
+}
+
+.celebration-star svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.celebration-star.is-earned {
+  opacity: 1;
+  filter: drop-shadow(0 0 16px rgb(240 214 138 / 0.7));
+  animation: star-land 0.6s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+  animation-delay: calc(0.4s + var(--i) * 0.55s);
+}
+
+@keyframes star-land {
+  0% { opacity: 0; transform: translateY(-60%) scale(1.8) rotate(-30deg); }
+  60% { opacity: 1; transform: translateY(4%) scale(0.92) rotate(4deg); }
+  100% { opacity: 1; transform: none; }
+}
+
+.celebration-sparks {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-family: var(--font-reading);
+  font-weight: 800;
+  font-variant-numeric: lining-nums tabular-nums;
+  font-size: clamp(36px, 8vmin, 64px);
+  color: var(--gold-light);
+  text-shadow: 0 0 18px rgb(240 214 138 / 0.5);
+  animation: spring-up 0.6s cubic-bezier(0.3, 1.5, 0.5, 1);
+}
+
+.celebration-spark-icon {
+  color: var(--ember);
+}
+
+.celebration-rewards {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(16px, 4vmin, 40px);
+  min-height: clamp(150px, 30vmin, 240px);
+}
+
+/* ---------- creature card: tap to flip ---------- */
+
+.magic-card {
+  position: relative;
+  width: clamp(110px, 24vmin, 180px);
+  aspect-ratio: 5 / 7;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  perspective: 800px;
+  animation: card-in 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(-40px) rotate(-200deg) scale(0.4); }
+  to { opacity: 1; transform: none; }
+}
+
+.magic-card-back,
+.magic-card-front {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  backface-visibility: hidden;
+  transition: transform 0.7s cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+
+.magic-card-back {
+  border: 3px solid var(--gold);
+  background:
+    radial-gradient(circle at 50% 50%, rgb(240 214 138 / 0.3), transparent 60%),
+    repeating-linear-gradient(45deg, #2a2038 0 10px, #1a1424 10px 20px);
+  color: var(--gold-light);
+  font-size: clamp(40px, 9vmin, 70px);
+  animation: focal-pulse 2.4s ease-in-out infinite;
+}
+
+.magic-card-front {
+  grid-template-rows: 1fr auto;
+  padding: 12px 8px;
+  border: 3px solid var(--gold-light);
+  background: radial-gradient(ellipse at 50% 30%, #fff6dc, var(--parchment) 70%);
+  color: var(--ink);
+  box-shadow: 0 0 36px rgb(240 214 138 / 0.6);
+  transform: rotateY(180deg);
+}
+
+.magic-card.is-flipped .magic-card-back {
+  transform: rotateY(-180deg);
+}
+
+.magic-card.is-flipped .magic-card-front {
+  transform: rotateY(0deg);
+}
+
+.magic-card-art {
+  font-size: clamp(48px, 11vmin, 84px);
+}
+
+.magic-card-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(14px, 3vmin, 20px);
+  line-height: 1.1;
+  text-align: center;
+}
+
+.magic-card.is-static {
+  cursor: default;
+}
+
+/* ---------- Іскрик evolves ---------- */
+
+.celebration-creature {
+  --iskryk-size: clamp(110px, 24vmin, 180px);
+  width: var(--iskryk-size);
+}
+
+.creature-change.is-wobbling .iskryk-body {
+  animation: iskryk-wobble 0.5s ease-in-out infinite;
+}
+
+.creature-change.is-evolved .iskryk {
+  animation: evolve-flash 0.9s ease-out;
+}
+
+@keyframes evolve-flash {
+  0% { transform: scale(0.4); opacity: 0; filter: brightness(3); }
+  60% { transform: scale(1.15); opacity: 1; filter: brightness(1.6); }
+  100% { transform: none; filter: none; }
+}
+
+/* ---------- golden confetti (first ever 3 stars) ---------- */
+
+.confetti {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.confetti span {
+  position: absolute;
+  top: -5%;
+  width: 8px;
+  height: 14px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #fff3cc, var(--gold));
+  animation: confetti-fall linear infinite;
+}
+
+.confetti span:nth-child(3n) {
+  background: linear-gradient(180deg, #f6e2a0, #c9a24a);
+  width: 6px;
+}
+
+@keyframes confetti-fall {
+  from { transform: translateY(0) rotate(0); }
+  to { transform: translateY(115vh) rotate(720deg); }
+}
+
+.celebration-actions {
+  display: flex;
+  gap: clamp(24px, 6vmin, 56px);
+  animation: spring-up 0.6s cubic-bezier(0.3, 1.5, 0.5, 1);
+}

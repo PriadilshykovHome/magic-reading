@@ -26,9 +26,18 @@ const STARS = makeStars(90);
  * The shared night backdrop: sky, stars, moon, floating candles, mist, drifting embers and a
  * vignette. Everything here is quiet and slow; the screen's focal element gets the attention.
  */
-export function Scene({ candles = [], moon = true }: { candles?: CandleSpot[]; moon?: boolean }) {
+export function Scene({
+  candles = [],
+  moon = true,
+  quiet = false,
+}: {
+  candles?: CandleSpot[];
+  moon?: boolean;
+  /** During tasks: fewer embers and dimmer candles, so nothing competes with the reading card. */
+  quiet?: boolean;
+}) {
   return (
-    <div className="scene" aria-hidden="true">
+    <div className={`scene ${quiet ? 'is-quiet' : ''}`} aria-hidden="true">
       <div className="scene-sky" />
       <div className="scene-stars">
         {STARS.map((s, i) => (
@@ -58,7 +67,7 @@ export function Scene({ candles = [], moon = true }: { candles?: CandleSpot[]; m
         ))}
       </div>
       <div className="scene-mist scene-mist-front" />
-      <Embers />
+      <Embers density={quiet ? 0.35 : 1} />
       <div className="scene-vignette" />
     </div>
   );

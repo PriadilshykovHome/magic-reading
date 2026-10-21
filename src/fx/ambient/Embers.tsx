@@ -32,7 +32,7 @@ function makeSprite(): HTMLCanvasElement {
 }
 
 /** Warm embers drifting slowly upward on one canvas. Off under reduced motion. */
-export function Embers() {
+export function Embers({ density = 1 }: { density?: number }) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -69,7 +69,7 @@ export function Embers() {
       ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
       // fewer on phones and weak devices
       const weak = (navigator.hardwareConcurrency || 4) <= 2;
-      const count = Math.round(Math.min(56, Math.max(16, (width * height) / 26000)) * (weak ? 0.5 : 1));
+      const count = Math.round(Math.min(56, Math.max(16, (width * height) / 26000)) * (weak ? 0.5 : 1) * density);
       while (embers.length < count) embers.push(make(true));
       embers.length = count;
     }
@@ -105,7 +105,7 @@ export function Embers() {
       cancelAnimationFrame(frame);
       window.removeEventListener('resize', resize);
     };
-  }, []);
+  }, [density]);
 
   return <canvas ref={ref} className="scene-embers" />;
 }

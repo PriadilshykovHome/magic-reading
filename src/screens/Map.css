@@ -1,32 +1,159 @@
 .map-screen {
-  justify-content: center;
+  padding: 0;
 }
 
-.map-back {
+.map-path {
   position: absolute;
-  top: calc(16px + env(safe-area-inset-top));
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.map-path path {
+  fill: none;
+  stroke: rgb(240 214 138 / 0.35);
+  stroke-width: 3px;
+  stroke-dasharray: 6 9;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.map-path.is-landscape {
+  display: none;
+}
+
+@media (orientation: landscape) {
+  .map-path.is-portrait {
+    display: none;
+  }
+
+  .map-path.is-landscape {
+    display: block;
+  }
+}
+
+/* ---------- level doors ---------- */
+
+.map-node {
+  --w: clamp(92px, 19vmin, 136px);
+  position: absolute;
+  left: var(--px);
+  top: var(--py);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  translate: -50% -50%;
+}
+
+@media (orientation: landscape) {
+  .map-node {
+    left: var(--lx);
+    top: var(--ly);
+  }
+}
+
+.map-door {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--w);
+  aspect-ratio: 200 / 260;
+  border: 3px solid var(--gold);
+  border-radius: 50% 50% 8px 8px / 36% 36% 8px 8px;
+  background:
+    radial-gradient(ellipse at 50% 120%, rgb(0 0 0 / 0.45), transparent 60%),
+    linear-gradient(90deg, #2e1b0e, #553620 30%, #664328 50%, #4f321d 72%, #2b190c);
+  box-shadow: 0 10px 22px rgb(0 0 0 / 0.55), inset 0 -3px 0 #ffe9b0;
+}
+
+.map-door-number {
+  /* digits in the reading font: the serif's old-style 1 looks like an I */
+  font-family: var(--font-reading);
+  font-weight: 800;
+  font-size: calc(var(--w) * 0.4);
+  line-height: 1;
+  background: linear-gradient(180deg, #fff3cc, var(--gold-light) 45%, var(--gold));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.map-lock {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: inherit;
+  background: rgb(14 11 20 / 0.6);
+  color: var(--gold-light);
+}
+
+.map-lock svg {
+  width: 44%;
+  height: 44%;
+}
+
+.map-node.is-locked .map-door {
+  border-color: rgb(201 162 74 / 0.45);
+  filter: saturate(0.5) brightness(0.75);
+}
+
+.map-node.is-next .map-door {
+  animation: node-glow 3.2s ease-in-out infinite;
+}
+
+@keyframes node-glow {
+  0%, 100% { box-shadow: 0 10px 22px rgb(0 0 0 / 0.55), inset 0 -3px 0 #ffe9b0, 0 0 18px rgb(240 214 138 / 0.25); }
+  50% { box-shadow: 0 10px 22px rgb(0 0 0 / 0.55), inset 0 -3px 0 #ffe9b0, 0 0 44px rgb(240 214 138 / 0.65); }
+}
+
+.map-node.is-shaking .map-door {
+  animation: wobble 0.35s ease-in-out;
+}
+
+.map-stars {
+  display: flex;
+  gap: 2px;
+}
+
+.map-stars svg {
+  width: calc(var(--w) * 0.26);
+  height: calc(var(--w) * 0.26);
+}
+
+/* ---------- jar + Іскрик ---------- */
+
+.map-corner {
+  position: absolute;
   left: calc(16px + env(safe-area-inset-left));
-  z-index: 1;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
 }
 
-.map-card {
-  max-width: min(90vw, 600px);
-  text-align: center;
+.map-iskryk {
+  --iskryk-size: clamp(72px, 15vmin, 110px);
+  width: var(--iskryk-size);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
 }
 
-.map-title {
-  margin: 0 0 10px;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(36px, 8vmin, 68px);
-  line-height: 1.05;
+.map-iskryk .is-bouncing .iskryk-body {
+  animation: iskryk-bounce 0.6s cubic-bezier(0.3, 1.5, 0.5, 1);
 }
 
-.map-text {
-  margin: 0;
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 500;
-  font-size: clamp(20px, 4.2vmin, 30px);
-  color: #5b4227;
+@keyframes iskryk-bounce {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.15, 0.85); }
+  60% { transform: translateY(-22%) scale(0.95, 1.08); }
+  100% { transform: none; }
 }
