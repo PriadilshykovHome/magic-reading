@@ -2,13 +2,26 @@
 // engine, task logic and what Соня says for each item. No UI here; that's '@game-ui'.
 import strings from '../../content/strings.uk.json';
 import type { GameData } from '../core/game';
+import type { Progress } from '../core/engine/progress';
 import { content } from './content/load';
-import { ITEM_KINDS, itemText, poolOf, reviewPoolOf } from './engine/content';
+import { bookChapters, ITEM_KINDS, itemText, poolOf, reviewPoolOf } from './engine/content';
 import { warmupLevel } from './engine/curriculum';
 import { readingEngine } from './engine/domain';
 import { lettersOf } from './engine/lexicon';
 import type { Level } from './engine/schema';
 import { taskLogics } from './tasks/logicRegistry';
+
+/** Every letter known from the levels he has finished, in teaching order. */
+function knownLetters(progress: Progress): string {
+  const last = content.levelOrder.findLast((id) => (progress.levels[id]?.bestStars ?? 0) > 0);
+  return (last && content.plans.get(last)?.known) || '';
+}
+
+/** Every syllable and word, by letter (computed once; the book shows the letters he knows). */
+const chapters = bookChapters(content);
+
+/** The family on the album's first page: МАМА, ТАТО and АЛІНА («Аліна — це мама!»). */
+const PORTRAITS = [{ item: 'w-mama' }, { item: 'w-tato' }, { item: 'w-alina', line: 'eggs.momPortrait' }];
 
 export const game: GameData<typeof strings> = {
   id: 'reading-uk',
@@ -20,7 +33,7 @@ export const game: GameData<typeof strings> = {
   logics: taskLogics,
   item(id) {
     const item = content.syllables.get(id) ?? content.words.get(id) ?? content.sentences.get(id);
-    return { text: itemText(content, id), audio: item?.audio };
+    return { text: itemText(content, id), audio: item?.audio, emoji: content.words.get(id)?.emoji };
   },
   levelItems(coreLevel) {
     const level = coreLevel as Level;
@@ -32,12 +45,19 @@ export const game: GameData<typeof strings> = {
     return warmupLevel(content.warmup, finished, recent);
   },
   canRead(progress) {
-    const last = content.levelOrder.findLast((id) => (progress.levels[id]?.bestStars ?? 0) > 0);
-    const known = new Set(last ? content.plans.get(last)?.known : '');
+    const known = new Set(knownLetters(progress));
     return (id) => {
       const text = content.words.get(id)?.text ?? content.sentences.get(id)?.text;
       return text !== undefined && lettersOf(text).every((ch) => known.has(ch));
     };
+  },
+  book(progress) {
+    const known = new Set(knownLetters(progress));
+    return chapters.filter((c) => known.has(c.title));
+  },
+  portraits(progress) {
+    const readable = this.canRead(progress);
+    return PORTRAITS.filter((p) => content.words.has(p.item) && readable(p.item));
   },
   nodeKind(level) {
     const template = content.plans.get(level.id)?.template;

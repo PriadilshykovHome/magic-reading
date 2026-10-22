@@ -1,7 +1,8 @@
 import { expect, test } from 'vitest';
 import { taskLogics } from '../tasks/logicRegistry';
-import { reviewPoolOf } from './content';
-import { rawBundle } from './testContent';
+import { bookChapters, itemText, reviewPoolOf } from './content';
+import { lettersOf } from './lexicon';
+import { rawBundle, testContent } from './testContent';
 import { validateContent, type RawBundle } from './validate';
 
 /** A third world written the new way: units of templates (a preview of World 3). */
@@ -88,4 +89,20 @@ test('steady pace: a new letter brings enough new words', () => {
   (raw.worlds.at(-1)!.lexicon.data as { sentences: unknown[] }).sentences = [];
   const messages = validateContent(raw, taskLogics).issues.map((i) => i.message).join('\n');
   expect(messages).toMatch(/unit test-garden\/e teaches only \d new words; a letter needs at least 6/);
+});
+
+test('the Book of Spells: every syllable and word on exactly one letter page, using only letters known by then', () => {
+  const content = testContent();
+  const chapters = bookChapters(content);
+  const pages = chapters.flatMap((c) => c.items);
+  expect(new Set(pages).size).toBe(pages.length);
+  const words = new Set([...content.words.values()].map((w) => w.text));
+  const expected = [...content.syllables.values()].filter((s) => !words.has(s.text)).length + content.words.size;
+  expect(pages).toHaveLength(expected);
+  // Each page's letter is the newest one it needs: every other letter has its own earlier page.
+  const known = new Set<string>();
+  for (const { title, items } of chapters) {
+    known.add(title);
+    for (const id of items) expect(lettersOf(itemText(content, id)).filter((ch) => !known.has(ch)), `${title}: ${id}`).toEqual([]);
+  }
 });

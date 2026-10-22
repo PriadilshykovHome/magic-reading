@@ -2,6 +2,7 @@
 import { indexGame, type GameContent, type WorldContent } from '../../core/engine/content.ts';
 import type { Card, Strings, VoiceTree, World } from '../../core/engine/schema.ts';
 import type { LevelPlan } from './curriculum.ts';
+import { lettersOf } from './lexicon.ts';
 import type { Config, Level, Lexicon, Sentence, Syllable, Template, Word } from './schema.ts';
 
 export type ItemKind = 'syllable' | 'word' | 'sentence';
@@ -94,4 +95,45 @@ export function syllableShape(syllable: Syllable, vowels: string): { consonant?:
   const vowel = syllable.parts.find((p) => vowels.includes(p));
   const consonant = syllable.parts.find((p) => !vowels.includes(p));
   return { consonant, vowel };
+}
+
+/**
+ * The Book of Spells: one chapter per letter, holding every syllable and word that letter made
+ * readable, in the order he first met them. A letter dates from the first item he met that uses
+ * it (the first worlds teach several at once), and an item belongs to its most recent letter;
+ * МА, where both are new, goes to the consonant (the one listed first).
+ */
+export function bookChapters(content: Content): { id: string; title: string; items: string[] }[] {
+  const order = content.plans.get(content.levelOrder.at(-1) ?? '')?.known ?? '';
+  const met: string[] = [];
+  const seen = new Set<string>();
+  // A syllable that is also a whole word (КІТ) appears once, as the word.
+  const wordTexts = new Set([...content.words.values()].map((w) => w.text));
+  const meet = (id: string) => {
+    const syllable = content.syllables.get(id);
+    if (syllable && wordTexts.has(syllable.text)) return;
+    if ((syllable || content.words.has(id)) && !seen.has(id)) {
+      seen.add(id);
+      met.push(id);
+    }
+  };
+  for (const id of content.levelOrder) {
+    const level = content.levels.get(id) as Level;
+    for (const item of [...poolOf(level, 'syllable'), ...poolOf(level, 'word'), ...(level.boss.item ? [level.boss.item] : [])]) meet(item);
+  }
+  for (const id of [...content.syllables.keys(), ...content.words.keys()]) meet(id);
+
+  const letters = new Map(met.map((id) => [id, lettersOf(itemText(content, id)).filter((ch) => order.includes(ch))]));
+  const since = new Map<string, number>();
+  met.forEach((id, i) => letters.get(id)!.forEach((ch) => since.has(ch) || since.set(ch, i)));
+  // Later first meeting wins; between letters met together, the one taught first.
+  const rank = (ch: string) => since.get(ch)! * order.length - order.indexOf(ch);
+  const chapters = new Map<string, string[]>();
+  for (const id of met) {
+    const own = letters.get(id)!;
+    if (own.length === 0) continue;
+    const letter = own.reduce((a, b) => (rank(b) > rank(a) ? b : a));
+    chapters.set(letter, [...(chapters.get(letter) ?? []), id]);
+  }
+  return [...chapters.keys()].sort((a, b) => rank(a) - rank(b)).map((letter) => ({ id: letter, title: letter, items: chapters.get(letter)! }));
 }

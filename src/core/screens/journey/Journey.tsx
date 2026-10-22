@@ -154,6 +154,20 @@ export function JourneyScreen() {
       }}
       creature={creatureStage(progress, game.content.config)}
       props={<PropLayer ids={props} slots={['sky', 'moon']} />}
+      shelf={
+        <button
+          type="button"
+          className="icon-button journey-book"
+          aria-label={t.book.open}
+          onClick={() => {
+            sfx.tap();
+            navigate('/book');
+          }}
+          data-book
+        >
+          <BookIcon />
+        </button>
+      }
       jar={<SparkJar count={sparkBalance(progress)} label={fmt(t.map.sparks, { n: sparkBalance(progress) })} />}
     />
   );
@@ -174,6 +188,8 @@ interface ViewProps {
   actions?: ReactNode;
   /** Ambient details in the sky behind the road. */
   props?: ReactNode;
+  /** The Book of Spells, the album and the castle windows: below the road in portrait, in the bar in landscape. */
+  shelf?: ReactNode;
 }
 
 type SegmentState = 'lit' | 'active' | 'dim';
@@ -211,7 +227,7 @@ interface Road {
 }
 
 /** The journey itself: also rendered by the test-build route with hundreds of levels. */
-export function JourneyView({ worlds, focus, walk, shaking, onOpen, onSign, creature, jar, actions, props }: ViewProps) {
+export function JourneyView({ worlds, focus, walk, shaking, onOpen, onSign, creature, jar, actions, props, shelf }: ViewProps) {
   const scroller = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState<{ width: number; height: number } | null>(null);
   const [scroll, setScroll] = useState(0);
@@ -379,7 +395,7 @@ export function JourneyView({ worlds, focus, walk, shaking, onOpen, onSign, crea
   }, [road, layout, nextId, flat]);
 
   return (
-    <main className="screen journey-screen">
+    <main className={`screen journey-screen ${shelf ? 'has-shelf' : ''}`}>
       <Scene candles={CANDLES} />
       {props}
       <header className="journey-bar">
@@ -394,6 +410,7 @@ export function JourneyView({ worlds, focus, walk, shaking, onOpen, onSign, crea
           {jar}
         </div>
       </header>
+      {shelf && <nav className="journey-shelf">{shelf}</nav>}
 
       <div
         ref={scroller}

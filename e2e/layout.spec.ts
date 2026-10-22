@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
+import { readFileSync } from 'node:fs';
 import { layoutProblems, unlockEverything } from './checks';
+
+/** Every level played (the saved-progress fixture), so the Book of Spells and the album are full. */
+const PLAYED = JSON.parse(readFileSync('src/reading/content/saved-progress.fixture.json', 'utf8')) as object;
 
 const L = 'tower-of-syllables';
 const task = (num: string, type: string, extra = '', world = L) => `#/dev/task/${world}/${num}/${type}?seed=1${extra}`;
@@ -41,11 +45,14 @@ const SCREENS: [string, string][] = [
   ['Magic Door: Я МИШКО!', task('finale-finale', 'sentencePicture', '&boss=1', 'star-observatory')],
   ['Magic Door: МИХАЙЛО', task('finale-finale', 'readPickPicture', '&boss=1', 'magic-kitchen')],
   ['celebration', '#/dev/celebration'],
+  ['Book of Spells: cover', '#/book'],
+  ['Book of Spells: Р', '#/book/12'],
+  ['Book of Spells: Ь (31 pages)', '#/book/21'],
 ];
 
 test('every screen keeps the layout rules', async ({ page }, info) => {
   test.setTimeout(120_000);
-  await unlockEverything(page);
+  await unlockEverything(page, PLAYED);
   for (const [name, path] of SCREENS) {
     await page.goto(path);
     await page.waitForLoadState('networkidle');

@@ -71,10 +71,12 @@ export async function layoutProblems(page: Page): Promise<string[]> {
 }
 
 /** Every level open, so any screen can be visited directly. */
-export async function unlockEverything(page: Page) {
-  await page.addInitScript(() => {
+/** Every level open; with `progress` (a saved progress document), that one, with every level open too. */
+export async function unlockEverything(page: Page, progress: object = {}) {
+  await page.addInitScript((saved) => {
     if (!localStorage.getItem('magic-reading:progress:guest')) {
-      localStorage.setItem('magic-reading:progress:guest', JSON.stringify({ settings: { unlockAll: true } }));
+      const settings = { ...(saved as { settings?: object }).settings, unlockAll: true };
+      localStorage.setItem('magic-reading:progress:guest', JSON.stringify({ ...saved, settings }));
     }
-  });
+  }, progress);
 }

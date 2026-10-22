@@ -23,16 +23,29 @@ export interface GameData<Strings extends object = object> {
   content: GameContent;
   engine: DomainEngine;
   logics: TaskRegistry;
-  /** What Соня says for an item, and its recording under public/audio/<audioRoot>/ if it has one. */
-  item(id: string): { text: string; audio?: string };
+  /** What Соня says for an item, its recording under public/audio/<audioRoot>/ if it has one,
+   *  and its picture (an emoji placeholder until the art exists). */
+  item(id: string): { text: string; audio?: string; emoji?: string };
   /** Every item a level may ask about, so its audio can preload. */
   levelItems(level: Level): string[];
   /** Which items he can read by now (every letter known from the levels he has finished). */
   canRead(progress: Progress): (id: string) => boolean;
+  /** The Book of Spells: a chapter for each thing he has learned so far (reading: a letter), in
+   *  teaching order, with every item it holds. Its pages light up as he masters them. */
+  book(progress: Progress): BookChapter[];
+  /** Family portraits for the album: an item he can read (МАМА) and, optionally, Соня's line for it. */
+  portraits(progress: Progress): { item: string; line?: string }[];
   /** How its door looks on the journey road. */
   nodeKind(level: Level): 'door' | 'review' | 'finale';
   /** Today's warm-up over what he has finished, or null if there's not enough yet. */
   warmup(progress: Progress): Level | null;
+}
+
+export interface BookChapter {
+  id: string;
+  /** Its title, shown big and drawn as a constellation on the cover (reading: the letter). */
+  title: string;
+  items: string[];
 }
 
 export interface IntroDemoProps {
