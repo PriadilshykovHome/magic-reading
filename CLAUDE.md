@@ -61,8 +61,11 @@ docs/PLAN.md
 - **The engine is pure TypeScript.** No React, no DOM, no `window`, no `localStorage`, no
   `Date.now()` or `Math.random()` called directly; time and randomness are passed in so tests
   are deterministic. Every engine module has Vitest unit tests.
-- **The progress store is the single source of truth.** The sync service mirrors it to
-  localStorage and Firestore (`players/{uid}`); components never talk to Firebase directly.
+- **The progress store is the single source of truth.** The sync service (`src/core/sync/cloud.ts`)
+  mirrors it to localStorage (one copy per account, `guest` before login) and Firestore
+  (`players/{uid}/games/<game id>`; the private profile in `players/{uid}`), merging field by
+  field (`src/core/engine/merge.ts`); components never talk to Firebase directly. No Firebase
+  in e2e runs (`VITE_E2E`); `VITE_FIREBASE_EMULATOR=true` points a dev server at the emulators.
 - Items are keyed by lexicon id (`syl-ma`), never by Cyrillic text.
 - **The engine decides, the UI choreographs.** In-level feedback comes from `src/core/engine/run.ts`
   as `FeedbackEvent`s (wrong + hint, correct with chime pitch / sparks / golden spark / praise,
@@ -234,6 +237,8 @@ npm run e2e               # Playwright: layout rules at 4 viewports + one full p
 npm run check-prod-build  # dist/ must not contain data-correct, /dev routes or __audio
 npm run audio:generate    # regenerate effects sprite + music (WAV) from scripts/make-audio.ts
 npm run validate-content  # content checks; -- --strict (assets are errors), --verbose, --root <dir>
+npm run test:rules        # Firestore security rules in the emulator (needs Java 21)
+npm run deploy:rules      # publish firestore.rules to the Firebase project (firebase login first)
 ```
 
 ## Testing conventions

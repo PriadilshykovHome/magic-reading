@@ -1,5 +1,5 @@
 // The progress store: the single source of truth for everything saved. Every change is
-// mirrored to this device immediately.
+// mirrored to this device immediately, and to the cloud by src/core/sync/cloud.ts.
 import { create } from 'zustand';
 import { game } from '@game';
 import { recordTaskResult, type Progress, type Settings, type TaskOutcome } from '../engine/progress';
@@ -7,6 +7,7 @@ import { finishLevel, finishWarmup, type CelebrationStep, type LevelSummary } fr
 import type { RunState } from '../engine/run';
 import type { Level } from '../engine/schema';
 import { loadProgress, saveProgress } from '../sync/localCache';
+import { useAccount } from './account';
 
 interface ProgressState {
   progress: Progress;
@@ -14,6 +15,8 @@ interface ProgressState {
   finishLevel(run: RunState, level: Level): { summary: LevelSummary; steps: CelebrationStep[] };
   finishWarmup(run: RunState): { summary: LevelSummary; steps: CelebrationStep[] };
   updateSettings(patch: Partial<Settings>): void;
+  /** Swap in another copy (another account's, or merged with the cloud's). */
+  replace(progress: Progress): void;
 }
 
 export const useProgress = create<ProgressState>()((set, get) => ({
@@ -33,10 +36,13 @@ export const useProgress = create<ProgressState>()((set, get) => ({
   },
   updateSettings(patch) {
     const { progress } = get();
-    set({ progress: { ...progress, settings: { ...progress.settings, ...patch } } });
+    set({ progress: { ...progress, settings: { ...progress.settings, ...patch }, settingsAt: new Date().toISOString() } });
+  },
+  replace(progress) {
+    set({ progress });
   },
 }));
 
 useProgress.subscribe((state, prev) => {
-  if (state.progress !== prev.progress) saveProgress(state.progress);
+  if (state.progress !== prev.progress) saveProgress(useAccount.getState().account, state.progress);
 });

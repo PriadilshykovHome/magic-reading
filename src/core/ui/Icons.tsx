@@ -114,3 +114,13 @@ export const CauldronIcon = () => (
     <circle cx="14.5" cy="7.8" r=".8" />
   </svg>
 );
+
+/** The cloud copy's state: a cloud with a tick, arrows (sending), or a slash (no cloud / offline). */
+export const CloudIcon = ({ state }: { state: 'synced' | 'syncing' | 'offline' | 'off' }) => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" {...common}>
+    <path d="M7 18.5a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 9.5a4.5 4.5 0 0 1-.5 9z" />
+    {state === 'synced' && <path d="M9.5 13.5l2 2 3.5-3.5" />}
+    {state === 'syncing' && <path d="M12 11v5M9.8 13.2L12 11l2.2 2.2" />}
+    {(state === 'offline' || state === 'off') && <path d="M4 4l16 16" />}
+  </svg>
+);

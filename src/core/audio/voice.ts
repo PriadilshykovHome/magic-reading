@@ -3,6 +3,7 @@
 // Every request goes through the scheduler, so lines never overlap or get chopped.
 import { game } from '@game';
 import type { Level } from '../engine/schema';
+import { useAccount } from '../store/account';
 import { fillTemplate, templateVars } from '../engine/text';
 import { clipStarter, preloadClips, scheduler } from './manager';
 import { pause, ShuffleBag, type Policy, type Starter } from './scheduler';
@@ -11,7 +12,11 @@ export { unlockAudio } from './manager';
 export type { Policy } from './scheduler';
 
 const { content } = game;
-const vars = templateVars(content.strings, content.config);
+let vars = templateVars(content.strings, content.config, useAccount.getState().profile ?? undefined);
+// His patronymic (formal Соня) comes from the private profile once the cloud has sent it.
+useAccount.subscribe((state, prev) => {
+  if (state.profile !== prev.profile) vars = templateVars(content.strings, content.config, state.profile ?? undefined);
+});
 const rotation = new ShuffleBag();
 
 /** Where a voice line's recording lives: lists are numbered from 1 ("praise.3"). */

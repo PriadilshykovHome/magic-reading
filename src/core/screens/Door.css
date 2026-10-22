@@ -180,11 +180,32 @@
   transform: scale(1.6);
 }
 
-.door-fullscreen {
+/* Top left: full screen (where the browser offers it) and the cloud copy's state. */
+.door-corner {
   position: absolute;
   top: calc(16px + env(safe-area-inset-top));
   left: calc(16px + env(safe-area-inset-left));
   z-index: 2;
+  display: flex;
+  gap: 16px;
+}
+
+/* Signed in it is only a quiet sign, not a button. */
+span.door-cloud {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: var(--tap-min);
+  color: rgb(240 214 138 / 0.55);
+}
+
+span.door-cloud svg {
+  width: 26px;
+  height: 26px;
+}
+
+span.door-cloud.is-offline {
+  color: rgb(235 221 191 / 0.4);
 }
 
 .build-id {

@@ -37,6 +37,8 @@ export const LevelProgressSchema = z.object({
 export const ProgressSchema = z.object({
   schemaVersion: z.literal(1).default(1),
   settings: SettingsSchema.prefault({}),
+  /** When the settings last changed (ISO time), so merging devices keeps the newer ones. */
+  settingsAt: z.string().nullable().default(null),
   levels: z.record(z.string(), LevelProgressSchema).default({}),
   items: z.record(z.string(), ItemProgressSchema).default({}),
   rewards: z

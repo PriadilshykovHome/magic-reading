@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { unlockAudio } from '../audio/voice';
+import { useAccount } from '../store/account';
+import { cloudAvailable } from '../sync/cloud';
+import { choseGuest, GUEST } from '../sync/localCache';
 import { Kharkiv } from '../fx/ambient/Kharkiv';
 import { Scene, type CandleSpot } from '../fx/ambient/Scene';
 import { PropLayer } from '../fx/props/Props';
 import { useProps } from '../fx/props/useProps';
 import { t } from '../strings';
-import { FullscreenIcon } from '../ui/Icons';
+import { CloudIcon, FullscreenIcon } from '../ui/Icons';
 import { DoorArt } from './DoorArt';
 import './Door.css';
 
@@ -28,22 +31,27 @@ const CANDLES: CandleSpot[] = [
   { x: 18, y: 84, scale: 0.5, wide: true },
 ];
 
-// The magic door: tapping it unlocks sound (iPhones need a tap first) and enters the castle.
-// Phase 7 adds the login in between.
+// The magic door: tapping it unlocks sound (iPhones need a tap first) and enters the castle,
+// or, the first time on a device with the cloud, the parent's login (which can be skipped).
 export function DoorScreen() {
   const navigate = useNavigate();
   const [opening, setOpening] = useState(false);
   const props = useProps('door');
 
+  const account = useAccount((s) => s.account);
+  const cloud = useAccount((s) => s.cloud);
+  const withCloud = cloudAvailable();
+
   function enter() {
     if (opening) return;
     unlockAudio();
+    const to = withCloud && account === GUEST && !choseGuest() ? '/login' : '/map';
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      navigate('/map');
+      navigate(to);
       return;
     }
     setOpening(true);
-    window.setTimeout(() => navigate('/map'), OPEN_MS);
+    window.setTimeout(() => navigate(to), OPEN_MS);
   }
 
   return (
@@ -78,16 +86,28 @@ export function DoorScreen() {
         </div>
       </div>
 
-      {canGoFullscreen() && (
-        <button
-          type="button"
-          className="icon-button door-fullscreen"
-          aria-label={t.map.fullscreen}
-          onClick={() => void document.documentElement.requestFullscreen?.().catch(() => {})}
-        >
-          <FullscreenIcon />
-        </button>
-      )}
+      <div className="door-corner">
+        {canGoFullscreen() && (
+          <button
+            type="button"
+            className="icon-button"
+            aria-label={t.map.fullscreen}
+            onClick={() => void document.documentElement.requestFullscreen?.().catch(() => {})}
+          >
+            <FullscreenIcon />
+          </button>
+        )}
+        {withCloud &&
+          (account === GUEST ? (
+            <button type="button" className="icon-button door-cloud" aria-label={t.sync.guest} onClick={() => navigate('/login')} data-cloud="guest">
+              <CloudIcon state="off" />
+            </button>
+          ) : (
+            <span className={`door-cloud is-${cloud}`} role="status" aria-label={cloud === 'off' ? t.sync.synced : t.sync[cloud]} data-cloud={cloud}>
+              <CloudIcon state={cloud === 'off' ? 'synced' : cloud} />
+            </span>
+          ))}
+      </div>
 
       <span className="door-flash" aria-hidden="true" />
       <p className="build-id">

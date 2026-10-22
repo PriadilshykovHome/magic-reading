@@ -1,0 +1,11 @@
+rules_version = '2';
+
+// Each signed-in player can read and write only their own documents: players/{uid} (the private
+// profile) and everything under it (players/{uid}/games/reading-uk, and later the other games).
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /players/{uid}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+  }
+}

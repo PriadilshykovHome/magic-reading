@@ -3,6 +3,7 @@ import { CelebrationScreen } from '../core/screens/Celebration';
 import { DevCelebrationScreen, DevJourneyScreen, DevTaskScreen } from '../core/screens/DevScreens';
 import { DoorScreen } from '../core/screens/Door';
 import { LevelIntroScreen } from '../core/screens/LevelIntro';
+import { LoginScreen } from '../core/screens/Login';
 import { JourneyScreen } from '../core/screens/journey/Journey';
 import { TaskRunnerScreen } from '../core/screens/TaskRunner';
 import { WarmupDoneScreen, WarmupScreen } from '../core/screens/Warmup';
@@ -11,6 +12,7 @@ import { TEST_BUILD } from '../core/testMode';
 // Hash URLs (#/map) because GitHub Pages has no fallback for deep links.
 export const router = createHashRouter([
   { path: '/', element: <DoorScreen /> },
+  { path: '/login', element: <LoginScreen /> },
   { path: '/map', element: <JourneyScreen /> },
   { path: '/map/:world', element: <JourneyScreen /> },
   { path: '/level/:world/:num', element: <LevelIntroScreen /> },

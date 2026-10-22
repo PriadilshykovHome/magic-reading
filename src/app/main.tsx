@@ -5,6 +5,7 @@ import { RouterProvider } from 'react-router';
 import { setVolumes } from '../core/audio/manager';
 import { unlockAudio } from '../core/audio/voice';
 import { useProgress } from '../core/store/progress';
+import { startSync } from '../core/sync/cloud';
 import { router } from './router';
 import { t } from '../core/strings';
 import '../core/styles/global.css';
@@ -24,6 +25,9 @@ const applyVolumes = () => {
 };
 applyVolumes();
 useProgress.subscribe(applyVolumes);
+
+// The cloud copy follows the family login (Firebase loads after the first screen).
+startSync();
 
 // Block the long-press menu small fingers trigger by accident.
 document.addEventListener('contextmenu', (e) => e.preventDefault());
