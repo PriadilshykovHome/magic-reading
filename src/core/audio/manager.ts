@@ -4,6 +4,7 @@ import { Howl, Howler } from 'howler';
 import manifest from 'virtual:audio-manifest';
 import { SILENT, TEST_BUILD } from '../testMode';
 import { pause, SfxGate, VoiceScheduler, type Playback, type Starter } from './scheduler';
+import musicLengths from './music-lengths.json';
 import spriteJson from './sfx-sprite.json';
 import { speechPlayback, unlockSpeech } from './speech';
 
@@ -85,7 +86,7 @@ const gate = new SfxGate();
 
 function effectsSprite(): Howl | null {
   if (SILENT) return null;
-  effects ??= new Howl({ src: [`${BASE}sfx/sfx.wav`], sprite, preload: true });
+  effects ??= new Howl({ src: [`${BASE}sfx/sfx.mp3`], sprite, preload: true });
   return effects;
 }
 
@@ -106,14 +107,19 @@ const tracks = new Map<string, Howl>();
 let currentTrack: MusicTrack | null = null;
 let ducked = false;
 
+/** A track is fetched only when its screen first plays it. It plays as a sprite of its exact
+ *  length (scripts/make-audio.ts), so the MP3 encoder's padding never leaves a gap in the loop. */
 function music(name: MusicTrack | 'fanfare'): Howl {
   let howl = tracks.get(name);
   if (!howl) {
-    howl = new Howl({ src: [`${BASE}music/${name}.wav`], loop: name !== 'fanfare', preload: true, volume: 0 });
+    const sprite = { [TRACK]: [0, musicLengths[name], name !== 'fanfare'] as [number, number, boolean] };
+    howl = new Howl({ src: [`${BASE}music/${name}.mp3`], sprite, preload: true, volume: 0 });
     tracks.set(name, howl);
   }
   return howl;
 }
+
+const TRACK = 'track';
 
 const musicLevel = () => volumes.music * (ducked ? DUCK : 1);
 
@@ -131,7 +137,7 @@ export function setMusic(track: MusicTrack | null): void {
   }
   if (track) {
     const howl = music(track);
-    if (!howl.playing()) howl.play();
+    if (!howl.playing()) howl.play(TRACK);
     howl.fade(howl.volume(), musicLevel(), 900);
   }
 }
@@ -141,7 +147,7 @@ export function playFanfare(): void {
   if (SILENT || volumes.music <= 0) return;
   const howl = music('fanfare');
   howl.volume(Math.min(1, volumes.music * 2.4));
-  howl.play();
+  howl.play(TRACK);
 }
 
 scheduler.onSpeaking((speaking) => {

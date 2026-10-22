@@ -13,6 +13,8 @@ type AudioState = {
 };
 
 test('the door tap unlocks sound; the map music plays and ducks under Соня', async ({ page }) => {
+  // The dev server has the cloud: play as a guest, so the door leads straight to the map.
+  await page.addInitScript(() => localStorage.setItem('magic-reading:guest-chosen', '1'));
   await page.goto('#/');
   await page.waitForFunction(() => 'speechSynthesis' in window);
   const before = await page.evaluate(() => (window as unknown as { __audio: AudioState }).__audio.context());

@@ -1,8 +1,11 @@
 // npm run audio:generate
-// Synthesises the game's sound effects (one Howler sprite) and music loops as WAV files.
+// Synthesises the game's sound effects (one Howler sprite) and music loops, then encodes them
+// as small mono MP3s with ffmpeg (brew install ffmpeg; only needed to regenerate, never shipped).
 // Everything is generated from code, so it is original and free to use (CC0). Deterministic:
-// running it again produces the same files. Recorded voice clips are separate (Phase 8).
-import { mkdirSync, writeFileSync } from 'node:fs';
+// running it again produces the same sounds. Recorded voice clips are separate (Phase 8).
+import { execFileSync } from 'node:child_process';
+import { mkdirSync, mkdtempSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 const OUT = join(import.meta.dirname, '..', 'public', 'audio');
@@ -132,6 +135,17 @@ function normalize(data: Float32Array, peakDb: number): Float32Array {
   return peak > 0 ? data.map((v) => (v / peak) * target) : data;
 }
 
+const WORK = mkdtempSync(join(tmpdir(), 'magic-audio-'));
+
+/** Writes `data` as an MP3 at `path` (through a WAV in a temporary folder). Returns its length in ms. */
+function writeMp3(path: string, data: Float32Array, rate: number, kbps: number): number {
+  const wav = join(WORK, 'clip.wav');
+  writeWav(wav, data, rate);
+  execFileSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-i', wav, '-c:a', 'libmp3lame', '-b:a', `${kbps}k`, '-ac', '1', path]);
+  console.log(`  ${path.slice(OUT.length + 1)}  ${(statSync(path).size / 1024).toFixed(0)} KB, ${(data.length / rate).toFixed(1)} s`);
+  return Math.round((data.length / rate) * 1000);
+}
+
 function writeWav(path: string, data: Float32Array, rate: number) {
   const buf = Buffer.alloc(44 + data.length * 2);
   buf.write('RIFF', 0);
@@ -148,7 +162,6 @@ function writeWav(path: string, data: Float32Array, rate: number) {
   buf.writeUInt32LE(data.length * 2, 40);
   data.forEach((v, i) => buf.writeInt16LE(Math.round(Math.max(-1, Math.min(1, v)) * 32767), 44 + i * 2));
   writeFileSync(path, buf);
-  console.log(`  ${path.slice(OUT.length + 1)}  ${(buf.length / 1024).toFixed(0)} KB, ${(data.length / rate).toFixed(1)} s`);
 }
 
 const NOTE = (name: string) => {
@@ -315,7 +328,7 @@ function makeSfx() {
     at += s.seconds + gap;
   }
   mkdirSync(join(OUT, 'sfx'), { recursive: true });
-  writeWav(join(OUT, 'sfx', 'sfx.wav'), normalize(track.data, -2), SFX_RATE);
+  writeMp3(join(OUT, 'sfx', 'sfx.mp3'), normalize(track.data, -2), SFX_RATE, 64);
   writeFileSync(join(import.meta.dirname, '..', 'src', 'core', 'audio', 'sfx-sprite.json'), `${JSON.stringify(sprite, null, 2)}\n`);
 }
 
@@ -363,7 +376,8 @@ function makeMusic() {
       t.add(at + 2 * BEAT, bell(NOTE(MELODY[bar * 2 + 1]!), 0.7), 2.5, 0.38);
     });
   }, 0.32);
-  writeWav(join(OUT, 'music', 'map.wav'), normalize(map, -6), MUSIC_RATE);
+  const lengths: Record<string, number> = {};
+  lengths.map = writeMp3(join(OUT, 'music', 'map.mp3'), normalize(map, -6), MUSIC_RATE, 40);
 
   // During tasks: almost nothing, so reading keeps its focus.
   const tasks = loop((t) => {
@@ -373,15 +387,18 @@ function makeMusic() {
       if (bar % 2 === 0) t.add(at + BEAT, musicBox(NOTE(MELODY[bar * 2]!)), 2, 0.12);
     });
   }, 0.4);
-  writeWav(join(OUT, 'music', 'tasks.wav'), normalize(tasks, -12), MUSIC_RATE);
+  lengths.tasks = writeMp3(join(OUT, 'music', 'tasks.mp3'), normalize(tasks, -12), MUSIC_RATE, 40);
 
   const fanfare = new Track(MUSIC_RATE, 4.2);
   ['C5', 'E5', 'G5', 'C6'].forEach((n, i) => fanfare.add(i * 0.14, bell(NOTE(n), 1.1), 1.4, 0.5));
   fanfare.add(0.62, pad(['C4', 'E4', 'G4', 'C5'].map(NOTE), 3.4), 3.4, 0.9);
   ['C6', 'E6', 'G6'].forEach((n) => fanfare.add(0.62, bell(NOTE(n), 1.2), 2.6, 0.35));
-  writeWav(join(OUT, 'music', 'fanfare.wav'), normalize(reverb(fanfare.data, MUSIC_RATE, 0.3, 1.2), -3), MUSIC_RATE);
+  lengths.fanfare = writeMp3(join(OUT, 'music', 'fanfare.mp3'), normalize(reverb(fanfare.data, MUSIC_RATE, 0.3, 1.2), -3), MUSIC_RATE, 48);
+  // Loops play as a sprite of exactly this length, so the encoder's padding never adds a gap.
+  writeFileSync(join(import.meta.dirname, '..', 'src', 'core', 'audio', 'music-lengths.json'), `${JSON.stringify(lengths, null, 2)}\n`);
 }
 
 console.log('Generating audio:');
 makeSfx();
 makeMusic();
+rmSync(WORK, { recursive: true, force: true });
