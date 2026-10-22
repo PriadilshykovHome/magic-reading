@@ -204,7 +204,8 @@ export function expandCurriculum(
         title: entry.title ?? (topic ? `${t.title} · ${topic.text}` : t.title),
         intro: entry.intro ?? { voice: t.intro.voice, ...(topic ? { topic } : {}), demo: { type: t.intro.demo, items: demoItems } },
         pool: entry.pool ?? { syllables: own.syllable, words: own.word, sentences: own.sentence },
-        reviewFrom: entry.reviewFrom ?? levels.map((l) => l.id),
+        // review every earlier level, without listing them all (290 levels would mean ~40,000 ids)
+        ...(entry.reviewFrom ? { reviewFrom: entry.reviewFrom } : { reviewEarlier: true }),
         tasks: entry.tasks ?? t.tasks,
         boss: entry.boss ?? {
           type: 'magicDoor',

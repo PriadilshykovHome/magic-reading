@@ -67,11 +67,18 @@ export function poolOf(level: Level, kind: ItemKind): string[] {
   return level.pool[POOL_KEY[kind]];
 }
 
-/** Items of `kind` from the levels in `reviewFrom` that this level doesn't already have. */
+/** The levels a level reviews: every one before it (reviewEarlier), or those in `reviewFrom`. */
+function reviewLevels(content: Content, level: Level): readonly string[] {
+  if (!level.reviewEarlier) return level.reviewFrom;
+  const at = content.levelOrder.indexOf(level.id);
+  return [...content.levelOrder.slice(0, at), ...level.reviewFrom];
+}
+
+/** Items of `kind` from the levels this level reviews that it doesn't already have itself. */
 export function reviewPoolOf(content: Content, level: Level, kind: ItemKind): string[] {
   const own = new Set(poolOf(level, kind));
   const out = new Set<string>();
-  for (const id of level.reviewFrom) {
+  for (const id of reviewLevels(content, level)) {
     const other = content.levels.get(id);
     if (other) for (const item of poolOf(other, kind)) if (!own.has(item)) out.add(item);
   }

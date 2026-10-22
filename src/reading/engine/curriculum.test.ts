@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest';
 import { taskLogics } from '../tasks/logicRegistry';
+import { reviewPoolOf } from './content';
 import { rawBundle } from './testContent';
 import { validateContent, type RawBundle } from './validate';
 
@@ -76,7 +77,8 @@ test('units × templates expand into levels; the levels he has played keep their
   expect(level('finale-finale').boss.item).toBe('w-oleksandr');
   expect(order.slice(0, -1).every((id) => !Object.values(content!.levels.get(id)!.pool).flat().includes('w-oleksandr'))).toBe(true);
   // Review reaches back over every earlier level; the unit's card comes with its last level.
-  expect(level('e-sentences').reviewFrom).toHaveLength(order.indexOf('test-garden/e-sentences'));
+  expect(level('e-sentences').reviewEarlier).toBe(true);
+  expect(reviewPoolOf(content!, level('e-sentences'), 'word')).toEqual(expect.arrayContaining(['w-mama', 'w-myshko', 'w-alina', 'w-pero']));
   expect(level('e-sentences').reward.card).toBe('card-fox');
 });
 

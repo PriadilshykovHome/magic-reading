@@ -1,12 +1,13 @@
 // The cloud copy: Firebase Auth (one family account) + Firestore, loaded only when needed so the
 // first screen never waits for it. Local first: every change is already on the device
 // (localCache.ts); this mirrors it to players/{uid}/games/{game id}, sending only changed fields
-// at most every few seconds (and right away when a level ends). Firestore's offline cache queues
-// writes made without internet. On login, app start and return to the tab, the cloud copy is
-// merged in field by field (src/core/engine/merge.ts), so progress from another device appears.
+// at most every few seconds (and right away when a level ends). Firestore Lite (plain requests,
+// about a third the size): a write that fails offline is simply sent again by the next merge.
+// On login, app start, return to the tab and coming back online, the cloud copy is merged in
+// field by field (src/core/engine/merge.ts), so progress from another device appears.
 import type { FirebaseOptions } from 'firebase/app';
 import type { Auth } from 'firebase/auth';
-import type { DocumentReference, Firestore } from 'firebase/firestore';
+import type { DocumentReference, Firestore } from 'firebase/firestore/lite';
 import { game } from '@game';
 import { changedPaths, mergeProfile, mergeProgress, ProfileSchema, type Profile } from '../engine/merge';
 import { emptyProgress, ProgressSchema, type Progress } from '../engine/progress';
@@ -16,6 +17,8 @@ import { SILENT } from '../testMode';
 import { forgetProgress, GUEST, hasProgress, loadProgress, rememberAccount, saveProfile } from './localCache';
 
 const WRITE_EVERY_MS = 5000;
+/** After a failed read or write, try again this often (a flaky connection may never go "offline"). */
+const RETRY_MS = 30_000;
 
 /** The web config is public by design (the security rules protect the data); none in e2e runs. */
 function firebaseConfig(): FirebaseOptions | null {
@@ -37,16 +40,16 @@ export const cloudAvailable = (): boolean => firebaseConfig() !== null;
 interface Firebase {
   auth: Auth;
   db: Firestore;
-  fs: typeof import('firebase/firestore');
+  fs: typeof import('firebase/firestore/lite');
   authApi: typeof import('firebase/auth');
 }
 
 let loading: Promise<Firebase> | null = null;
 function firebase(): Promise<Firebase> {
   loading ??= (async () => {
-    const [{ initializeApp }, authApi, fs] = await Promise.all([import('firebase/app'), import('firebase/auth'), import('firebase/firestore')]);
+    const [{ initializeApp }, authApi, fs] = await Promise.all([import('firebase/app'), import('firebase/auth'), import('firebase/firestore/lite')]);
     const app = initializeApp(firebaseConfig()!);
-    const db = fs.initializeFirestore(app, { localCache: fs.persistentLocalCache({ tabManager: fs.persistentMultipleTabManager() }) });
+    const db = fs.getFirestore(app);
     const auth = authApi.getAuth(app);
     // Local checks against the Firebase emulators (VITE_FIREBASE_EMULATOR=true), never in production.
     if (import.meta.env.DEV && import.meta.env.VITE_FIREBASE_EMULATOR === 'true') {
@@ -76,6 +79,11 @@ export async function signIn(login: string, password: string): Promise<'ok' | 'w
 
 let session: { uid: string; doc: DocumentReference; written: Progress | null; exists: boolean } | null = null;
 let timer: number | undefined;
+let retry: number | undefined;
+const retryLater = () => {
+  window.clearTimeout(retry);
+  retry = window.setTimeout(() => void pull(), RETRY_MS);
+};
 let writing: Promise<void> = Promise.resolve();
 
 /** Starts following the login; call once at app start. */
@@ -117,6 +125,7 @@ async function attach(uid: string) {
 function detach() {
   session = null;
   window.clearTimeout(timer);
+  window.clearTimeout(retry);
   if (useAccount.getState().account !== GUEST) {
     rememberAccount(GUEST);
     useAccount.getState().set({ account: GUEST, profile: null });
@@ -141,8 +150,9 @@ async function pull() {
     useProgress.getState().replace(merged);
     await flush();
   } catch {
-    // offline and nothing cached yet: try again when back online
+    // offline: try again when back online, back to the tab, or in a while
     useAccount.getState().set({ cloud: 'offline' });
+    retryLater();
   }
 }
 
@@ -180,7 +190,6 @@ function flush(): Promise<void> {
     }
     const { fs } = await firebase();
     useAccount.getState().set({ cloud: navigator.onLine ? 'syncing' : 'offline' });
-    // Firestore keeps the write in its offline queue, so it is safe to count it as sent.
     current.written = progress;
     const stamp = { updatedAt: fs.serverTimestamp() };
     const done = current.exists
@@ -191,8 +200,13 @@ function flush(): Promise<void> {
       await done;
       if (session === current) useAccount.getState().set({ cloud: 'synced' });
     } catch {
-      // rejected (e.g. signed out meanwhile): the next pull merges and tries again
-      if (session === current) current.written = null;
+      // offline, or signed out meanwhile: the next pull (back online, back to the tab) merges
+      // the cloud copy in again and sends whatever is still missing
+      if (session === current) {
+        current.written = null;
+        useAccount.getState().set({ cloud: 'offline' });
+        retryLater();
+      }
     }
   });
   return writing;

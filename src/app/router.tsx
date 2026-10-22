@@ -1,31 +1,38 @@
 import { createHashRouter, Navigate } from 'react-router';
-import { CelebrationScreen } from '../core/screens/Celebration';
-import { DevCelebrationScreen, DevJourneyScreen, DevTaskScreen } from '../core/screens/DevScreens';
 import { DoorScreen } from '../core/screens/Door';
 import { LevelIntroScreen } from '../core/screens/LevelIntro';
-import { LoginScreen } from '../core/screens/Login';
 import { JourneyScreen } from '../core/screens/journey/Journey';
 import { TaskRunnerScreen } from '../core/screens/TaskRunner';
-import { WarmupDoneScreen, WarmupScreen } from '../core/screens/Warmup';
 import { TEST_BUILD } from '../core/testMode';
+
+// Screens he passes through every time (door, map, intro, tasks) load with the app; the rest
+// load the first time they open (React Router's lazy routes), and the celebration is fetched
+// in the background once the app is idle, so it is ready when the first level ends.
+const celebration = () => import('../core/screens/Celebration');
+const warmup = () => import('../core/screens/Warmup');
+const dev = () => import('../core/screens/DevScreens');
 
 // Hash URLs (#/map) because GitHub Pages has no fallback for deep links.
 export const router = createHashRouter([
   { path: '/', element: <DoorScreen /> },
-  { path: '/login', element: <LoginScreen /> },
+  { path: '/login', lazy: async () => ({ Component: (await import('../core/screens/Login')).LoginScreen }) },
   { path: '/map', element: <JourneyScreen /> },
   { path: '/map/:world', element: <JourneyScreen /> },
   { path: '/level/:world/:num', element: <LevelIntroScreen /> },
   { path: '/level/:world/:num/play', element: <TaskRunnerScreen /> },
-  { path: '/level/:world/:num/done', element: <CelebrationScreen /> },
-  { path: '/warmup', element: <WarmupScreen /> },
-  { path: '/warmup/done', element: <WarmupDoneScreen /> },
+  { path: '/level/:world/:num/done', lazy: async () => ({ Component: (await celebration()).CelebrationScreen }) },
+  { path: '/warmup', lazy: async () => ({ Component: (await warmup()).WarmupScreen }) },
+  { path: '/warmup/done', lazy: async () => ({ Component: (await warmup()).WarmupDoneScreen }) },
   ...(TEST_BUILD
     ? [
-        { path: '/dev/task/:world/:num/:type', element: <DevTaskScreen /> },
-        { path: '/dev/celebration', element: <DevCelebrationScreen /> },
-        { path: '/dev/journey', element: <DevJourneyScreen /> },
+        { path: '/dev/task/:world/:num/:type', lazy: async () => ({ Component: (await dev()).DevTaskScreen }) },
+        { path: '/dev/celebration', lazy: async () => ({ Component: (await dev()).DevCelebrationScreen }) },
+        { path: '/dev/journey', lazy: async () => ({ Component: (await dev()).DevJourneyScreen }) },
       ]
     : []),
   { path: '*', element: <Navigate to="/" replace /> },
 ]);
+
+// Safari had no requestIdleCallback until recently.
+const idle = (fn: () => void) => (typeof requestIdleCallback === 'function' ? requestIdleCallback(fn, { timeout: 5000 }) : setTimeout(fn, 3000));
+idle(() => void celebration().then(warmup));

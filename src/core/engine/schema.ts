@@ -111,6 +111,8 @@ export const LevelSchema = z.strictObject({
   /** Item ids this level teaches, grouped as the domain likes (reading: syllables, words, sentences). */
   pool: z.record(z.string(), z.array(z.string())),
   reviewFrom: z.array(LevelId).default([]),
+  /** Review everything the levels before this one taught (instead of listing them all in reviewFrom). */
+  reviewEarlier: z.boolean().default(false),
   tasks: z.array(TaskEntrySchema).min(1),
   boss: z.strictObject({
     type: z.literal('magicDoor'),

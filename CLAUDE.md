@@ -72,6 +72,10 @@ docs/PLAN.md
   streak wand / wave, door open) and the celebration's running order from `finishLevel` in
   `src/core/engine/rewards.ts` (`CelebrationStep`s). Animations, sounds and Соня's lines react to
   those events; never re-derive game rules in components.
+- **Size budgets** (`scripts/check-prod-build.ts`, CI): first-load JS, each lazy chunk, audio,
+  the whole site. Screens off the everyday path (login, celebration, warm-up, later Book and
+  Album) are React Router `lazy` routes; Firebase loads lazily (Firestore Lite).
+  `npm run bundle-report` shows what each package costs.
 - Code that Node runs directly (`src/core/engine/`, `src/reading/engine/`,
   `src/reading/tasks/*/logic.ts`, `scripts/`) uses explicit `.ts` import extensions and only
   erasable TypeScript; it must not import JSON, CSS or React.
@@ -237,7 +241,7 @@ npm run lint              # ESLint
 npm run typecheck         # tsc --noEmit
 npm test                  # Vitest (engine, content, rules)
 npm run e2e               # Playwright: layout rules at 4 viewports + one full play-through (6 tests)
-npm run check-prod-build  # dist/ must not contain data-correct, /dev routes or __audio
+npm run check-prod-build  # dist/ has no data-correct, /dev routes or __audio, and fits the size budgets
 npm run audio:generate    # regenerate effects sprite + music (MP3, needs ffmpeg) from scripts/make-audio.ts
 npm run bundle-report     # what each package and folder costs in the production build
 npm run validate-content  # content checks; -- --strict (assets are errors), --verbose, --root <dir>
