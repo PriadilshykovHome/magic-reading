@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { unlockAudio } from '../audio/voice';
+import { unlockAudio, voice } from '../audio/voice';
 import { useAccount } from '../store/account';
 import { cloudAvailable } from '../sync/cloud';
 import { choseGuest, GUEST } from '../sync/localCache';
 import { Kharkiv } from '../fx/ambient/Kharkiv';
+import { MoonStar } from '../fx/ambient/MoonStar';
+import { particles } from '../fx/particles';
+import { useBirthday } from '../fx/useBirthday';
 import { Scene, type CandleSpot } from '../fx/ambient/Scene';
 import { PropLayer } from '../fx/props/Props';
 import { useProps } from '../fx/props/useProps';
@@ -37,6 +40,12 @@ export function DoorScreen() {
   const navigate = useNavigate();
   const [opening, setOpening] = useState(false);
   const props = useProps('door');
+  // His birthday: as many candles as his new age, confetti, and Соня's wish when he comes in.
+  const { birthday, age } = useBirthday();
+  const candles = birthday && age ? CANDLES.slice(0, Math.min(age, CANDLES.length)) : CANDLES;
+  useEffect(() => {
+    if (birthday) particles.confettiRain();
+  }, [birthday]);
 
   const account = useAccount((s) => s.account);
   const cloud = useAccount((s) => s.cloud);
@@ -45,6 +54,7 @@ export function DoorScreen() {
   function enter() {
     if (opening) return;
     unlockAudio();
+    if (birthday) void voice.say('eggs.birthday');
     const to = withCloud && account === GUEST && !choseGuest() ? '/login' : '/map';
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       navigate(to);
@@ -56,7 +66,8 @@ export function DoorScreen() {
 
   return (
     <main className={`screen door-screen ${opening ? 'is-opening' : ''}`}>
-      <Scene candles={CANDLES} />
+      <Scene candles={candles} />
+      <MoonStar />
       <Kharkiv />
       <PropLayer ids={props} slots={['sky', 'moon', 'roofs', 'corner']} />
 

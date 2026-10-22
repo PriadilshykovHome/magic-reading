@@ -52,6 +52,8 @@ const SCREENS: [string, string][] = [
   ['album: a world', '#/album/2'],
   ['album: special cards', '#/album/6'],
   ['journey: the castle with its cat', '?props=cat#/map/magic-kitchen'],
+  ['door: birthday, синичка, winter', '?props=synychka&birthday=2021-01-10&date=2027-01-10#/'],
+  ['journey: pysanky around Великдень', '?date=2027-05-02#/map/tower-of-words'],
 ];
 
 test('every screen keeps the layout rules', async ({ page }, info) => {

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { sfx } from '../../audio/sfx';
+import { voice } from '../../audio/voice';
 import { t } from '../../strings';
 import { Pumpkin } from '../ambient/Pumpkin';
 import { PROPS, type PropSlot } from './pick';
@@ -37,8 +38,52 @@ const DRAWINGS: Record<string, () => React.ReactNode> = {
   stork: Stork,
   kalyna: Kalyna,
   sleepyOwl: SleepyOwl,
+  synychka: Synychka,
   owlMoon: () => (reduced() ? null : <OwlMoon />),
 };
+
+/** Синичка, Соня's friend, sometimes perches in the corner; tap her and she hops and sings. A quiet
+ *  family nod the game never explains. */
+function Synychka() {
+  const [singing, setSinging] = useState(false);
+  const timer = useRef<number>(undefined);
+  useEffect(() => () => window.clearTimeout(timer.current), []);
+  return (
+    <button
+      type="button"
+      className={`prop prop-synychka ${singing ? 'is-singing' : ''}`}
+      aria-label={t.door.synychka}
+      onClick={() => {
+        void voice.say('eggs.synychka', 'interrupt');
+        setSinging(true);
+        window.clearTimeout(timer.current);
+        timer.current = window.setTimeout(() => setSinging(false), 1400);
+      }}
+    >
+      <svg viewBox="0 0 80 80" aria-hidden="true">
+        <path d="M6 70q30-8 68 2" stroke="#4a3826" strokeWidth="4" fill="none" strokeLinecap="round" />
+        <path d="M58 66l10-6m-26 8l-6-8" stroke="#4a3826" strokeWidth="2" strokeLinecap="round" />
+        <g className="synychka-bird">
+          <path d="M18 50l-12 6 13-2z" fill="#5d7486" />
+          <ellipse cx="38" cy="50" rx="17" ry="14" fill="#d9bd5a" />
+          <path d="M23 46q6-12 22-8l-8 14q-10 2-14-6z" fill="#6e8a9a" />
+          <circle cx="47" cy="36" r="11" fill="#f2ead6" />
+          <path d="M37 33q9-12 21 0z" fill="#5d7486" />
+          <path d="M40 38q8 3 16 0" stroke="#1d1727" strokeWidth="2.2" fill="none" strokeLinecap="round" />
+          <circle cx="51" cy="36.5" r="1.8" fill="#1d1727" />
+          <path d="M57 38l6 1.5-6 1.5z" fill="#3a2a1c" />
+          <path d="M38 52v12m6-12v12" stroke="#4a3826" strokeWidth="1.6" strokeLinecap="round" />
+        </g>
+        <g className="synychka-notes" fill="#f0d68a">
+          <circle cx="66" cy="22" r="2.4" />
+          <path d="M68.4 22V12" stroke="#f0d68a" strokeWidth="1.2" />
+          <circle cx="58" cy="12" r="2" />
+          <path d="M60 12V4" stroke="#f0d68a" strokeWidth="1.2" />
+        </g>
+      </svg>
+    </button>
+  );
+}
 
 /** St Nicholas Day: a small present left by the door. */
 function MykolaiGift() {

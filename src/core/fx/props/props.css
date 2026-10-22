@@ -97,7 +97,55 @@
   width: var(--w);
 }
 
-/* ---------- the corner ---------- */
+/* ---------- the corners ---------- */
+
+.prop-synychka {
+  right: calc(14px + env(safe-area-inset-right));
+  bottom: calc(6px + env(safe-area-inset-bottom));
+  z-index: 2;
+  width: clamp(64px, 12vmin, 96px);
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  pointer-events: auto;
+  opacity: 0.92;
+}
+
+.prop-synychka svg {
+  width: 100%;
+  height: 100%;
+}
+
+.synychka-bird {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+.synychka-notes {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.prop-synychka.is-singing .synychka-bird {
+  animation: synychka-hop 0.7s ease-in-out 2;
+}
+
+.prop-synychka.is-singing .synychka-notes {
+  opacity: 1;
+}
+
+@keyframes synychka-hop {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-14%) rotate(-6deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prop-synychka.is-singing .synychka-bird {
+    animation: none;
+  }
+}
 
 .prop-sleepy-owl {
   right: calc(14px + env(safe-area-inset-right));

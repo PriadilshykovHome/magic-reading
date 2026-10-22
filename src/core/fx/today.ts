@@ -11,3 +11,8 @@ export function forcedProps(): string[] | null {
   const value = params().get('props');
   return value === null ? null : value.split(',').filter(Boolean);
 }
+
+/** `?birthday=2021-10-22` previews the birthday surprises (his real birthday stays in the private profile). */
+export function birthdayOverride(): string | undefined {
+  return /^\d{4}-\d{2}-\d{2}$/.exec(params().get('birthday') ?? '')?.[0];
+}

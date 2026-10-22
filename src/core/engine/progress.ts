@@ -52,6 +52,8 @@ export const ProgressSchema = z.object({
       milestones: z.array(z.string()).default([]),
       /** The day of his last daily warm-up (one a day). */
       lastWarmup: z.string().nullable().default(null),
+      /** The day he last caught the shooting star (one bonus spark a day). */
+      lastStar: z.string().nullable().default(null),
     })
     .prefault({}),
   easterEggs: z.object({ found: z.array(z.string()).default([]) }).prefault({}),

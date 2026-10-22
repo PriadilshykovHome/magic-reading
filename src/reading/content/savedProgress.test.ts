@@ -16,7 +16,7 @@ import saved from './saved-progress.fixture.json';
 test('progress saved on 2026-10-22 still loads, merges unchanged, and every id in it resolves', () => {
   const content = testContent();
   const progress = ProgressSchema.parse(saved);
-  expect(progress).toEqual(saved); // nothing dropped or reshaped
+  expect(progress).toMatchObject(saved); // nothing dropped or reshaped (new fields arrive with defaults)
   expect(mergeProgress(progress, progress, content.config.mastery.distinctDays)).toEqual(progress);
 
   expect(Object.keys(progress.levels).filter((id) => !content.levels.has(id))).toEqual([]);

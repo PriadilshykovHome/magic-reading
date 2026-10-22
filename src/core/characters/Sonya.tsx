@@ -1,3 +1,4 @@
+import { useBirthday } from '../fx/useBirthday';
 import './characters.css';
 
 // Her вишиванка scarf: a band of linen around her neck, embroidered in red and black (rhombi and
@@ -16,6 +17,8 @@ export type SonyaMood = 'idle' | 'happy' | 'shrug' | 'talk' | 'celebrate';
  * whose parts Phase 6 animates properly; for now simple CSS moods.
  */
 export function Sonya({ mood = 'idle', className = '' }: { mood?: SonyaMood; className?: string }) {
+  // On his birthday she swaps her wizard hat for a party hat.
+  const { birthday } = useBirthday();
   return (
     <div className={`sonya sonya-${mood} ${className}`} aria-hidden="true">
       <svg viewBox="0 0 120 132">
@@ -76,11 +79,20 @@ export function Sonya({ mood = 'idle', className = '' }: { mood?: SonyaMood; cla
           </g>
           <path d="M55 78l5 9 5-9z" fill="#f0b55a" />
           <path d="M48 124l-4 6M54 125v6M66 125v6M72 124l4 6" stroke="#f0b55a" strokeWidth="3" strokeLinecap="round" />
-          <g className="sonya-hat">
-            <path d="M44 36L66 4 74 36z" fill="url(#sonya-hat)" />
-            <ellipse cx="59" cy="36" rx="19" ry="5" fill="#2d6b65" />
-            <path d="M64 17l1.6 3.2 3.4.5-2.5 2.4.6 3.4-3.1-1.6-3.1 1.6.6-3.4-2.5-2.4 3.4-.5z" fill="#f0d68a" />
-          </g>
+          {birthday ? (
+            <g className="sonya-hat sonya-party-hat">
+              <path d="M46 36L60 4 74 36z" fill="#c9a24a" />
+              <path d="M51 25l14-6M48 32l22-9M55 14l8-4" stroke="#7cc4bd" strokeWidth="3" strokeLinecap="round" />
+              <ellipse cx="60" cy="36" rx="15" ry="4" fill="#9b4a3c" />
+              <circle cx="60" cy="4" r="4.5" fill="#f6ecd4" />
+            </g>
+          ) : (
+            <g className="sonya-hat">
+              <path d="M44 36L66 4 74 36z" fill="url(#sonya-hat)" />
+              <ellipse cx="59" cy="36" rx="19" ry="5" fill="#2d6b65" />
+              <path d="M64 17l1.6 3.2 3.4.5-2.5 2.4.6 3.4-3.1-1.6-3.1 1.6.6-3.4-2.5-2.4 3.4-.5z" fill="#f0d68a" />
+            </g>
+          )}
         </g>
       </svg>
     </div>

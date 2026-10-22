@@ -1,5 +1,8 @@
+import { game } from '@game';
 import type { CSSProperties } from 'react';
+import { surprisesOn } from '../../engine/calendar';
 import { seededRandom } from '../../engine/rng';
+import { today } from '../today';
 import { Embers } from './Embers';
 import './ambient.css';
 
@@ -22,6 +25,18 @@ function makeStars(count: number): Star[] {
 
 const STARS = makeStars(90);
 
+/** Falling things for the seasonal layers: x %, size, fall time, delay, sway. */
+function makeFall(count: number, seed: number) {
+  const rnd = seededRandom(seed);
+  return Array.from({ length: count }, () => ({ x: rnd() * 100, size: 0.6 + rnd() * 0.8, dur: 14 + rnd() * 12, delay: -rnd() * 26, sway: 10 + rnd() * 30 }));
+}
+const SNOW = makeFall(26, 7);
+const LEAVES = makeFall(7, 11);
+const FIREFLIES = makeFall(9, 13);
+
+const fallStyle = (f: (typeof SNOW)[number]) =>
+  ({ left: `${f.x}%`, '--s': f.size, '--dur': `${f.dur}s`, '--delay': `${f.delay}s`, '--sway': `${f.sway}px` }) as CSSProperties;
+
 /**
  * The shared night backdrop: sky, stars, moon, floating candles, mist, drifting embers and a
  * vignette. Everything here is quiet and slow; the screen's focal element gets the attention.
@@ -36,8 +51,11 @@ export function Scene({
   /** During tasks: fewer embers and dimmer candles, so nothing competes with the reading card. */
   quiet?: boolean;
 }) {
+  // The day and season (`?date=` previews another day): a sunrise palette in the morning, and
+  // outside tasks, fireflies on summer evenings, falling leaves in autumn, snow in winter.
+  const day = surprisesOn(today(), game.content.config.eggs);
   return (
-    <div className={`scene ${quiet ? 'is-quiet' : ''}`} aria-hidden="true">
+    <div className={`scene ${quiet ? 'is-quiet' : ''} is-${day.timeOfDay}`} aria-hidden="true">
       <div className="scene-sky" />
       <div className="scene-stars">
         {STARS.map((s, i) => (
@@ -67,6 +85,27 @@ export function Scene({
         ))}
       </div>
       <div className="scene-mist scene-mist-front" />
+      {!quiet && day.snow && (
+        <div className="scene-fall scene-snow">
+          {SNOW.map((f, i) => (
+            <span key={i} style={fallStyle(f)} />
+          ))}
+        </div>
+      )}
+      {!quiet && day.season === 'autumn' && (
+        <div className="scene-fall scene-leaves">
+          {LEAVES.map((f, i) => (
+            <span key={i} style={fallStyle(f)} />
+          ))}
+        </div>
+      )}
+      {!quiet && day.fireflies && (
+        <div className="scene-fireflies">
+          {FIREFLIES.map((f, i) => (
+            <span key={i} style={{ ...fallStyle(f), top: `${45 + ((i * 37) % 45)}%` }} />
+          ))}
+        </div>
+      )}
       <Embers density={quiet ? 0.35 : 1} />
       <div className="scene-vignette" />
     </div>

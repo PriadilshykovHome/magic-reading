@@ -42,6 +42,7 @@ export function mergeProgress(a: Progress, b: Progress, keepDays: number): Progr
       litWindows: union(a.rewards.litWindows, b.rewards.litWindows),
       milestones: union(a.rewards.milestones, b.rewards.milestones),
       lastWarmup: later(a.rewards.lastWarmup, b.rewards.lastWarmup),
+      lastStar: later(a.rewards.lastStar, b.rewards.lastStar),
     },
     easterEggs: { found: union(a.easterEggs.found, b.easterEggs.found) },
   };

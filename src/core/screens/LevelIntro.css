@@ -21,6 +21,40 @@
 
 .intro-sonya {
   width: clamp(110px, 26vmin, 220px);
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.intro-sonya.is-spinning .sonya {
+  animation: sonya-spin 1.4s ease-in-out;
+}
+
+.intro-sonya.is-spinning .sonya-hat {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: sonya-hat-fly 1.4s ease-in-out;
+}
+
+@keyframes sonya-spin {
+  0% { transform: rotate(0); }
+  60% { transform: rotate(360deg) scale(1.04); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes sonya-hat-fly {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  35% { transform: translateY(-140%) rotate(-25deg); }
+  60% { transform: translateY(-90%) rotate(20deg); }
+  85% { transform: translateY(6%) rotate(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-sonya.is-spinning .sonya,
+  .intro-sonya.is-spinning .sonya-hat {
+    animation: none;
+  }
 }
 
 .intro-demo {

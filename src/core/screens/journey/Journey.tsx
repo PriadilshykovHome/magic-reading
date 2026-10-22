@@ -8,8 +8,10 @@ import { voice } from '../../audio/voice';
 import { Iskryk } from '../../characters/Iskryk';
 import { creatureStage, sparkBalance, type Progress } from '../../engine/progress';
 import { timeOfDay } from '../../engine/calendar';
+import { hiddenPysanky } from '../../engine/eggs';
 import { castleWindows, isLevelUnlocked, warmupDue } from '../../engine/rewards';
 import { Scene, type CandleSpot } from '../../fx/ambient/Scene';
+import { particles } from '../../fx/particles';
 import { PropLayer } from '../../fx/props/Props';
 import { useProps } from '../../fx/props/useProps';
 import { today } from '../../fx/today';
@@ -48,6 +50,9 @@ export interface Walk {
   to: string;
 }
 
+/** Соня announces the pysanky hunt once per visit to the app. */
+let pysankyAnnounced = false;
+
 function nextLevelToPlay(progress: Progress): string | undefined {
   const { levels, levelOrder } = game.content;
   return levelOrder.find((id) => isLevelUnlocked(progress, levels.get(id)!) && !progress.levels[id]?.bestStars);
@@ -75,6 +80,27 @@ export function JourneyScreen() {
   }, [greeted, setGreeted]);
 
   const nextId = nextLevelToPlay(progress);
+
+  // Around Великдень the pysanky hide along his road; Соня mentions it once per visit.
+  const { config } = game.content;
+  const hidden = hiddenPysanky(progress, today(), config);
+  const huntOn = hidden.length > 0;
+  useEffect(() => {
+    if (huntOn && !pysankyAnnounced) {
+      pysankyAnnounced = true;
+      void voice.say('eggs.pysankyStart');
+    }
+  }, [huntOn]);
+  const findPysanka = (index: number, at: Point) => {
+    particles.sparkle(at.x, at.y);
+    sfx.pop();
+    if (useProgress.getState().findPysanka(index, today())) {
+      sfx.fanfare();
+      particles.confettiRain();
+      void voice.say('eggs.pysankyDone', 'interrupt');
+    }
+  };
+
   const worlds = useMemo<JourneyWorld[]>(
     () => {
       const canRead = game.canRead(progress);
@@ -157,6 +183,28 @@ export function JourneyScreen() {
       }}
       creature={creatureStage(progress, game.content.config)}
       props={<PropLayer ids={props} slots={['sky', 'moon']} />}
+      pysanky={{ total: config.eggs.pysankyCount, hidden }}
+      onPysanka={findPysanka}
+      onSneeze={(at) => {
+        sfx.sneeze();
+        particles.sparkle(at.x, at.y);
+        void voice.say('eggs.sneeze', 'interrupt');
+      }}
+      onCorners={() => {
+        void voice.say('eggs.fireworks', 'interrupt');
+        [
+          [25, 30],
+          [70, 22],
+          [50, 45],
+          [32, 55],
+          [75, 50],
+        ].forEach(([x, y], i) =>
+          window.setTimeout(() => {
+            sfx.fireworkBurst();
+            particles.firework(x!, y!, i);
+          }, i * 450),
+        );
+      }}
       shelf={
         <>
           <button
@@ -212,6 +260,21 @@ interface ViewProps {
   props?: ReactNode;
   /** The Book of Spells, the album and the castle windows: below the road in portrait, in the bar in landscape. */
   shelf?: ReactNode;
+  /** Around Великдень: the pysanky still hidden (indices of `total`), on free spots along his road. */
+  pysanky?: { total: number; hidden: number[] };
+  onPysanka?(index: number, at: Point): void;
+  /** Hidden surprises: a long press on Іскрик, and the four corners tapped clockwise. */
+  onSneeze?(at: Point): void;
+  onCorners?(): void;
+}
+
+/** Where a tap landed, as a corner of the screen (0 top-left, then clockwise), if it did. */
+function cornerOf(x: number, y: number): number | null {
+  const zone = 72;
+  const right = x > window.innerWidth - zone;
+  const bottom = y > window.innerHeight - zone;
+  if ((x >= zone && !right) || (y >= zone && !bottom)) return null;
+  return bottom ? (right ? 2 : 3) : right ? 1 : 0;
 }
 
 type SegmentState = 'lit' | 'active' | 'dim';
@@ -249,8 +312,11 @@ interface Road {
 }
 
 /** The journey itself: also rendered by the test-build route with hundreds of levels. */
-export function JourneyView({ worlds, focus, walk, shaking, onOpen, onSign, creature, jar, actions, props, shelf }: ViewProps) {
+export function JourneyView({ worlds, focus, walk, shaking, onOpen, onSign, creature, jar, actions, props, shelf, pysanky, onPysanka, onSneeze, onCorners }: ViewProps) {
   const scroller = useRef<HTMLDivElement>(null);
+  const corners = useRef<{ next: number; at: number }>({ next: 0, at: 0 });
+  const press = useRef(0);
+  const [sneezing, setSneezing] = useState(false);
   const [size, setSize] = useState<{ width: number; height: number } | null>(null);
   const [scroll, setScroll] = useState(0);
   const [nextInView, setNextInView] = useState(true);
@@ -323,6 +389,20 @@ export function JourneyView({ worlds, focus, walk, shaking, onOpen, onSign, crea
     });
     return out;
   }, [layout, worlds]);
+
+  // The pysanky: on free spots (no signpost there) up to the world he has reached, spread evenly,
+  // each egg always on the same spot so finding one doesn't move the others.
+  const eggs = useMemo(() => {
+    if (!layout || !pysanky?.hidden.length) return [];
+    const taken = new Set(signs.map((s) => `${s.x},${s.y}`));
+    const reach = layout.nodes.find((n) => n.id === nextId)?.region ?? layout.regions.length - 1;
+    const free = layout.spots.filter((s) => !taken.has(`${s.x},${s.y}`) && s.region <= reach);
+    const pool = free.length >= pysanky.total ? free : layout.spots.filter((s) => !taken.has(`${s.x},${s.y}`));
+    return pysanky.hidden.flatMap((i) => {
+      const spot = pool[Math.floor(((i + 0.5) * pool.length) / pysanky.total)];
+      return spot ? [{ i, x: spot.x, y: spot.y }] : [];
+    });
+  }, [layout, signs, pysanky, nextId]);
 
   const along = (p: Point) => (layout?.orientation === 'portrait' ? p.y : p.x);
   const viewLen = layout ? (layout.orientation === 'portrait' ? size!.height : size!.width) : 0;
@@ -417,7 +497,20 @@ export function JourneyView({ worlds, focus, walk, shaking, onOpen, onSign, crea
   }, [road, layout, nextId, flat]);
 
   return (
-    <main className={`screen journey-screen ${shelf ? 'has-shelf' : ''}`}>
+    <main
+      className={`screen journey-screen ${shelf ? 'has-shelf' : ''}`}
+      onPointerDown={(e) => {
+        // A parent's secret: the four corners, clockwise from top-left, within 5 seconds.
+        if (!onCorners || (e.target as Element).closest('button')) return;
+        const corner = cornerOf(e.clientX, e.clientY);
+        const c = corners.current;
+        if (corner === null) return;
+        if (corner === c.next && (corner === 0 || performance.now() - c.at < 5000)) {
+          corners.current = { next: (corner + 1) % 4, at: corner === 0 ? performance.now() : c.at };
+          if (corner === 3) onCorners();
+        } else corners.current = { next: corner === 0 ? 1 : 0, at: performance.now() };
+      }}
+    >
       <Scene candles={CANDLES} />
       {props}
       <header className="journey-bar">
@@ -461,10 +554,38 @@ export function JourneyView({ worlds, focus, walk, shaking, onOpen, onSign, crea
                   />
                 )),
             )}
+            {eggs.map((egg) => (
+              <button
+                key={egg.i}
+                type="button"
+                className="journey-pysanka"
+                style={{ left: egg.x, top: egg.y }}
+                aria-label={t.map.pysanka}
+                onClick={(e) => onPysanka?.(egg.i, { x: e.clientX, y: e.clientY })}
+                data-pysanka={egg.i}
+              >
+                <Pysanka index={egg.i} />
+              </button>
+            ))}
             {rest && (
               <m.div
-                className="journey-iskryk"
+                className={`journey-iskryk ${onSneeze ? 'is-pressable' : ''} ${sneezing ? 'is-sneezing' : ''}`}
                 aria-hidden="true"
+                onPointerDown={(e) => {
+                  if (!onSneeze) return;
+                  const at = { x: e.clientX, y: e.clientY };
+                  window.clearTimeout(press.current);
+                  // A long press: he sneezes a puff of glitter.
+                  press.current = window.setTimeout(() => {
+                    setSneezing(true);
+                    onSneeze(at);
+                    window.setTimeout(() => setSneezing(false), 900);
+                  }, 600);
+                }}
+                onPointerUp={() => window.clearTimeout(press.current)}
+                onPointerLeave={() => window.clearTimeout(press.current)}
+                onPointerCancel={() => window.clearTimeout(press.current)}
+                onContextMenu={(e) => e.preventDefault()}
                 initial={walking ? { x: walking[0]!.x, y: walking[0]!.y } : false}
                 animate={walking ? { x: walking.map((p) => p.x), y: walking.map((p) => p.y) } : { x: rest.x, y: rest.y }}
                 transition={walking ? { duration: 1.8, ease: 'easeInOut' } : { duration: 0 }}
@@ -633,5 +754,27 @@ function Sparkles({ points }: { points: Point[] }) {
         />
       ))}
     </>
+  );
+}
+
+const EGG_COLOURS = [
+  ['#9b4a3c', '#e0bf6a'],
+  ['#c9a24a', '#5b3a6e'],
+  ['#4f7f78', '#f0d68a'],
+  ['#7c3a34', '#7cc4bd'],
+  ['#2b1d10', '#d9a05a'],
+];
+
+/** A pysanka: an egg with a band, waves and dots, in the palette's muted reds, golds and teals. */
+function Pysanka({ index }: { index: number }) {
+  const [base, line] = EGG_COLOURS[index % EGG_COLOURS.length]!;
+  return (
+    <svg viewBox="0 0 40 50" aria-hidden="true">
+      <ellipse cx="20" cy="27" rx="15" ry="20" fill={base} />
+      <path d="M6 24h28M6 31h28" stroke={line} strokeWidth="1.6" />
+      <path d="M7 27.5q3.3-3 6.5 0t6.5 0 6.5 0 6.5 0" fill="none" stroke={line} strokeWidth="1.4" />
+      <path d="M20 9l3 5-3 5-3-5zM20 36l3 4-3 4-3-4z" fill={line} />
+      <ellipse cx="14" cy="17" rx="3" ry="5" fill="#fff" opacity=".18" transform="rotate(-20 14 17)" />
+    </svg>
   );
 }

@@ -426,3 +426,137 @@
     animation: none;
   }
 }
+
+/* ---------- the moon's shooting star (MoonStar, door screen) ---------- */
+
+.moon-button {
+  position: absolute;
+  z-index: 3;
+  top: calc(7% + env(safe-area-inset-top) + clamp(30px, 6.5vmin, 60px) / 2 - 32px);
+  right: calc(10% + clamp(30px, 6.5vmin, 60px) / 2 - 32px);
+  width: var(--tap-min);
+  height: var(--tap-min);
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+}
+
+.moon-star {
+  position: absolute;
+  z-index: 3;
+  top: calc(9% + env(safe-area-inset-top));
+  right: 16%;
+  width: 88px;
+  height: 88px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  animation: moon-star-fly 3.6s cubic-bezier(0.3, 0.1, 0.6, 1) forwards;
+}
+
+.moon-star-head {
+  position: absolute;
+  inset: 32px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fffbe8 0 30%, rgb(240 214 138 / 0.9) 45%, transparent 72%);
+  box-shadow: 0 0 18px 6px rgb(240 214 138 / 0.55);
+}
+
+.moon-star-tail {
+  position: absolute;
+  top: 40px;
+  left: 44px;
+  width: 90px;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, rgb(240 214 138 / 0.8), transparent);
+  transform-origin: 0 50%;
+  transform: rotate(-24deg);
+}
+
+@keyframes moon-star-fly {
+  0% { translate: 0 0; opacity: 0; }
+  8% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { translate: min(-60vw, -260px) 22vh; opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .moon-star {
+    animation: moon-star-fade 3.6s linear forwards;
+  }
+
+  @keyframes moon-star-fade {
+    0%, 85% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+}
+
+/* ---------- time of day and seasons (Scene) ---------- */
+
+/* Mornings: the horizon warms toward sunrise; the night above stays. */
+.scene.is-morning .scene-sky {
+  background:
+    radial-gradient(ellipse 90% 40% at 50% 100%, rgb(240 170 120 / 0.22) 0%, transparent 70%),
+    radial-gradient(ellipse 70% 50% at 50% 30%, rgb(255 170 90 / 0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 120% 90% at 50% 25%, #3a2c48 0%, var(--dusk) 38%, var(--stone) 80%);
+}
+
+.scene-fall span {
+  position: absolute;
+  top: -6%;
+  animation: fall var(--dur) linear infinite;
+  animation-delay: var(--delay);
+}
+
+@keyframes fall {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(var(--sway), 28vh) rotate(90deg); }
+  50% { transform: translate(0, 56vh) rotate(180deg); }
+  75% { transform: translate(calc(var(--sway) * -1), 84vh) rotate(270deg); }
+  100% { transform: translate(0, 112vh) rotate(360deg); }
+}
+
+.scene-snow span {
+  width: calc(5px * var(--s));
+  height: calc(5px * var(--s));
+  border-radius: 50%;
+  background: rgb(246 236 212 / 0.55);
+  filter: blur(0.4px);
+}
+
+.scene-leaves span {
+  width: calc(14px * var(--s));
+  height: calc(9px * var(--s));
+  border-radius: 80% 0;
+  background: linear-gradient(135deg, rgb(176 110 50 / 0.7), rgb(124 70 30 / 0.6));
+  opacity: 0.75;
+}
+
+.scene-fireflies span {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #f6e7a0;
+  box-shadow: 0 0 8px 3px rgb(240 214 138 / 0.5);
+  animation: firefly calc(var(--dur) / 2) ease-in-out infinite;
+  animation-delay: var(--delay);
+}
+
+@keyframes firefly {
+  0%, 100% { transform: translate(0, 0); opacity: 0.1; }
+  30% { opacity: 0.9; }
+  50% { transform: translate(var(--sway), -18px); opacity: 0.3; }
+  70% { opacity: 0.85; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene-fall,
+  .scene-fireflies {
+    display: none;
+  }
+}

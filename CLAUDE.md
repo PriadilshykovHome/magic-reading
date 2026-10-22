@@ -130,7 +130,11 @@ docs/                    PLAN.md (vision, roadmap), curriculum.md, architecture.
   all their letters; tapping one has Соня read it.
 - Ambient props (`src/core/fx/props/`: `pick.ts` chooses, `Props.tsx` draws): at most
   `config.props.perScreen` a screen, seasonal ones on their `props.dates`, the rest by daily
-  `props.chance`. Preview with `?date=YYYY-MM-DD` or `?props=owlMoon,stork` before the `#/`.
+  `props.chance`. Preview with `?date=YYYY-MM-DD` or `?props=owlMoon,stork` before the `#/`
+  (`?birthday=YYYY-MM-DD` previews the birthday; pysanky show around Великдень, e.g. `?date=2027-05-02`).
+- The Book of Spells (`#/book`) shows `GameData.book(progress)`: a chapter per letter, pages lit
+  when mastered; the album (`#/album`) shows `GameData.portraits` and the cards per world. Saved
+  surprises (the shooting star's spark, pysanky) are pure functions in `src/core/engine/eggs.ts`.
 - The daily warm-up («Чарівна розминка», the `warmup` template) reviews finished levels once a day
   from the map's cauldron; it lights the day's castle window and records no level progress.
 - Text is shown in UPPERCASE unless the parent turns on lowercase sentences.

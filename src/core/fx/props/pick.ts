@@ -23,6 +23,7 @@ export const PROPS: readonly PropDef[] = [
   { id: 'stork', screens: ['door'], slots: ['roofs'] },
   { id: 'kalyna', screens: ['door'], slots: ['ground-right'] },
   { id: 'sleepyOwl', screens: ['door'], slots: ['corner'] },
+  { id: 'synychka', screens: ['door'], slots: ['corner'] },
   { id: 'owlMoon', screens: ['door', 'map'], slots: ['moon'] },
   // Drawn by the map's castle (CastleWindows), not by PropLayer.
   { id: 'cat', screens: ['map'], slots: ['castle'] },

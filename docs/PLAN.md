@@ -245,7 +245,7 @@ One-time extras: the egg hatches after the very first level, and his first ever 
 ### Easter eggs (hidden surprises)
 
 - Tap Соня 5 times quickly: she spins, her hat flies off and lands back on her head.
-- Tap the moon on the map: a shooting star crosses the sky, and catching it gives a bonus spark.
+- Tap the moon on the start screen: a shooting star crosses the sky, and catching it gives a bonus spark (once a day).
 - Long-press Іскрик: he sneezes a puff of glitter.
 - A small cat sometimes peeks out of a castle window and giggles when tapped.
 - Time of day: after 19:00 the castle windows glow and fireflies appear; mornings use a sunrise palette.
@@ -420,11 +420,19 @@ Later waves (worlds 6 to 13) are written just in time, after Phase 9. `caseMatch
 
 9\. **Collections & Easter eggs.** Build the Book of Spells (one chapter per letter, opening with «Сузір’я літер»), card album (one page per world), castle windows (lit by the daily warm-up) and every Easter egg (ambient ones use the props system), including the seasonal ones with the Orthodox Easter date calculation and all Personal touches (Чарівна пошта, family portraits, formal Соня; Kharkiv on the horizon is done in G6). The Book and the album are lazy screens, within the size budgets.
    - Done when: a debug date override (`?date=YYYY-MM-DD`, already there for props) can trigger each seasonal surprise.
+   - Done (22 Oct 2026):
+     - **Книга Чар** (`#/book`): his name in gold, «Сузір’я літер» (each learned letter as a constellation: the glyph thinned to its centre line, stars along it), a page per letter with every syllable and word it made readable, mastered ones glowing; formal Соня on the cover (3 taps).
+     - **Колекція Мишка** (`#/album`): «Родина» (МАМА, ТАТО, АЛІНА once readable), a page of cards per world reached, the special cards.
+     - **On the map:** a shelf with the Book, the castle (this week's lit windows, warmer after 19:00, sometimes a cat) and the album; Іскрик sneezes glitter on a long press; the four corners clockwise launch fireworks; around Великдень 5 pysanky hide along the road (all found → the pysanka card).
+     - **On the door:** the moon's shooting star (catch it: a bonus spark once a day; the map's moon sits under the spark jar, so this lives on the door), the синичка (a prop; tap → she sings), and on his birthday as many candles as his age, confetti, Соня's party hat and her wish (`?birthday=YYYY-MM-DD` previews it).
+     - **Everywhere:** mornings warm the horizon; outside tasks, fireflies on summer evenings, falling leaves in autumn, snow in winter. Соня spins and loses her hat after 5 taps at a level's intro.
+     - **Moved to Phase 8** (they need recordings): Чарівна пошта and the parents' recorded hellos in the portraits. **Not done:** the spinning wheel for the celebration stars (a quiet nod; later, if wanted).
 
 8\. **Parent area & recording studio.** Build the gate, progress views and settings, including the private child profile.
    - Progress views are grouped by world and letter, with a "words he can read" curve.
    - Add the recording studio (with family messages). It works one world at a time ("record the next world") and has zip export.
    - Add JSON export/import and the `audio:prepare` script (ffmpeg, like `audio:generate`).
+   - From Phase 9: Чарівна пошта (Соня brings a letter from МАМА or ТАТО after some levels) and the parents' recorded hellos on the album's portraits.
    - Done when: dropping your recorded zip into the project replaces the placeholder voice with no code change.
 
 10\. **Install & offline (PWA).** `vite-plugin-pwa`: precache the app shell, fonts and effects; cache music and voice clips on first play; a manifest (name, icons from the door art, standalone, both orientations). A new version is applied at the next start, never mid-level; the parent area shows the app version.
