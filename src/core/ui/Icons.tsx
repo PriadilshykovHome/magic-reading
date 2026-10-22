@@ -43,12 +43,6 @@ export const CheckIcon = () => (
   </svg>
 );
 
-export const BackIcon = () => (
-  <svg viewBox="0 0 24 24" aria-hidden="true" {...common}>
-    <path d="M15 5l-7 7 7 7" />
-  </svg>
-);
-
 export const CastleIcon = () => (
   <svg viewBox="0 0 24 24" aria-hidden="true" {...common}>
     <path d="M4 21V9h3v2h2V9h2v2h2V9h2v2h2V9h3v12zM10 21v-4a2 2 0 0 1 4 0v4M12 9V3l4 1.5L12 6" />

@@ -14,7 +14,7 @@ export function starsFor(firstTry: number, scored: number, config: Config): 1 | 
   return 1;
 }
 
-export function nextLevelId(content: GameContent, levelId: string): string | null {
+function nextLevelId(content: GameContent, levelId: string): string | null {
   const at = content.levelOrder.indexOf(levelId);
   return at >= 0 ? (content.levelOrder[at + 1] ?? null) : null;
 }

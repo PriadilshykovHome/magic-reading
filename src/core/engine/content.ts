@@ -58,7 +58,7 @@ export function indexGame<W extends World, L extends Level, C extends CoreConfig
   };
 }
 
-export function flattenVoice(tree: VoiceTree): Map<string, string | string[]> {
+function flattenVoice(tree: VoiceTree): Map<string, string | string[]> {
   const out = new Map<string, string | string[]>();
   const walk = (node: VoiceNode, path: string) => {
     if (typeof node === 'string' || Array.isArray(node)) out.set(path, node);

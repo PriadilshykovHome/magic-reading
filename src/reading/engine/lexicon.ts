@@ -14,17 +14,17 @@ export function translit(text: string, letters: Letters): string {
     .replace(/^-|-$/g, '');
 }
 
-export const syllableId = (text: string, letters: Letters) => `syl-${translit(text, letters)}`;
+const syllableId = (text: string, letters: Letters) => `syl-${translit(text, letters)}`;
 
 /** The letters a text uses (upper case, letters only). */
 export const lettersOf = (text: string) => [...text.toLocaleUpperCase('uk-UA')].filter((ch) => /\p{L}/u.test(ch));
 
 /** A sentence's words, without punctuation. */
-export const sentenceWords = (text: string) => text.replace(/[^\p{L}\s'’-]/gu, '').trim().split(/\s+/);
+const sentenceWords = (text: string) => text.replace(/[^\p{L}\s'’-]/gu, '').trim().split(/\s+/);
 
 /** One part per sound: the soft sign and apostrophe stay with their consonant, and a digraph at
  *  the start of a syllable is one sound (examples in content/config.json). */
-export function letterParts(text: string, letters: Letters): string[] {
+function letterParts(text: string, letters: Letters): string[] {
   const parts: string[] = [];
   for (const ch of text) {
     if (letters.softeners.includes(ch) && parts.length > 0) parts[parts.length - 1] += ch;

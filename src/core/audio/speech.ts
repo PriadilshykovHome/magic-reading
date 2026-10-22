@@ -6,6 +6,16 @@ import type { Playback } from './scheduler';
 const supported = !SILENT && typeof window !== 'undefined' && 'speechSynthesis' in window;
 let voice: SpeechSynthesisVoice | null = null;
 
+// Chrome refuses speech until the first tap on the page ('not-allowed'), so a level opened
+// directly would start silent. Whatever it refused in a row (an instruction and its item) is
+// kept and said on that first tap.
+interface Refused {
+  text: string;
+  rate: number;
+}
+let refused: Refused[] = [];
+let refusedAt = 0;
+
 function pickVoice() {
   voice = speechSynthesis.getVoices().find((v) => v.lang.toLowerCase().startsWith('uk')) ?? null;
 }
@@ -13,10 +23,6 @@ function pickVoice() {
 if (supported) {
   pickVoice();
   speechSynthesis.addEventListener?.('voiceschanged', pickVoice);
-}
-
-export function hasUkrainianVoice(): boolean {
-  return voice !== null;
 }
 
 export function speechPlayback(text: string, rate: number, volume: number): Playback {
@@ -31,7 +37,16 @@ export function speechPlayback(text: string, rate: number, volume: number): Play
   u.volume = volume;
   // Never hang the game on a silent or broken speech engine.
   const timer = window.setTimeout(finish, 1500 + text.length * 120);
-  u.onend = u.onerror = () => {
+  u.onend = () => {
+    window.clearTimeout(timer);
+    finish();
+  };
+  u.onerror = (e) => {
+    if (e.error === 'not-allowed') {
+      const now = performance.now();
+      refused = now - refusedAt < 3000 ? [...refused, { text, rate }].slice(-3) : [{ text, rate }];
+      refusedAt = now;
+    }
     window.clearTimeout(timer);
     finish();
   };
@@ -52,4 +67,11 @@ export function unlockSpeech(): void {
   const u = new SpeechSynthesisUtterance(' ');
   u.volume = 0;
   speechSynthesis.speak(u);
+}
+
+/** The lines refused before the first tap (see above), handed over once. */
+export function takeRefused(): Refused[] {
+  const lines = refused;
+  refused = [];
+  return lines;
 }

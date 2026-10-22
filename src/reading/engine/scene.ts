@@ -4,11 +4,11 @@
 // what, where, doing what, how big), so the only way to the right one is to read every word.
 import { shuffle, type Rng } from '../../core/engine/rng.ts';
 
-export const RELATIONS = ['on', 'in', 'under', 'near', 'and', 'has'] as const;
+const RELATIONS = ['on', 'in', 'under', 'near', 'and', 'has'] as const;
 export type Relation = (typeof RELATIONS)[number];
 /** Relations a wrong picture may swap between (a different place). */
 const PLACES: readonly Relation[] = ['on', 'in', 'under', 'near'];
-export const SIZES = ['small', 'big'] as const;
+const SIZES = ['small', 'big'] as const;
 export type Size = (typeof SIZES)[number];
 
 export interface Thing {

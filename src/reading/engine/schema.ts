@@ -27,7 +27,7 @@ const DemoType = z.enum(['syllableMerge', 'wordMerge', 'readAlong']);
 
 // ---------- the lexicon as written ----------
 
-export const WordRowSchema = z.strictObject({
+const WordRowSchema = z.strictObject({
   id: WordId,
   /** Hand-written syllable split, e.g. "МА-МА"; the text and syllables are derived from it. */
   split: z.string().regex(/^[^\s-]+(-[^\s-]+)*$/, 'syllables joined by "-"'),
@@ -39,7 +39,7 @@ export const WordRowSchema = z.strictObject({
   stress: z.number().int().min(0).optional(),
 });
 
-export const SentenceRowSchema = z.strictObject({
+const SentenceRowSchema = z.strictObject({
   id: SentenceId,
   text: Text,
   /** Its picture as a spec: "kit:small sleeps on dyvan" (src/reading/engine/scene.ts). */

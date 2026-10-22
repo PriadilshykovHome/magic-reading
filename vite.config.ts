@@ -52,9 +52,23 @@ function audioManifest(): Plugin {
   };
 }
 
+/** Vitest caches transformed modules across runs, keyed by their source, so a file whose
+ *  `import.meta.glob` finds content/worlds/* would miss a world added later: key it by the
+ *  world folders too. */
+function globCacheKey(): Plugin {
+  return {
+    name: 'glob-cache-key',
+    configureVitest({ defineCacheKeyGenerator }) {
+      defineCacheKeyGenerator(({ sourceCode }) =>
+        sourceCode.includes('import.meta.glob') ? readdirSync('./content/worlds', { recursive: true }).sort().join('|') : undefined,
+      );
+    },
+  };
+}
+
 export default defineConfig({
   base: REPO_BASE,
-  plugins: [react(), htmlStrings(), audioManifest()],
+  plugins: [react(), htmlStrings(), audioManifest(), globCacheKey()],
   // The active game's domain pack (see src/core/game.ts): swap these two to build another game.
   resolve: {
     alias: {

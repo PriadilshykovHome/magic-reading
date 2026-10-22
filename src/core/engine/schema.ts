@@ -9,9 +9,9 @@ export const slugId = (prefix: string) =>
 export const CardId = slugId('card-');
 export const LevelId = z.string().regex(/^[a-z0-9-]+\/[a-z0-9-]+$/, 'must look like world-id/level-key');
 
-export const AssetPath = z.string().regex(/^[a-z0-9_-]+(\/[a-z0-9_.-]+)+$/, 'lower-case relative path');
+const AssetPath = z.string().regex(/^[a-z0-9_-]+(\/[a-z0-9_.-]+)+$/, 'lower-case relative path');
 export const Text = z.string().trim().min(1);
-export const Count = z.number().int().min(1);
+const Count = z.number().int().min(1);
 
 // ---------- tuning ----------
 

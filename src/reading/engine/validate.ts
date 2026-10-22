@@ -36,7 +36,7 @@ export interface RawBundle {
 }
 
 /** The curriculum's pace: what a unit and a level may introduce. */
-export const PACE = { minNewWordsPerLetterUnit: 6, maxNewItemsPerLevel: 12 };
+const PACE = { minNewWordsPerLetterUnit: 6, maxNewItemsPerLevel: 12 };
 
 export function validateContent(
   raw: RawBundle,

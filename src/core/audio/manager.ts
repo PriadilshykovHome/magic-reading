@@ -6,7 +6,7 @@ import { SILENT, TEST_BUILD } from '../testMode';
 import { pause, SfxGate, VoiceScheduler, type Playback, type Starter } from './scheduler';
 import musicLengths from './music-lengths.json';
 import spriteJson from './sfx-sprite.json';
-import { speechPlayback, unlockSpeech } from './speech';
+import { speechPlayback, takeRefused, unlockSpeech } from './speech';
 
 export type SfxName = keyof typeof spriteJson;
 /** [start ms, duration ms] of each effect in the generated sprite (scripts/make-audio.ts). */
@@ -166,6 +166,8 @@ export function unlockAudio(): void {
   if (SILENT || unlocked) return;
   unlocked = true;
   unlockSpeech();
+  const refused = takeRefused();
+  if (refused.length) void scheduler.say(refused.map((r) => () => speechPlayback(r.text, r.rate, volumes.voice)), 'ifIdle');
   effectsSprite(); // creating a Howl inside the tap sets up and resumes the audio context
   void Howler.ctx?.resume();
 }

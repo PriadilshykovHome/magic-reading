@@ -10,7 +10,7 @@ export interface Look {
   motifs: ComponentType[];
 }
 
-export const LOOKS: Record<string, Look> = {
+const LOOKS: Record<string, Look> = {
   'stone-tower': { accent: '201 162 74', motifs: [Tower, Spire] },
   'scroll-tower': { accent: '216 199 156', motifs: [ScrollTower, Books] },
   garden: { accent: '150 160 90', motifs: [Sunflowers, Hills] },
@@ -18,6 +18,6 @@ export const LOOKS: Record<string, Look> = {
   kitchen: { accent: '196 140 90', motifs: [Cauldron, Shelf] },
 };
 
-export const DEFAULT_LOOK: Look = { accent: '201 162 74', motifs: [Hills] };
+const DEFAULT_LOOK: Look = { accent: '201 162 74', motifs: [Hills] };
 
 export const lookOf = (name: string): Look => LOOKS[name] ?? DEFAULT_LOOK;

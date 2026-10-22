@@ -16,7 +16,7 @@ export interface TrueFalseData {
   truth: boolean;
 }
 
-export const VERDICTS = ['yes', 'no'] as const;
+const VERDICTS = ['yes', 'no'] as const;
 
 export const trueFalse: ReadingTaskLogic<Config, TrueFalseData> = {
   id: 'trueFalse',

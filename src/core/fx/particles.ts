@@ -9,7 +9,7 @@ import { SILENT } from '../testMode';
 type Fire = (options: ConfettiOptions) => Promise<unknown>;
 
 const GOLD = ['#fff3cc', '#f0d68a', '#c9a24a', '#ffd36b'];
-export const FIREWORK_COLORS = [GOLD, ['#c9b6ff', '#9b7be0', '#f0d68a'], ['#9ee6de', '#5fb8af', '#f0d68a']];
+const FIREWORK_COLORS = [GOLD, ['#c9b6ff', '#9b7be0', '#f0d68a'], ['#9ee6de', '#5fb8af', '#f0d68a']];
 
 let fire: Promise<Fire | null> | null = null;
 let alive: { count: number; until: number }[] = [];
@@ -30,7 +30,7 @@ function load(): Promise<Fire | null> {
   return fire;
 }
 
-export function effectsEnabled(): boolean {
+function effectsEnabled(): boolean {
   if (SILENT || typeof window === 'undefined') return false;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
   return !useProgress.getState().progress.settings.reducedEffects;

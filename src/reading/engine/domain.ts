@@ -17,7 +17,7 @@ const asKind = (kind: string): ItemKind => {
   return kind;
 };
 
-export function createBuildContext(content: Content, level: Level, rng: Rng): ReadingBuildContext {
+function createBuildContext(content: Content, level: Level, rng: Rng): ReadingBuildContext {
   const exists = (kind: ItemKind, id: string) =>
     (kind === 'syllable' ? content.syllables : kind === 'word' ? content.words : content.sentences).has(id);
   // Review spans every earlier level, so each kind is gathered once per level and remembered.

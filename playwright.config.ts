@@ -15,12 +15,12 @@ export default defineConfig({
   testDir: 'e2e',
   testIgnore: 'audio.spec.ts', // needs sound: run with --config e2e/audio.config.ts
   fullyParallel: true,
-  workers: process.env.CI ? 3 : 5,
+  workers: 3, // more than 3 starves the shared preview server on a laptop (timeouts)
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['list'], ['html', { open: 'never', outputFolder: 'e2e-report' }]] : 'list',
   use: {
     baseURL: `http://localhost:${PORT}/magic-reading/`,
-    // Locally use the installed Chrome; CI installs Playwright's Chromium.
+    // Locally use the installed Chrome; CI runs in Playwright's image, which has its Chromium.
     channel: process.env.CI ? undefined : 'chrome',
     screenshot: 'only-on-failure',
   },

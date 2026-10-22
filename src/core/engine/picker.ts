@@ -9,7 +9,7 @@ const DAY_MS = 86_400_000;
 /** With a thousand words learned, review still only draws from the most overdue few. */
 const REVIEW_LIMIT = 50;
 
-export function srWeight(item: ItemProgress | undefined, now: Date, config: Config): number {
+function srWeight(item: ItemProgress | undefined, now: Date, config: Config): number {
   const { weights, intervalDays, max } = config.boxes;
   if (!item) return weights[0]! * 1.2; // new material: as shaky as box 1, slightly favoured
   const box = Math.min(Math.max(item.box, 1), max) - 1;

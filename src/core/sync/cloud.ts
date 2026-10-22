@@ -62,7 +62,7 @@ function firebase(): Promise<Firebase> {
 }
 
 /** Logins are email-shaped: a plain username becomes <username>@magic-reading.local. */
-export const loginEmail = (login: string) => (login.includes('@') ? login.trim() : `${login.trim().toLowerCase()}@magic-reading.local`);
+const loginEmail = (login: string) => (login.includes('@') ? login.trim() : `${login.trim().toLowerCase()}@magic-reading.local`);
 
 export async function signIn(login: string, password: string): Promise<'ok' | 'wrong' | 'offline'> {
   const { auth, authApi } = await firebase();

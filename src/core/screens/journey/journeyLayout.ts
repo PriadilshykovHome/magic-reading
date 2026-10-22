@@ -60,7 +60,7 @@ export interface JourneyLayout {
 
 const GAP = 16;
 /** A finale's door is this much bigger. */
-export const FINALE_SCALE = 1.2;
+const FINALE_SCALE = 1.2;
 /** Door + gap + stars row, from the door width (matches journey.css). */
 const nodeHeight = (w: number) => Math.round(w * 1.3 + 6 + w * 0.26);
 /** The road's wave: centre, one side, centre, other side. */

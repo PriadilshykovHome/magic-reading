@@ -24,10 +24,6 @@ export function seasonFor(date: Date): Season {
   return 'autumn';
 }
 
-export function parseSeason(value: string | null | undefined): Season | undefined {
-  return SEASONS.find((s) => s === value);
-}
-
 export function timeOfDay(date: Date, eggs: Config['eggs']): TimeOfDay {
   const hour = date.getHours();
   if (hour < 5) return 'night';

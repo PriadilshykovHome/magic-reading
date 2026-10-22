@@ -236,7 +236,7 @@ export function expandCurriculum(
 }
 
 /** Levels he must have finished before the daily warm-up has enough to review. */
-export const WARMUP_AFTER_LEVELS = 3;
+const WARMUP_AFTER_LEVELS = 3;
 
 /**
  * Today's warm-up: a few tasks from the warm-up template over everything he has finished (the
