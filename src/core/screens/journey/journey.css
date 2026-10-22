@@ -1,0 +1,356 @@
+/* The journey: one road through every world. The road scrolls inside its own area; the screen
+   never scrolls. Sizes come from journeyLayout.ts (--door-w, --w per door). */
+
+.journey-screen {
+  padding: 0;
+}
+
+.journey-bar {
+  position: absolute;
+  top: calc(16px + env(safe-area-inset-top));
+  left: calc(16px + env(safe-area-inset-left));
+  right: calc(16px + env(safe-area-inset-right));
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  pointer-events: none;
+}
+
+.journey-bar > *,
+.journey-bar-end > * {
+  pointer-events: auto;
+}
+
+.journey-bar-end {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.journey-scroll {
+  position: absolute;
+  inset: calc(96px + env(safe-area-inset-top)) 0 0;
+  z-index: 1;
+  overflow: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.journey-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.journey-scroll.is-portrait {
+  overflow-y: auto;
+  touch-action: pan-y;
+  /* the road fades in under the bar and at the bottom edge */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 28px, #000 calc(100% - 20px), transparent);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 28px, #000 calc(100% - 20px), transparent);
+}
+
+.journey-scroll.is-landscape {
+  overflow-x: auto;
+  touch-action: pan-x;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 32px, #000 calc(100% - 32px), transparent);
+  mask-image: linear-gradient(to right, transparent 0, #000 32px, #000 calc(100% - 32px), transparent);
+}
+
+.journey-track {
+  position: relative;
+}
+
+/* ---------- the road ---------- */
+
+.journey-road {
+  position: absolute;
+  inset: 0 auto auto 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.road-base {
+  fill: none;
+  stroke: rgb(34 26 44 / 0.75);
+  stroke-width: calc(var(--door-w) * 0.5);
+  stroke-linecap: round;
+}
+
+.road-base.is-lit,
+.road-base.is-active {
+  stroke: rgb(201 162 74 / 0.14);
+}
+
+/* Stepping stones along the road */
+.road-stones {
+  fill: none;
+  stroke: rgb(150 132 120 / 0.28);
+  stroke-width: calc(var(--door-w) * 0.2);
+  stroke-linecap: round;
+  stroke-dasharray: calc(var(--door-w) * 0.08) calc(var(--door-w) * 0.24);
+}
+
+.road-stones.is-lit {
+  stroke: rgb(240 214 138 / 0.75);
+}
+
+.road-stones.is-active {
+  stroke: rgb(240 214 138 / 0.4);
+}
+
+.road-spark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff8e0 0%, #f0d68a 40%, rgb(240 214 138 / 0) 72%);
+  box-shadow: 0 0 10px 3px rgb(240 214 138 / 0.45);
+  pointer-events: none;
+}
+
+/* ---------- a world's gate ---------- */
+
+.journey-gate {
+  position: absolute;
+  translate: -50% -50%;
+  display: grid;
+  place-items: center;
+  padding: 0 28px;
+  border: 1.5px solid rgb(var(--accent) / 0.55);
+  border-radius: 14px 14px 6px 6px;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgb(var(--accent) / 0.22), transparent 70%),
+    linear-gradient(180deg, #2a2135, #18121f);
+  box-shadow: 0 8px 18px rgb(0 0 0 / 0.5), inset 0 1px 0 rgb(255 240 200 / 0.12);
+  cursor: pointer;
+}
+
+/* stone posts at either end */
+.journey-gate::before,
+.journey-gate::after {
+  content: '';
+  position: absolute;
+  top: -10px;
+  bottom: -4px;
+  width: 12px;
+  border-radius: 6px 6px 2px 2px;
+  background: linear-gradient(90deg, #1a1420, #3a3046 50%, #1a1420);
+}
+
+.journey-gate::before {
+  left: -6px;
+}
+
+.journey-gate::after {
+  right: -6px;
+}
+
+.journey-gate-title {
+  overflow: hidden;
+  max-width: 100%;
+  font-family: var(--font-display-sc);
+  font-weight: 600;
+  font-size: clamp(19px, 3.4vmin, 26px);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  background: linear-gradient(180deg, #fff3cc, var(--gold-light) 45%, var(--gold));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* ---------- doors ---------- */
+
+.journey-node {
+  position: absolute;
+  translate: -50% -50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: var(--w);
+  height: calc(var(--w) * 1.56 + 6px);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.journey-door {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--w);
+  aspect-ratio: 200 / 260;
+  border: 3px solid var(--gold);
+  border-radius: 50% 50% 8px 8px / 36% 36% 8px 8px;
+  background:
+    radial-gradient(ellipse at 50% 120%, rgb(0 0 0 / 0.45), transparent 60%),
+    linear-gradient(90deg, #2e1b0e, #553620 30%, #664328 50%, #4f321d 72%, #2b190c);
+  box-shadow: 0 10px 22px rgb(0 0 0 / 0.55), inset 0 -3px 0 #ffe9b0;
+}
+
+/* The next door: warm light from its crack, and the screen's one gentle pulse. */
+.journey-door::before {
+  content: '';
+  position: absolute;
+  inset: -40%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(240 214 138 / 0.5), rgb(240 214 138 / 0) 62%);
+  opacity: 0;
+}
+
+/* light from the edge of a door left ajar */
+.journey-door-light {
+  position: absolute;
+  top: 24%;
+  bottom: 5%;
+  right: 9%;
+  width: 3px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, rgb(255 236 180 / 0), #ffe8b0 30%, #ffd27a);
+  box-shadow: 0 0 12px 3px rgb(255 210 120 / 0.55);
+  opacity: 0;
+}
+
+.journey-node.is-next .journey-door::before {
+  animation: door-call 3.2s ease-in-out infinite;
+}
+
+.journey-node.is-next .journey-door-light {
+  opacity: 1;
+}
+
+@keyframes door-call {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+
+.journey-door-number {
+  /* digits in the reading font: the serif's old-style 1 looks like an I */
+  font-family: var(--font-reading);
+  font-weight: 800;
+  font-size: calc(var(--w) * 0.36);
+  line-height: 1;
+  background: linear-gradient(180deg, #fff3cc, var(--gold-light) 45%, var(--gold));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: none;
+}
+
+.journey-node.is-next .journey-door-number {
+  /* the light behind the crack shows through the gap in the number */
+  filter: drop-shadow(0 0 6px rgb(30 18 8 / 0.9));
+}
+
+.journey-door-badge {
+  position: absolute;
+  right: 8%;
+  bottom: 7%;
+  display: grid;
+  place-items: center;
+  width: 30%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgb(14 11 20 / 0.7);
+  color: var(--gold-light);
+}
+
+.journey-door-badge svg {
+  width: 70%;
+  height: 70%;
+}
+
+/* A finale: bigger, with a crest over the arch and a double gold rim. */
+.journey-node.is-finale .journey-door {
+  border-width: 4px;
+  box-shadow:
+    0 12px 26px rgb(0 0 0 / 0.6),
+    inset 0 -3px 0 #ffe9b0,
+    0 0 0 3px rgb(14 11 20 / 0.9),
+    0 0 0 5px rgb(201 162 74 / 0.55);
+}
+
+.journey-node.is-finale .journey-door::after {
+  content: '';
+  position: absolute;
+  top: 6%;
+  left: 50%;
+  width: 22%;
+  aspect-ratio: 1;
+  translate: -50% 0;
+  background: radial-gradient(circle, #fff3cc 0 18%, var(--gold) 20% 46%, transparent 48%);
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+.journey-lock {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: inherit;
+  background: rgb(14 11 20 / 0.55);
+  color: var(--gold-light);
+}
+
+.journey-lock svg {
+  width: 40%;
+  height: 40%;
+}
+
+.journey-node.is-locked .journey-door {
+  border-color: rgb(201 162 74 / 0.4);
+  filter: saturate(0.45) brightness(0.7);
+}
+
+.journey-node.is-locked .journey-door-number {
+  opacity: 0.55;
+}
+
+.journey-node.is-shaking .journey-door {
+  animation: wobble 0.35s ease-in-out;
+}
+
+.journey-node:focus-visible {
+  outline: none;
+}
+
+.journey-node:focus-visible .journey-door {
+  outline: 3px solid var(--gold-light);
+  outline-offset: 4px;
+}
+
+.journey-stars {
+  display: flex;
+  gap: 2px;
+  height: calc(var(--w) * 0.26);
+}
+
+.journey-stars svg {
+  width: calc(var(--w) * 0.26);
+  height: calc(var(--w) * 0.26);
+}
+
+.journey-node.is-locked .journey-stars {
+  opacity: 0.35;
+}
+
+/* ---------- Іскрик on the road ---------- */
+
+.journey-iskryk {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  width: calc(var(--door-w) * 0.72);
+  margin: calc(var(--door-w) * -0.6) 0 0 calc(var(--door-w) * -0.36);
+  pointer-events: none;
+}

@@ -19,6 +19,8 @@ export interface GameData {
   item(id: string): { text: string; audio?: string };
   /** Every item a level may ask about, so its audio can preload. */
   levelItems(level: Level): string[];
+  /** How its door looks on the journey road. */
+  nodeKind(level: Level): 'door' | 'review' | 'finale';
 }
 
 export interface IntroDemoProps {

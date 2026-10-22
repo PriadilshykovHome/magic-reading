@@ -4,8 +4,10 @@ import type { Page } from '@playwright/test';
 const TEXT_MIN = { 'read-syllable': 64, 'read-word': 48, 'read-sentence': 32, 'bubble-inner': 64 } as const;
 
 /**
- * The layout rules, checked in the page: no scrolling, nothing cut off, every tap target at
- * least 64×64 with 16 px between neighbours, reading text never below its minimum.
+ * The layout rules, checked in the page: no page scrolling, nothing cut off, every tap target at
+ * least 64×64 with 16 px between neighbours, reading text never below its minimum. Inside a
+ * scrolling area ([data-scroll-region], the journey road) things may sit beyond the edge, and
+ * its targets are only compared with each other (they slide past the fixed ones).
  */
 export async function layoutProblems(page: Page): Promise<string[]> {
   await page.evaluate(() => document.fonts.ready);
@@ -25,6 +27,7 @@ export async function layoutProblems(page: Page): Promise<string[]> {
       `${el.tagName.toLowerCase()}.${[...el.classList].filter((c) => !c.startsWith('is-')).join('.')}${el.getAttribute('aria-label') ? ` "${el.getAttribute('aria-label')}"` : ''}`;
     const moving = (el: Element) => el.closest('.bubble') !== null;
     const rect = (el: Element) => el.getBoundingClientRect();
+    const scrolling = (el: Element) => el.closest('[data-scroll-region]');
 
     const targets = [...document.querySelectorAll('button, a[href], [role="button"], [data-drop]')].filter(visible);
     for (const el of targets) {
@@ -34,7 +37,7 @@ export async function layoutProblems(page: Page): Promise<string[]> {
 
     const content = [...targets, ...document.querySelectorAll('.read-syllable, .read-word, .read-sentence, .parchment, .option')];
     for (const el of content.filter(visible)) {
-      if (moving(el)) continue;
+      if (moving(el) || scrolling(el)) continue;
       const r = rect(el);
       if (r.left < -1 || r.top < -1 || r.right > vw + 1 || r.bottom > vh + 1) {
         out.push(`cut off: ${name(el)} at ${Math.round(r.left)},${Math.round(r.top)}–${Math.round(r.right)},${Math.round(r.bottom)}`);
@@ -46,7 +49,7 @@ export async function layoutProblems(page: Page): Promise<string[]> {
       for (let j = i + 1; j < still.length; j++) {
         const a = still[i]!;
         const b = still[j]!;
-        if (a.contains(b) || b.contains(a)) continue;
+        if (a.contains(b) || b.contains(a) || scrolling(a) !== scrolling(b)) continue;
         const ra = rect(a);
         const rb = rect(b);
         const dx = Math.max(0, Math.max(ra.left, rb.left) - Math.min(ra.right, rb.right));

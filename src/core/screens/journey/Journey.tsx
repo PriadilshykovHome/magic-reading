@@ -1,0 +1,499 @@
+import { m } from 'motion/react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useNavigate, useParams } from 'react-router';
+import { game } from '@game';
+import { sfx } from '../../audio/sfx';
+import { useMusic } from '../../audio/useMusic';
+import { voice } from '../../audio/voice';
+import { Iskryk } from '../../characters/Iskryk';
+import { creatureStage, sparkBalance, type Progress } from '../../engine/progress';
+import { isLevelUnlocked } from '../../engine/rewards';
+import { Scene, type CandleSpot } from '../../fx/ambient/Scene';
+import { lookOf } from '../../fx/regions/looks';
+import { useGame } from '../../store/game';
+import { useProgress } from '../../store/progress';
+import { fmt, t } from '../../strings';
+import { SparkJar } from '../../ui/Candles';
+import { HomeButton } from '../../ui/HomeButton';
+import { BookIcon, LockIcon, MyDoorIcon, StarIcon } from '../../ui/Icons';
+import { levelPath } from '../useLevel';
+import { journeyLayout, roadSegments, samplesBetween, type JourneyLayout, type NodeKind, type Point } from './journeyLayout';
+import '../../fx/regions/regions.css';
+import './journey.css';
+
+const CANDLES: CandleSpot[] = [
+  { x: 3, y: 34, scale: 0.55 },
+  { x: 95, y: 58, scale: 0.6, wide: true },
+];
+
+export type NodeState = 'done' | 'next' | 'open' | 'locked';
+
+export interface JourneyWorld {
+  id: string;
+  title: string;
+  look: string;
+  levels: { id: string; kind: NodeKind; state: NodeState; stars: number }[];
+}
+
+/** Іскрик walks from a finished door to the one it opened. */
+export interface Walk {
+  from: string;
+  to: string;
+}
+
+function nextLevelToPlay(progress: Progress): string | undefined {
+  const { levels, levelOrder } = game.content;
+  return levelOrder.find((id) => isLevelUnlocked(progress, levels.get(id)!) && !progress.levels[id]?.bestStars);
+}
+
+/** The map: one road through every world, opening on his next door. */
+export function JourneyScreen() {
+  const navigate = useNavigate();
+  const { world: worldParam } = useParams();
+  const progress = useProgress((s) => s.progress);
+  const { greeted, setGreeted, walk, takeWalk } = useGame();
+  const [shaking, setShaking] = useState<string | null>(null);
+  const [pendingWalk] = useState(() => walk);
+  useMusic('map');
+  useEffect(() => {
+    if (pendingWalk) takeWalk();
+  }, [pendingWalk, takeWalk]);
+
+  useEffect(() => {
+    if (greeted) return;
+    setGreeted();
+    const timer = window.setTimeout(() => void voice.say('greeting'), 600);
+    return () => window.clearTimeout(timer);
+  }, [greeted, setGreeted]);
+
+  const nextId = nextLevelToPlay(progress);
+  const worlds = useMemo<JourneyWorld[]>(
+    () =>
+      game.content.worlds.map(({ world, levels }) => ({
+        id: world.id,
+        title: world.title,
+        look: world.look,
+        levels: levels.map((level) => {
+          const stars = progress.levels[level.id]?.bestStars ?? 0;
+          const state: NodeState = !isLevelUnlocked(progress, level) ? 'locked' : level.id === nextId ? 'next' : stars > 0 ? 'done' : 'open';
+          return { id: level.id, kind: game.nodeKind(level), state, stars };
+        }),
+      })),
+    [progress, nextId],
+  );
+
+  // /map/<world>: open on that world's first unfinished door (or its first door).
+  const focus = worldParam
+    ? (() => {
+        const w = worlds.find((x) => x.id === worldParam);
+        return w?.levels.find((l) => l.state === 'next' || l.state === 'open')?.id ?? w?.levels[0]?.id;
+      })()
+    : undefined;
+
+  const open = useCallback(
+    (levelId: string) => {
+      const level = game.content.levels.get(levelId);
+      if (!level || !isLevelUnlocked(useProgress.getState().progress, level)) {
+        sfx.wrong();
+        setShaking(levelId);
+        window.setTimeout(() => setShaking(null), 400);
+        return;
+      }
+      sfx.tap();
+      navigate(levelPath(levelId));
+    },
+    [navigate],
+  );
+
+  // On a laptop, Enter opens his next door.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' && e.target === document.body && nextId) open(nextId);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [nextId, open]);
+
+  return (
+    <JourneyView
+      worlds={worlds}
+      focus={focus}
+      walk={pendingWalk}
+      shaking={shaking}
+      onOpen={open}
+      creature={creatureStage(progress, game.content.config)}
+      jar={<SparkJar count={sparkBalance(progress)} label={fmt(t.map.sparks, { n: sparkBalance(progress) })} />}
+    />
+  );
+}
+
+interface ViewProps {
+  worlds: JourneyWorld[];
+  /** Open centred on this level (default: his next one). */
+  focus?: string;
+  walk?: Walk | null;
+  shaking?: string | null;
+  onOpen(levelId: string): void;
+  creature: number;
+  jar: ReactNode;
+}
+
+type SegmentState = 'lit' | 'active' | 'dim';
+
+/** The road: every world's gate then its doors, as points; one smooth segment between each pair. */
+interface Road {
+  points: Point[];
+  /** Index in `points` of each door, in play order. */
+  doorPoint: number[];
+  /** Index in `points` of each world's gate. */
+  gatePoint: number[];
+  paths: string[];
+  /** Segment i runs from points[i] to points[i + 1]. */
+  state: SegmentState[];
+  /** The stretch leading to his next door, where the sparks travel. */
+  active?: number;
+}
+
+/** The journey itself: also rendered by the test-build route with hundreds of levels. */
+export function JourneyView({ worlds, focus, walk, shaking, onOpen, creature, jar }: ViewProps) {
+  const scroller = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState<{ width: number; height: number } | null>(null);
+  const [scroll, setScroll] = useState(0);
+  const [nextInView, setNextInView] = useState(true);
+  const [walked, setWalked] = useState(false);
+  const reduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  useLayoutEffect(() => {
+    const el = scroller.current!;
+    const measure = () => setSize({ width: el.clientWidth, height: el.clientHeight });
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const layout = useMemo(
+    () => (size ? journeyLayout(worlds.map((w) => ({ id: w.id, levels: w.levels.map((l) => ({ id: l.id, kind: l.kind })) })), size) : null),
+    [worlds, size],
+  );
+  const flat = useMemo(() => worlds.flatMap((w) => w.levels), [worlds]);
+  const nextId = flat.find((l) => l.state === 'next')?.id;
+
+  // The road's points in order: each world's gate, then its doors. A stretch is lit up to the
+  // doors he has finished, sparkles on the way to his next one, and dim beyond.
+  const road = useMemo<Road | null>(() => {
+    if (!layout) return null;
+    const points: Point[] = [];
+    const doorPoint: number[] = [];
+    const gatePoint: number[] = [];
+    const doorOfPoint = new Map<number, number>();
+    let k = 0;
+    layout.regions.forEach((region, r) => {
+      gatePoint.push(points.length);
+      points.push(region.gate);
+      for (; k < layout.nodes.length && layout.nodes[k]!.region === r; k++) {
+        doorOfPoint.set(points.length, k);
+        doorPoint.push(points.length);
+        points.push(layout.nodes[k]!);
+      }
+    });
+    const toward = (i: number): SegmentState => {
+      const level = flat[doorOfPoint.get(i) ?? -1];
+      return level?.state === 'done' ? 'lit' : level?.state === 'next' ? 'active' : 'dim';
+    };
+    const state = points.slice(1).map((_, i): SegmentState => {
+      if (doorOfPoint.has(i + 1)) return toward(i + 1);
+      const beyond = toward(i + 2); // into a gate: like the stretch after it, sparks only after the gate
+      return beyond === 'active' ? 'lit' : beyond;
+    });
+    const active = state.indexOf('active');
+    return { points, doorPoint, gatePoint, paths: roadSegments(points), state, active: active >= 0 ? active : undefined };
+  }, [layout, flat]);
+
+  const along = (p: Point) => (layout?.orientation === 'portrait' ? p.y : p.x);
+  const viewLen = layout ? (layout.orientation === 'portrait' ? size!.height : size!.width) : 0;
+
+  const scrollToLevel = useCallback(
+    (levelId: string | undefined, smooth: boolean) => {
+      const el = scroller.current;
+      if (!el || !layout || !levelId) return;
+      const node = layout.nodes.find((n) => n.id === levelId);
+      if (!node) return;
+      const behavior = smooth && !reduced ? 'smooth' : 'instant';
+      if (layout.orientation === 'portrait') el.scrollTo({ top: node.y - el.clientHeight / 2, behavior });
+      else el.scrollTo({ left: node.x - el.clientWidth / 2, behavior });
+    },
+    [layout, reduced],
+  );
+
+  // After a level opened a new door, Іскрик walks the road from the finished door to it.
+  const walkPath = useMemo(() => {
+    if (!walk || !road || reduced) return null;
+    const from = road.doorPoint[flat.findIndex((l) => l.id === walk.from)];
+    const to = road.doorPoint[flat.findIndex((l) => l.id === walk.to)];
+    if (from === undefined || to === undefined || to <= from) return null;
+    const steps: Point[] = [];
+    for (let i = from; i < to; i++) {
+      const pts = samplesBetween(road.points, i, 14);
+      if (i < to - 1) steps.push(...pts);
+      else {
+        const door = road.points[to]!;
+        steps.push(...pts.filter((p) => Math.hypot(p.x - door.x, p.y - door.y) >= layout!.door * 1.1));
+      }
+    }
+    return steps;
+  }, [walk, road, flat, reduced, layout]);
+  const walking = walkPath && !walked ? walkPath : null;
+
+  // Open on his door (or where Іскрик starts walking from), then follow him.
+  const opened = useRef(false);
+  useLayoutEffect(() => {
+    if (!layout || !road || opened.current) return;
+    opened.current = true;
+    scrollToLevel(walk?.from ?? focus ?? nextId ?? flat.at(-1)?.id, false);
+    if (walkPath) window.setTimeout(() => scrollToLevel(walk!.to, true), 350);
+  }, [layout, road, walk, walkPath, focus, nextId, flat, scrollToLevel]);
+
+  const onScroll = () => {
+    const el = scroller.current;
+    if (!el || !layout) return;
+    const pos = layout.orientation === 'portrait' ? el.scrollTop : el.scrollLeft;
+    // Only re-render when it changes which worlds are drawn or whether his door is in view.
+    setScroll((prev) => (Math.abs(prev - pos) > viewLen / 3 ? pos : prev));
+    const next = layout.nodes.find((n) => n.id === nextId);
+    if (next) {
+      const at = along(next);
+      setNextInView(at > pos + 24 && at < pos + viewLen - 24);
+    }
+  };
+
+  // In landscape the wheel scrolls the road sideways.
+  useEffect(() => {
+    const el = scroller.current;
+    if (!el || layout?.orientation !== 'landscape') return;
+    const onWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) el.scrollLeft += e.deltaY;
+    };
+    el.addEventListener('wheel', onWheel, { passive: true });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, [layout?.orientation]);
+
+  // Draw only the worlds near what he sees.
+  const shown = layout
+    ? new Set(layout.regions.filter((r) => r.end >= scroll - viewLen && r.start <= scroll + 2 * viewLen).map((r) => r.index))
+    : new Set<number>();
+
+  // Іскрик rests on the road just before his next door.
+  const rest = useMemo(() => {
+    if (!road || !layout) return null;
+    const target = nextId ? flat.findIndex((l) => l.id === nextId) : flat.length - 1;
+    const at = road.doorPoint[target];
+    if (at === undefined) return null;
+    const door = road.points[at]!;
+    if (!nextId) return door;
+    // A world's first door comes straight after its gate: he waits at the door's side.
+    if (road.gatePoint.includes(at - 1)) {
+      const side = layout.orientation === 'portrait' && door.x < layout.width / 2 ? 1 : -1;
+      return { x: door.x + side * layout.door * 0.95, y: door.y + layout.door * 0.35 };
+    }
+    // Otherwise on the road, just outside the door: the last point a door's width away from it.
+    const pts = samplesBetween(road.points, at - 1, 30);
+    const away = pts.filter((p) => Math.hypot(p.x - door.x, p.y - door.y) >= layout.door * 1.1);
+    return away.at(-1) ?? pts[0]!;
+  }, [road, layout, nextId, flat]);
+
+  return (
+    <main className="screen journey-screen">
+      <Scene candles={CANDLES} />
+      <header className="journey-bar">
+        <HomeButton />
+        <div className="journey-bar-end">
+          {!nextInView && nextId && (
+            <button type="button" className="icon-button" aria-label={t.map.toMyDoor} onClick={() => scrollToLevel(nextId, true)} data-to-my-door>
+              <MyDoorIcon />
+            </button>
+          )}
+          {jar}
+        </div>
+      </header>
+
+      <div
+        ref={scroller}
+        className={`journey-scroll is-${layout?.orientation ?? 'portrait'}`}
+        onScroll={onScroll}
+        data-scroll-region
+      >
+        {layout && road && (
+          <div className="journey-track" style={{ width: layout.width, height: layout.height, '--door-w': `${layout.door}px` } as CSSProperties}>
+            {/* In layers across the worlds in view: scenery, the road, then gates and doors. */}
+            {(['scenery', 'road', 'doors'] as const).map((layer) =>
+              layout.regions
+                .filter((region) => shown.has(region.index))
+                .map((region) => (
+                  <Region
+                    key={`${layer}-${region.id}`}
+                    layer={layer}
+                    layout={layout}
+                    region={region.index}
+                    world={worlds[region.index]!}
+                    road={road}
+                    shaking={shaking}
+                    onOpen={onOpen}
+                  />
+                )),
+            )}
+            {rest && (
+              <m.div
+                className="journey-iskryk"
+                aria-hidden="true"
+                initial={walking ? { x: walking[0]!.x, y: walking[0]!.y } : false}
+                animate={walking ? { x: walking.map((p) => p.x), y: walking.map((p) => p.y) } : { x: rest.x, y: rest.y }}
+                transition={walking ? { duration: 1.8, ease: 'easeInOut' } : { duration: 0 }}
+                onAnimationComplete={() => walking && setWalked(true)}
+              >
+                <Iskryk stage={creature} mood={walking ? 'dance' : 'idle'} />
+              </m.div>
+            )}
+          </div>
+        )}
+      </div>
+    </main>
+  );
+}
+
+function Region({
+  layer,
+  layout,
+  region: r,
+  world,
+  road,
+  shaking,
+  onOpen,
+}: {
+  layer: 'scenery' | 'road' | 'doors';
+  layout: JourneyLayout;
+  region: number;
+  world: JourneyWorld;
+  road: Road;
+  shaking?: string | null;
+  onOpen(levelId: string): void;
+}) {
+  const region = layout.regions[r]!;
+  const look = lookOf(world.look);
+  const portrait = layout.orientation === 'portrait';
+  const band = portrait
+    ? { top: region.start, left: 0, width: layout.width, height: region.end - region.start }
+    : { left: region.start, top: 0, width: region.end - region.start, height: layout.height };
+  const length = portrait ? band.height : band.width;
+  const motifs = Array.from({ length: Math.max(1, Math.floor(length / 380)) }, (_, i) => i);
+  const nodes = layout.nodes.filter((n) => n.region === r);
+  const levels = new Map(world.levels.map((l) => [l.id, l]));
+  // This world draws the road from the previous world's last door, through its gate, to its last door.
+  const first = Math.max(0, road.gatePoint[r]! - 1);
+  const end = (road.gatePoint[r + 1] ?? road.points.length) - 1;
+  const segments = Array.from({ length: end - first }, (_, k) => first + k);
+
+  if (layer === 'scenery') {
+    return (
+      <div className={`journey-region look-${world.look}`} style={{ ...band, '--accent': look.accent } as CSSProperties} aria-hidden="true">
+        {motifs.map((i) => {
+          const Motif = look.motifs[i % look.motifs.length]!;
+          const offset = 120 + i * 380;
+          const side = i % 2 === 0 ? 'is-start' : 'is-end';
+          const far = i % 3 === 2 ? 'is-far' : '';
+          return (
+            <div key={i} className={`region-motif ${side} ${far}`} style={portrait ? { bottom: offset } : { left: offset }}>
+              <Motif />
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  if (layer === 'road') {
+    return (
+      <>
+        <svg className="journey-road" style={{ width: layout.width, height: layout.height }} aria-hidden="true">
+          {segments.map((i) => (
+            <path key={i} d={road.paths[i]} className={`road-base is-${road.state[i]}`} />
+          ))}
+          {segments.map((i) => (
+            <path key={`s${i}`} d={road.paths[i]} className={`road-stones is-${road.state[i]}`} />
+          ))}
+        </svg>
+        {road.active !== undefined && segments.includes(road.active) && <Sparkles points={samplesBetween(road.points, road.active, 24)} />}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        className="journey-gate"
+        style={{ left: region.gate.x, top: region.gate.y, width: region.gate.w, height: region.gate.h, '--accent': look.accent } as CSSProperties}
+        onClick={() => {
+          sfx.tap();
+          void voice.text(world.title, 'interrupt');
+        }}
+      >
+        <span className="journey-gate-title">{world.title}</span>
+      </button>
+
+      {nodes.map((node) => {
+        const level = levels.get(node.id)!;
+        return (
+          <button
+            key={node.id}
+            type="button"
+            className={`journey-node is-${level.state} is-${node.kind} ${shaking === node.id ? 'is-shaking' : ''}`}
+            style={{ left: node.x, top: node.y, '--w': `${node.w}px` } as CSSProperties}
+            aria-label={`${fmt(t.map.level, { n: node.n })}. ${level.state === 'locked' ? t.map.locked : fmt(t.map.stars, { n: level.stars })}`}
+            onClick={() => onOpen(node.id)}
+            data-level={node.id}
+          >
+            <span className="journey-door">
+              <span className="journey-door-light" />
+              {level.state === 'locked' ? (
+                <span className="journey-lock">
+                  <LockIcon />
+                </span>
+              ) : (
+                <span className="journey-door-number">{node.n}</span>
+              )}
+              {node.kind === 'review' && (
+                <span className="journey-door-badge">
+                  <BookIcon />
+                </span>
+              )}
+            </span>
+            <span className="journey-stars">
+              {[0, 1, 2].map((s) => (
+                <StarIcon key={s} filled={s < level.stars} />
+              ))}
+            </span>
+          </button>
+        );
+      })}
+    </>
+  );
+}
+
+/** Three sparks travelling up the stretch of road to his next door. */
+function Sparkles({ points }: { points: Point[] }) {
+  return (
+    <>
+      {[0, 1, 2].map((i) => (
+        <m.span
+          key={i}
+          className="road-spark"
+          aria-hidden="true"
+          initial={{ x: points[0]!.x, y: points[0]!.y, opacity: 0 }}
+          animate={{ x: points.map((p) => p.x), y: points.map((p) => p.y), opacity: [0, 1, 1, 0] }}
+          transition={{ duration: 2.6, ease: 'linear', repeat: Infinity, delay: i * 0.85, opacity: { duration: 2.6, times: [0, 0.15, 0.8, 1], repeat: Infinity, delay: i * 0.85 } }}
+        />
+      ))}
+    </>
+  );
+}

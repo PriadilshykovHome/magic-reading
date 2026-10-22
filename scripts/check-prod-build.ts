@@ -6,7 +6,7 @@ const dir = join(import.meta.dirname, '..', 'dist', 'assets');
 const js = readdirSync(dir).filter((f) => f.endsWith('.js'));
 const leaks = js.flatMap((f) => {
   const code = readFileSync(join(dir, f), 'utf8');
-  return ['data-correct', '/dev/task', '/dev/celebration', '__audio'].filter((needle) => code.includes(needle)).map((n) => `${f}: ${n}`);
+  return ['data-correct', '/dev/task', '/dev/celebration', '/dev/journey', '__audio'].filter((needle) => code.includes(needle)).map((n) => `${f}: ${n}`);
 });
 if (leaks.length) {
   console.error(`✖ Test-only code in the production build:\n  ${leaks.join('\n  ')}`);

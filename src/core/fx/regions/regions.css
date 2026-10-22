@@ -1,0 +1,72 @@
+/* A world's stretch of the journey road: a faint wash of its accent and quiet silhouettes at the
+   edges. Static apart from a few candle-lit windows breathing slowly (opacity only). */
+
+.journey-region {
+  position: absolute;
+  overflow: hidden;
+  pointer-events: none;
+  background: radial-gradient(ellipse 80% 60% at 50% 100%, rgb(var(--accent) / 0.07), transparent 70%);
+}
+
+.journey-scroll.is-landscape .journey-region {
+  background: radial-gradient(ellipse 60% 80% at 0% 50%, rgb(var(--accent) / 0.07), transparent 70%);
+}
+
+.region-motif {
+  position: absolute;
+  width: clamp(70px, 24vmin, 150px);
+  opacity: 0.55;
+}
+
+.region-motif svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.region-motif.is-far {
+  width: clamp(48px, 15vmin, 100px);
+  opacity: 0.32;
+}
+
+/* portrait: along the left and right edges, partly off the road's sides */
+.journey-scroll.is-portrait .region-motif.is-start {
+  left: -3%;
+}
+
+.journey-scroll.is-portrait .region-motif.is-end {
+  right: -3%;
+}
+
+/* landscape: rising from the bottom edge, like a far skyline */
+.journey-scroll.is-landscape .region-motif {
+  bottom: -2%;
+  width: clamp(60px, 30vmin, 150px);
+}
+
+.journey-scroll.is-landscape .region-motif.is-end {
+  width: clamp(44px, 20vmin, 100px);
+  opacity: 0.3;
+}
+
+.look-window {
+  opacity: 0.55;
+  animation: window-breathe 7s ease-in-out infinite;
+}
+
+.look-window.is-slow {
+  opacity: 0.35;
+  animation-duration: 11s;
+  animation-delay: -3s;
+}
+
+@keyframes window-breathe {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.7; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .look-window {
+    animation: none;
+  }
+}

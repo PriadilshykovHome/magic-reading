@@ -20,4 +20,11 @@ export const game: GameData = {
     const level = coreLevel as Level;
     return ITEM_KINDS.flatMap((kind) => [...poolOf(level, kind), ...reviewPoolOf(content, level, kind)]);
   },
+  nodeKind(level) {
+    const template = content.plans.get(level.id)?.template;
+    if (template === 'review') return 'review';
+    // A finale, or a world's last level with its own door word (МИШКО).
+    const world = content.worlds.find((w) => w.levels.at(-1)?.id === level.id);
+    return template === 'finale' || (world && level.boss.item) ? 'finale' : 'door';
+  },
 };

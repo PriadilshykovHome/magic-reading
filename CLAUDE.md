@@ -42,7 +42,7 @@ src/
   core/                  the game-agnostic shell (shared later with the English and maths games)
     engine/              pure TS: session, picker, run, rewards, progress, calendar, validate framework
     game.ts              the seam: GameData ('@game') and GameUi ('@game-ui') interfaces
-    screens/             Door Map LevelIntro TaskRunner Celebration (later Login Book Album Parent)
+    screens/             Door, journey/ (the map: one road), LevelIntro TaskRunner Celebration (later Login Book Album Parent)
     tasks/               TaskProps/TaskType, useChoice, useDrag
     audio/ characters/ fx/ ui/ store/ sync/ styles/
   reading/               this game's domain pack
@@ -228,11 +228,14 @@ npm run validate-content  # content checks; -- --strict (assets are errors), --v
   engine, content validator and audio scheduler; e2e (Playwright, 6) covers layout, one full
   play-through and the celebration. Add a test only for a new rule, not for every case.
 - `e2e/checks.ts` (`layoutProblems`) enforces the layout rules: no page scroll, nothing cut off,
-  tap targets ≥ 64×64 with ≥ 16 px gaps, reading text minimums. It runs at the extremes
+  tap targets ≥ 64×64 with ≥ 16 px gaps, reading text minimums. The map's road scrolls inside
+  `[data-scroll-region]`: its doors may sit past the edge and are only compared with each other;
+  `journeyLayout.ts` keeps the spacing by construction (unit-tested for ~290 levels). It runs at the extremes
   (360×640, 844×390, 768×1024, 1024×768). Add any new screen or task type to `e2e/layout.spec.ts`.
 - Test builds (`TEST_BUILD` in `src/testMode.ts`: dev server or `VITE_MARK_CORRECT=true`) mark
-  correct answers with `data-correct` and add `#/dev/task/<world>/<num>/<type>?seed=N[&boss=1]`
-  and `#/dev/celebration`. `VITE_E2E=true` silences speech and sound. Production strips all of it.
+  correct answers with `data-correct` and add `#/dev/task/<world>/<num>/<type>?seed=N[&boss=1]`,
+  `#/dev/celebration` and `#/dev/journey?done=N` (the planned ~290-level road). `VITE_E2E=true`
+  silences speech and sound. Production strips all of it.
 - Engine code uses explicit seeds; UI picks a random seed per session.
 
 ## Deployment
