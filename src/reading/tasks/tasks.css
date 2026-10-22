@@ -530,9 +530,19 @@
   width: clamp(120px, 28vmin, 220px);
 }
 
-/* Phones in landscape: a five-word sentence's slots stay on one row (5 × 64 px + gaps). */
+/* Phones in landscape: a five-word sentence's slots stay on one row (5 × 64 px + gaps), and
+   its words in two rows with room to spare (text renders a few px wider on some systems). */
 @media (orientation: landscape) and (max-height: 520px) {
   .is-sentence .build-work {
     --tile-w: 64px;
+  }
+
+  .is-sentence .tile {
+    padding-inline: 8px;
+  }
+
+  /* the picture's column only as wide as the picture; the words get the rest */
+  .task-layout.is-sentence {
+    grid-template-columns: auto minmax(0, 1fr);
   }
 }
