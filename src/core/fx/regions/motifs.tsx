@@ -83,3 +83,52 @@ export function Hills() {
     </svg>
   );
 }
+
+export function Observatory() {
+  return (
+    <svg viewBox="0 0 130 260" preserveAspectRatio="xMidYMax meet">
+      <path d="M30 260V110h70v150z" fill={stone.a} />
+      {/* the dome, open along a slit, and the telescope peeking out */}
+      <path d="M22 112a43 43 0 0 1 86 0z" fill={stone.b} />
+      <path d="M62 70l6-1 4 42h-12z" fill="#120e18" />
+      <path d="M58 86l34-30 6 6-34 30z" fill="#3a3046" />
+      <path d="M22 112h86" stroke="rgb(240 214 138 / .14)" strokeWidth="1.5" />
+      <path className="look-window" d="M56 170a9 9 0 0 1 18 0v26H56z" fill="#f0c674" />
+    </svg>
+  );
+}
+
+export function Planets() {
+  return (
+    <svg viewBox="0 0 120 120" preserveAspectRatio="xMidYMax meet">
+      <circle cx="60" cy="60" r="22" fill={stone.a} />
+      <ellipse cx="60" cy="62" rx="44" ry="9" fill="none" stroke="rgb(216 199 156 / .35)" strokeWidth="2.5" transform="rotate(-14 60 62)" />
+      <circle cx="18" cy="26" r="6" fill={stone.a} />
+      <circle cx="104" cy="98" r="4" fill="rgb(240 214 138 / .35)" />
+    </svg>
+  );
+}
+
+export function Cauldron() {
+  return (
+    <svg viewBox="0 0 130 120" preserveAspectRatio="xMidYMax meet">
+      <path d="M20 54h90c0 30-18 50-45 50S20 84 20 54z" fill={stone.a} />
+      <path d="M14 50h102v8H14z" fill={stone.b} />
+      <path d="M36 104l-8 16M94 104l8 16" stroke={stone.b} strokeWidth="5" strokeLinecap="round" />
+      {/* steam, and the warm glow of what's cooking */}
+      <path d="M50 40c-6-10 6-14 0-26M70 42c-6-10 6-14 0-26M88 40c-6-10 6-14 0-26" stroke="rgb(216 199 156 / .22)" strokeWidth="3" fill="none" strokeLinecap="round" />
+      <ellipse className="look-window" cx="65" cy="54" rx="40" ry="4" fill="#e8b45e" />
+    </svg>
+  );
+}
+
+export function Shelf() {
+  return (
+    <svg viewBox="0 0 120 150" preserveAspectRatio="xMidYMax meet">
+      <path d="M8 60h104v6H8zM8 120h104v6H8z" fill={stone.b} />
+      <path d="M18 60V34h14v26zM40 60V24a8 8 0 0 1 16 0v36zM64 60V38h12v22zM84 60V30h18v30z" fill={stone.a} />
+      <path d="M16 120V96h20v24zM44 120v-34h14v34zM66 120V92a9 9 0 0 1 18 0v28zM92 120v-20h14v20z" fill={stone.a} />
+      <path className="look-window is-slow" d="M70 104h10v10H70z" fill="#f0c674" />
+    </svg>
+  );
+}

@@ -752,7 +752,9 @@ Build in 9 phases, plus the growth steps after Phase 6, each ending in something
   - Kharkiv on the door screen's horizon (the Annunciation Cathedral, rooftops, Держпром, the Ferris wheel; tapping the wheel says `eggs.kharkiv` and lights the windows);
   - the props registry (`src/core/fx/props/`, dates and chances in `config.json` → `props`): pumpkins, Миколай's gift, the carol star, a stork on Держпром, калина, a sleepy owl (tap → hoot), an owl across the moon. `?date=YYYY-MM-DD` and `?props=a,b` preview them;
   - Соня's вишиванка scarf.
-- G7. Content wave 1: worlds 3 to 5 (about 60 levels), with a native-speaker review list.
+- G7. Content wave 1: worlds 3 to 5. Done: 59 new levels (70 in all, 170 words, 118 sentences),
+  the ОЛЕКСАНДР, «Я МИШКО!», ХАРКІВ and МИХАЙЛО doors, 13 cards, observatory and kitchen scenery.
+  Review list: `docs/review/wave-1.md`.
 
 Later waves (worlds 6 to 13) are written just in time, after Phase 9. `caseMatch` and `story` arrive with worlds 8 and 11.
 

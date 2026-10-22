@@ -90,6 +90,97 @@
       "emoji": "🐲",
       "art": "img/cards/golden-dragon.webp",
       "sound": "sfx/cards/golden-dragon.mp3"
+    },
+    {
+      "id": "card-owlet",
+      "name": "Совеня Пухнастик",
+      "emoji": "🦉",
+      "art": "img/cards/owlet.webp",
+      "sound": "sfx/cards/owlet.mp3"
+    },
+    {
+      "id": "card-beaver",
+      "name": "Бобер Будівничий",
+      "emoji": "🦫",
+      "art": "img/cards/beaver.webp",
+      "sound": "sfx/cards/beaver.mp3"
+    },
+    {
+      "id": "card-zebra",
+      "name": "Зебра Смугастик",
+      "emoji": "🦓",
+      "art": "img/cards/zebra.webp",
+      "sound": "sfx/cards/zebra.mp3"
+    },
+    {
+      "id": "card-sunflower",
+      "name": "Соняшник Сонечко",
+      "emoji": "🌻",
+      "art": "img/cards/sunflower.webp",
+      "sound": "sfx/cards/sunflower.mp3"
+    },
+    {
+      "id": "card-tram",
+      "name": "Трамвайчик Дзень",
+      "emoji": "🚋",
+      "art": "img/cards/tram.webp",
+      "sound": "sfx/cards/tram.mp3"
+    },
+    {
+      "id": "card-deer",
+      "name": "Олень Зоряний",
+      "emoji": "🦌",
+      "art": "img/cards/deer.webp",
+      "sound": "sfx/cards/deer.mp3"
+    },
+    {
+      "id": "card-comet",
+      "name": "Комета Хвостата",
+      "emoji": "☄️",
+      "art": "img/cards/comet.webp",
+      "sound": "sfx/cards/comet.mp3"
+    },
+    {
+      "id": "card-telescope",
+      "name": "Телескоп Далекогляд",
+      "emoji": "🔭",
+      "art": "img/cards/telescope.webp",
+      "sound": "sfx/cards/telescope.mp3"
+    },
+    {
+      "id": "card-goose",
+      "name": "Гуска Гагуся",
+      "emoji": "🪿",
+      "art": "img/cards/goose.webp",
+      "sound": "sfx/cards/goose.mp3"
+    },
+    {
+      "id": "card-bat",
+      "name": "Кажанчик Нічка",
+      "emoji": "🦇",
+      "art": "img/cards/bat.webp",
+      "sound": "sfx/cards/bat.mp3"
+    },
+    {
+      "id": "card-ferris-wheel",
+      "name": "Харківське колесо",
+      "emoji": "🎡",
+      "art": "img/cards/ferris-wheel.webp",
+      "sound": "sfx/cards/ferris-wheel.mp3"
+    },
+    {
+      "id": "card-teapot",
+      "name": "Чайничок Пихтун",
+      "emoji": "🫖",
+      "art": "img/cards/teapot.webp",
+      "sound": "sfx/cards/teapot.mp3"
+    },
+    {
+      "id": "card-wand",
+      "name": "Чарівна паличка",
+      "emoji": "🪄",
+      "art": "img/cards/wand.webp",
+      "sound": "sfx/cards/wand.mp3"
     }
   ]
 }

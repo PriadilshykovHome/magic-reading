@@ -30,6 +30,15 @@ const SCREENS: [string, string][] = [
   ['buildSentence: У ДРАКОНА ШОКОЛАД', task('04', 'buildSentence', '&target=s-u-drakona-shokolad', 'tower-of-words')],
   ['Magic Door', task('02', 'buildWord', '&boss=1')],
   ['Magic Door: МИШКО', task('05', 'readPickPicture', '&boss=1', 'tower-of-words')],
+  // Content wave 1 (worlds 3–5): the longest words and sentences, and the new doors.
+  ['buildWord: ВИ-ШИ-ВАН-КА', task('rev2-review', 'buildWord', '&target=w-vyshyvanka', 'sunflower-garden')],
+  ['buildWord: ЧЕ-РЕ-ПА-ХА', task('rev2-review', 'buildWord', '&target=w-cherepakha', 'magic-kitchen')],
+  ['missingSyllable: МО-РО-ЗИ-ВО', task('rev2-review', 'missingSyllable', '&target=w-morozyvo', 'sunflower-garden')],
+  ['readPickPicture: ПОЖЕЖНИК', task('rev2-review', 'readPickPicture', '&target=w-pozhezhnyk', 'magic-kitchen')],
+  ['buildSentence: МАЛИЙ КІТ СПИТЬ НА ДИВАНІ', task('finale-finale', 'buildSentence', '&target=s-malyj-kit-spytj-na-dyvani', 'star-observatory')],
+  ['sentencePicture: ЧАРІВНИК НЕСЕ ПАЛИЧКУ', task('rev2-review', 'sentencePicture', '&target=s-charivnyk-nese-palychku', 'magic-kitchen')],
+  ['Magic Door: Я МИШКО!', task('finale-finale', 'sentencePicture', '&boss=1', 'star-observatory')],
+  ['Magic Door: МИХАЙЛО', task('finale-finale', 'readPickPicture', '&boss=1', 'magic-kitchen')],
   ['celebration', '#/dev/celebration'],
 ];
 

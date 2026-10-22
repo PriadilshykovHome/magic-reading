@@ -102,7 +102,8 @@ docs/PLAN.md
   ids `tower-of-syllables/01`…, which his saved progress is keyed by).
 - `npm run validate-content` checks schemas, ids, splits (one vowel per syllable), that every level
   uses only letters taught by then, the pace (a letter unit brings ≥ 6 new words, no level more
-  than 12 new items), task configs, pool sizes (it dry-builds every possible task), voice lines
+  than 12 new items), task configs, pool sizes (it dry-builds every task on each level's own items
+  and a sample of its review), letters no unit teaches yet, voice lines
   and assets. `-- --report` prints the progress curve. Missing audio/pictures are warnings
   (`--strict` makes them errors). A broken content file must fail the build, not the game.
 - Adding a level or world means content and assets only. If a level needs a code change,

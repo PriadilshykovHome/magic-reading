@@ -84,7 +84,7 @@ export function journeyLayout(regions: readonly RegionInput[], viewport: { width
     // and are far enough apart vertically.
     const lane = Math.max(big + GAP + 2, Math.min(W * 0.26, 200));
     const step = Math.max(Math.ceil((bigH + GAP) / 2) + 4, Math.round(h * 0.78));
-    const gate = { w: Math.min(W - 2 * GAP, 300), h: 64 };
+    const gate = { w: Math.min(W - 2 * GAP, 360), h: 64 };
     const gateGap = Math.ceil(bigH / 2 + gate.h / 2 + GAP) + 4;
     // Measured from the bottom, then flipped once the length is known: the road climbs.
     const rise: { at: number; node: Omit<JourneyNode, 'y'> }[] = [];
@@ -127,7 +127,7 @@ export function journeyLayout(regions: readonly RegionInput[], viewport: { width
   // Landscape: doors are far enough apart along the road; the wave uses the height available.
   const step = Math.max(Math.ceil((big + door) / 2 + GAP) + 2, Math.round(W * 0.12));
   const amplitude = Math.max(0, Math.min(120, (H - bigH - 2 * GAP) / 2));
-  const gate = { w: 260, h: 64 };
+  const gate = { w: 320, h: 64 };
   const gateGap = Math.ceil(gate.w / 2 + big / 2 + GAP) + 4;
   let at = GAP + gate.w / 2;
   regions.forEach((region, r) => {

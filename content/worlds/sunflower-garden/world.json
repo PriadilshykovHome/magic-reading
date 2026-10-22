@@ -1,0 +1,16 @@
+{
+  "id": "sunflower-garden",
+  "order": 3,
+  "title": "Сад Соняшників",
+  "look": "garden",
+  "signs": ["w-metro", "w-avtobus", "w-kavun"],
+  "units": [
+    {"key": "practice", "levels": ["words", "words", "sentences"]},
+    {"key": "e", "letters": "Е", "card": "card-owlet", "levels": ["letters", "words", "words", "sentences", "sentences"]},
+    {"key": "b", "letters": "Б", "card": "card-beaver", "levels": ["letters", "words", "words", "sentences", "sentences"]},
+    {"key": "rev1", "levels": ["review"]},
+    {"key": "z", "letters": "З", "card": "card-zebra", "levels": ["letters", "words", "words", "sentences"]},
+    {"key": "rev2", "levels": ["review"]},
+    {"key": "finale", "levels": [{"t": "finale", "door": "w-oleksandr", "line": "magicDoor.dadName", "card": "card-sunflower"}]}
+  ]
+}

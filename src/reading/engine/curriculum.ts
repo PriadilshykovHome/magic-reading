@@ -123,9 +123,12 @@ export function expandCurriculum(
   for (const w of lexicon.words) texts.set(w.id, w.text);
   for (const s of lexicon.sentences) texts.set(s.id, s.text);
   const readyUnit = new Map<string, number>();
+  const allKnown = unitKnown.at(-1) ?? new Set<string>();
   for (const [id, text] of texts) {
     const letters = lettersOf(text);
     readyUnit.set(id, unitKnown.findIndex((set) => letters.every((ch) => set.has(ch))));
+    const untaught = [...new Set(letters.filter((ch) => !allKnown.has(ch)))];
+    if (untaught.length && !taughtByHand.has(id)) error('content/worlds', `${id} uses ${untaught.join(', ')}, which no unit teaches yet`);
   }
   const pending: Record<ItemKindName, string[]> = {
     syllable: drills.filter((id) => !taughtByHand.has(id)),

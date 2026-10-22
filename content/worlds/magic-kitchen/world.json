@@ -1,0 +1,17 @@
+{
+  "id": "magic-kitchen",
+  "order": 5,
+  "title": "Чарівна Кухня",
+  "look": "kitchen",
+  "signs": ["w-kukhnya", "w-derzhprom", "w-kharkiv"],
+  "units": [
+    {"key": "h", "letters": "Г", "card": "card-goose", "levels": ["letters", "words", "words", "sentences", "sentences"]},
+    {"key": "zh", "letters": "Ж", "card": "card-bat", "levels": ["letters", "words", "words", "sentences"]},
+    {"key": "rev1", "levels": ["review"]},
+    {"key": "kh", "letters": "Х", "levels": ["letters", "words", "words", "sentences"]},
+    {"key": "kharkiv", "levels": [{"t": "finale", "door": "w-kharkiv", "line": "magicDoor.kharkiv", "card": "card-ferris-wheel"}]},
+    {"key": "ch", "letters": "Ч", "card": "card-teapot", "levels": ["letters", "words", "words", "sentences", "sentences"]},
+    {"key": "rev2", "levels": ["review"]},
+    {"key": "finale", "levels": [{"t": "finale", "door": "w-mykhajlo", "line": "magicDoor.fullName", "card": "card-wand"}]}
+  ]
+}

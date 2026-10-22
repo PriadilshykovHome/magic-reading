@@ -28,10 +28,12 @@ test('a broken content file is caught, with a message pointing at the problem', 
     ['split without syllables', (r) => (lexicon(r).words.find((w) => w.id === 'w-lysa')!.split = 'ЛИСА'), /syllable ЛИСА in ЛИСА needs exactly one vowel/],
     ['unknown card', (r) => (level(r, 2).card = 'card-dragon'), /unknown card card-dragon/],
     ['schema', (r) => (level(r, 0).id = 'Tower/1'), /id: must look like world-id\/level-key/],
+    ['letters no unit teaches', (r) => lexicon(r).sentences.push({ id: 's-tsap', text: 'Цап тут.', scene: 'kit' }), /s-tsap uses Ц, which no unit teaches yet/],
     ['missing instruction', (r) => delete ((r.voice.data as Json).instructions as Json).buildWord, /no instruction line instructions.buildWord/],
   ];
   for (const [name, breakIt, expected] of cases) {
     const raw = rawBundle();
+    raw.worlds = raw.worlds.slice(0, 2); // every case breaks the first two worlds
     breakIt(raw);
     expect(errorsOf(raw), name).toMatch(expected);
   }

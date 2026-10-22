@@ -6,6 +6,7 @@ import { validateContent, type RawBundle } from './validate';
 /** A third world written the new way: units of templates (a preview of World 3). */
 function withGarden(units: unknown[], words?: unknown[]): RawBundle {
   const raw = rawBundle();
+  raw.worlds = raw.worlds.slice(0, 2); // the two worlds written out in full, then this one
   raw.worlds.push({
     world: { file: 'content/worlds/test-garden/world.json', data: { id: 'test-garden', order: 3, title: 'Сад', look: 'garden', units } },
     lexicon: {

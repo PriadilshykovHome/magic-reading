@@ -162,11 +162,21 @@ export function checkTasks<C extends GameContent>(
   return out;
 }
 
+/** Review items checked per task entry, spread over all of them (see dryBuild). */
+const REVIEW_SAMPLE = 12;
+
 function dryBuild(ctx: BuildContext<GameContent>, logic: AnyTaskLogic, config: unknown, where: string, file: string, error: Report) {
   const eligible = logic.eligible(ctx, config);
   if (eligible.length === 0) return error(file, `${where}: nothing to ask about (check the pool)`);
   const max = ctx.content.config.answers.maxChoices;
-  for (const target of eligible) {
+  // Every item of the level's own, and an even sample of review: a review item was built in its
+  // own level already, and later levels only add candidates, so checking all of them again would
+  // make validation grow with the square of the content.
+  const own = eligible.filter((id) => !ctx.isReview(id));
+  const review = eligible.filter((id) => ctx.isReview(id));
+  const step = Math.max(1, review.length / REVIEW_SAMPLE);
+  const sample = Array.from({ length: Math.min(REVIEW_SAMPLE, review.length) }, (_, i) => review[Math.floor(i * step)]!);
+  for (const target of [...own, ...sample]) {
     try {
       const built = logic.build(ctx, config, target);
       if (built.options.length > max && !logic.manyOptions) {

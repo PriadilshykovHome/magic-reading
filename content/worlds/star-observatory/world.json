@@ -1,0 +1,26 @@
+{
+  "id": "star-observatory",
+  "order": 4,
+  "title": "Зоряна Обсерваторія",
+  "look": "observatory",
+  "signs": ["w-tramvaj", "w-trolejbus", "w-korabelj"],
+  "units": [
+    {"key": "j", "letters": "Й", "card": "card-tram", "levels": ["letters", "words", "words", "sentences"]},
+    {"key": "soft", "letters": "Ь", "card": "card-deer", "levels": ["letters", "words", "words", "sentences", "sentences"]},
+    {"key": "rev1", "levels": ["review"]},
+    {"key": "ya", "letters": "Я", "card": "card-comet", "levels": ["letters", "words", "words", "sentences", "sentences"]},
+    {"key": "rev2", "levels": ["review"]},
+    {
+      "key": "finale",
+      "levels": [
+        {
+          "t": "finale",
+          "door": "s-ya-myshko",
+          "line": "magicDoor.iAmMyshko",
+          "boss": {"type": "magicDoor", "inner": "sentencePicture", "item": "s-ya-myshko", "openedLine": "magicDoor.iAmMyshko"},
+          "card": "card-telescope"
+        }
+      ]
+    }
+  ]
+}
