@@ -19,7 +19,8 @@
     "audio:generate": "node --disable-warning=ExperimentalWarning scripts/make-audio.ts",
     "check-prod-build": "node --disable-warning=ExperimentalWarning scripts/check-prod-build.ts",
     "test:rules": "firebase emulators:exec --only firestore --project demo-magic-reading 'vitest run --config vitest.rules.config.ts'",
-    "deploy:rules": "firebase deploy --only firestore:rules"
+    "deploy:rules": "firebase deploy --only firestore:rules",
+    "bundle-report": "node --disable-warning=ExperimentalWarning scripts/bundle-report.ts"
   },
   "dependencies": {
     "@tsparticles/confetti": "^4.4.0",
@@ -35,7 +36,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@firebase/rules-unit-testing": "^6.0.0",
-    "@playwright/test": "^1.64.1",
+    "@playwright/test": "1.64.1",
     "@types/howler": "^2.2.13",
     "@types/node": "^24.19.2",
     "@types/react": "^19.3.0",

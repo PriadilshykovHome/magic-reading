@@ -16,7 +16,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  # Everything except the browser tests, and the site itself.
+  checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -44,7 +45,25 @@ jobs:
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ vars.VITE_FIREBASE_APP_ID }}
       - run: npm run check-prod-build
-      - run: npx playwright install --with-deps chromium
+      - if: github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  # The browser tests, in Playwright's own image: the browser and its system packages are
+  # already there (installing them took 12 minutes). Its tag must match @playwright/test.
+  e2e:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      options: --user 1001
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
       - run: npm run e2e
       - if: failure()
         uses: actions/upload-artifact@v7
@@ -53,14 +72,10 @@ jobs:
           path: |
             e2e-report
             test-results
-      - if: github.ref == 'refs/heads/main'
-        uses: actions/upload-pages-artifact@v5
-        with:
-          path: dist
 
   deploy:
     if: github.ref == 'refs/heads/main'
-    needs: build
+    needs: [checks, e2e]
     runs-on: ubuntu-latest
     environment:
       name: github-pages
