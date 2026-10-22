@@ -1,6 +1,7 @@
 // Wrong options are confusable on purpose (same consonant МА/МО, same vowel МА/ЛА, look-alike
 // words МАМА/ЛАМА), so the only way to the right answer is to really read or listen.
 import { syllableShape } from './content.ts';
+import { sceneKey } from './scene.ts';
 import type { Sentence, Syllable, Word } from './schema.ts';
 
 /** Higher = more confusable; -Infinity = never a valid wrong option. */
@@ -39,7 +40,7 @@ export function wordScore(target: Word, other: Word): number {
  * shows (for "Мама там." a scene with мама і тато would be ambiguous).
  */
 export function sentenceCompatible(target: Sentence, other: Sentence): boolean {
-  if (target.id === other.id || target.scene === other.scene || target.emoji === other.emoji) return false;
+  if (target.id === other.id || sceneKey(target.scene) === sceneKey(other.scene)) return false;
   return !target.depicts.every((thing) => other.depicts.includes(thing));
 }
 

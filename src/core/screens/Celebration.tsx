@@ -8,7 +8,7 @@ import { Iskryk } from '../characters/Iskryk';
 import { Sonya, type SonyaMood } from '../characters/Sonya';
 import { game } from '@game';
 import { creatureStage, sparkBalance } from '../engine/progress';
-import type { CelebrationStep, LevelSummary } from '../engine/rewards';
+import { WARMUP_ID, type CelebrationStep, type LevelSummary } from '../engine/rewards';
 import { Scene, type CandleSpot } from '../fx/ambient/Scene';
 import { particles } from '../fx/particles';
 import { SparkFlights, type Flight } from '../fx/SparkFlight';
@@ -402,17 +402,20 @@ export function Celebration({
         <div className="celebration-actions">
           {buttons && (
             <>
-              <m.button
-                type="button"
-                className="big-button is-ghost"
-                aria-label={t.celebration.playAgain}
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ ...spring, delay: 0.1 }}
-                onClick={() => navigate(`${levelPath(summary.levelId)}/play`, { replace: true })}
-              >
-                <AgainIcon />
-              </m.button>
+              {/* the warm-up is once a day: no playing it again */}
+              {summary.levelId !== WARMUP_ID && (
+                <m.button
+                  type="button"
+                  className="big-button is-ghost"
+                  aria-label={t.celebration.playAgain}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ ...spring, delay: 0.1 }}
+                  onClick={() => navigate(`${levelPath(summary.levelId)}/play`, { replace: true })}
+                >
+                  <AgainIcon />
+                </m.button>
+              )}
               <m.button
                 type="button"
                 className="big-button"

@@ -354,3 +354,9 @@
   margin: calc(var(--door-w) * -0.6) 0 0 calc(var(--door-w) * -0.36);
   pointer-events: none;
 }
+
+/* The daily warm-up's cauldron: a steady warm glow, no pulse (the next door has the screen's one). */
+.journey-warmup {
+  border-color: rgb(240 214 138 / 0.85);
+  background: radial-gradient(circle at 50% 70%, rgb(255 190 110 / 0.28), rgb(26 20 36 / 0.85) 70%);
+}

@@ -5,6 +5,7 @@
 // so the reading game can be swapped for the English or maths one without touching core.
 import type { ComponentType } from 'react';
 import type { GameContent } from './engine/content';
+import type { Progress } from './engine/progress';
 import type { Level } from './engine/schema';
 import type { DomainEngine, TaskRegistry } from './engine/taskLogic';
 import type { TaskType } from './tasks/types';
@@ -21,6 +22,8 @@ export interface GameData {
   levelItems(level: Level): string[];
   /** How its door looks on the journey road. */
   nodeKind(level: Level): 'door' | 'review' | 'finale';
+  /** Today's warm-up over what he has finished, or null if there's not enough yet. */
+  warmup(progress: Progress): Level | null;
 }
 
 export interface IntroDemoProps {

@@ -1,10 +1,12 @@
-import { pictureOf, useDisplayText } from '../shared/helpers';
 import { useChoice } from '../../../core/tasks/useChoice';
-import { correctMark } from '../../../core/testMode';
 import type { TaskProps } from '../../../core/tasks/types';
+import { correctMark } from '../../../core/testMode';
+import { SceneView } from '../shared/SceneView';
+import { useDisplayText } from '../shared/helpers';
+import type { ScenePicksData } from './logic';
 
-// Reading task: a short sentence, he taps the matching scene. Spoken only after he answers.
-export function SentencePicture({ task, hint, onMiss, onComplete }: TaskProps) {
+// Reading task: a short sentence, he taps the matching picture. Spoken only after he answers.
+export function SentencePicture({ task, hint, onMiss, onComplete }: TaskProps<ScenePicksData>) {
   const show = useDisplayText();
   const { pick, stateOf, isWrong } = useChoice(task, onMiss, onComplete);
   return (
@@ -17,12 +19,12 @@ export function SentencePicture({ task, hint, onMiss, onComplete }: TaskProps) {
           <button
             key={id}
             type="button"
-            className={`option ${stateOf(id, hint)}`}
+            className={`option scene-box ${stateOf(id, hint)}`}
             disabled={isWrong(id)}
             onClick={() => pick(id)}
             {...correctMark(id === task.target)}
           >
-            <span className="emoji-picture">{pictureOf(id)}</span>
+            <SceneView scene={task.data.scenes[id]!} />
           </button>
         ))}
       </div>

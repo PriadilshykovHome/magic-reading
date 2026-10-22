@@ -5,6 +5,7 @@ import { DoorScreen } from '../core/screens/Door';
 import { LevelIntroScreen } from '../core/screens/LevelIntro';
 import { JourneyScreen } from '../core/screens/journey/Journey';
 import { TaskRunnerScreen } from '../core/screens/TaskRunner';
+import { WarmupDoneScreen, WarmupScreen } from '../core/screens/Warmup';
 import { TEST_BUILD } from '../core/testMode';
 
 // Hash URLs (#/map) because GitHub Pages has no fallback for deep links.
@@ -15,6 +16,8 @@ export const router = createHashRouter([
   { path: '/level/:world/:num', element: <LevelIntroScreen /> },
   { path: '/level/:world/:num/play', element: <TaskRunnerScreen /> },
   { path: '/level/:world/:num/done', element: <CelebrationScreen /> },
+  { path: '/warmup', element: <WarmupScreen /> },
+  { path: '/warmup/done', element: <WarmupDoneScreen /> },
   ...(TEST_BUILD
     ? [
         { path: '/dev/task/:world/:num/:type', element: <DevTaskScreen /> },

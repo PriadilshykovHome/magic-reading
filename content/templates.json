@@ -19,8 +19,8 @@
     "tasks": [
       {"type": "readPickPicture", "count": 3, "choices": 3},
       {"type": "buildWord", "count": 2, "extraTiles": 1},
+      {"type": "missingSyllable", "count": 2, "choices": 3},
       {"type": "hearPick", "count": 1, "itemKind": "word", "choices": 3},
-      {"type": "hearPick", "count": 1, "itemKind": "syllable", "choices": 3},
       {"type": "readAloud", "count": 1, "itemKind": "word"}
     ],
     "boss": {"inner": "readPickPicture", "pick": "newest"}
@@ -31,9 +31,9 @@
     "teaches": ["sentence"],
     "tasks": [
       {"type": "sentencePicture", "count": 3, "choices": 3},
-      {"type": "readPickPicture", "count": 2, "choices": 3},
-      {"type": "buildWord", "count": 1, "extraTiles": 1},
-      {"type": "hearPick", "count": 1, "itemKind": "word", "choices": 3},
+      {"type": "trueFalse", "count": 2},
+      {"type": "buildSentence", "count": 1, "extraTiles": 1},
+      {"type": "readPickPicture", "count": 1, "choices": 3},
       {"type": "readAloud", "count": 1, "itemKind": "sentence"}
     ],
     "boss": {"inner": "sentencePicture", "pick": "newest"}
@@ -45,8 +45,10 @@
       {"type": "hearPick", "count": 1, "itemKind": "syllable", "choices": 3},
       {"type": "bubblePop", "count": 1},
       {"type": "readPickPicture", "count": 2, "choices": 3},
-      {"type": "buildWord", "count": 2, "extraTiles": 1},
+      {"type": "buildWord", "count": 1, "extraTiles": 1},
+      {"type": "missingSyllable", "count": 1, "choices": 3},
       {"type": "sentencePicture", "count": 2, "choices": 3},
+      {"type": "trueFalse", "count": 1},
       {"type": "readAloud", "count": 1, "itemKind": "word"}
     ],
     "boss": {"inner": "readPickPicture", "pick": "weakest"}
@@ -56,10 +58,22 @@
     "intro": {"voice": "levelIntro.finale", "demo": "readAlong", "from": "recent"},
     "tasks": [
       {"type": "readPickPicture", "count": 3, "choices": 3},
-      {"type": "buildWord", "count": 2, "extraTiles": 1},
+      {"type": "buildWord", "count": 1, "extraTiles": 1},
+      {"type": "buildSentence", "count": 1, "extraTiles": 1},
       {"type": "sentencePicture", "count": 2, "choices": 3},
-      {"type": "hearPick", "count": 1, "itemKind": "word", "choices": 3},
+      {"type": "trueFalse", "count": 1},
       {"type": "readAloud", "count": 1, "itemKind": "sentence"}
+    ],
+    "boss": {"inner": "readPickPicture", "pick": "weakest"}
+  },
+  "warmup": {
+    "title": "Чарівна розминка",
+    "intro": {"voice": "warmup.start", "demo": "readAlong", "from": "recent"},
+    "tasks": [
+      {"type": "readPickPicture", "count": 1, "choices": 3},
+      {"type": "missingSyllable", "count": 1, "choices": 3},
+      {"type": "sentencePicture", "count": 1, "choices": 3},
+      {"type": "trueFalse", "count": 1}
     ],
     "boss": {"inner": "readPickPicture", "pick": "weakest"}
   }

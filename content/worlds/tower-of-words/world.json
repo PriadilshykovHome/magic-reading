@@ -125,9 +125,10 @@
           "reviewFrom": ["tower-of-words/03"],
           "tasks": [
             {"type": "sentencePicture", "count": 3, "choices": 3},
-            {"type": "readPickPicture", "count": 2, "choices": 3},
-            {"type": "buildWord", "count": 1, "extraTiles": 1},
-            {"type": "readAloud", "count": 2, "itemKind": "sentence"}
+            {"type": "trueFalse", "count": 2},
+            {"type": "buildSentence", "count": 1, "extraTiles": 1},
+            {"type": "readPickPicture", "count": 1, "choices": 3},
+            {"type": "readAloud", "count": 1, "itemKind": "sentence"}
           ],
           "boss": {"type": "magicDoor", "inner": "sentencePicture", "pick": "weakest"},
           "card": "card-fox"

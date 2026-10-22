@@ -28,8 +28,10 @@ export interface BuildContext<C extends GameContent = GameContent> {
 
 export interface Built<Data> {
   target: string;
-  /** Answer options including the target, already shuffled. Empty for tasks without choices. */
+  /** Answer options including the right one, already shuffled. Empty for tasks without choices. */
   options: string[];
+  /** The right option, when it isn't the target itself (the missing syllable of a word, "yes"). */
+  answer?: string;
   data: Data;
 }
 
@@ -82,6 +84,8 @@ export interface TaskInstance<Data = unknown> {
   kind: string;
   target: string;
   options: string[];
+  /** The right option, when it isn't the target. */
+  answer?: string;
   data: Data;
   instruction: string;
 }

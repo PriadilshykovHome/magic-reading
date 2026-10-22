@@ -7,7 +7,7 @@ export function useChoice(task: TaskInstance, onMiss: () => void, onComplete: ()
   const [solved, setSolved] = useState(false);
   const pick = (id: string) => {
     if (solved || wrong.includes(id)) return;
-    if (id === task.target) {
+    if (id === (task.answer ?? task.target)) {
       setSolved(true);
       onComplete();
     } else {
@@ -16,9 +16,10 @@ export function useChoice(task: TaskInstance, onMiss: () => void, onComplete: ()
     }
   };
   const stateOf = (id: string, hint: boolean) => {
-    if (solved) return id === task.target ? 'is-correct' : 'is-faded';
+    const right = task.answer ?? task.target;
+    if (solved) return id === right ? 'is-correct' : 'is-faded';
     if (wrong.includes(id)) return 'is-wrong';
-    return hint && id === task.target ? 'is-hint' : '';
+    return hint && id === right ? 'is-hint' : '';
   };
   return { pick, stateOf, solved, isWrong: (id: string) => wrong.includes(id) };
 }

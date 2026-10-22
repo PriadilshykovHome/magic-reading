@@ -3,6 +3,7 @@
 import cards from '../../../content/cards.json';
 import config from '../../../content/config.json';
 import strings from '../../../content/strings.uk.json';
+import scenes from '../../../content/scenes.json';
 import templates from '../../../content/templates.json';
 import voice from '../../../content/voice.uk.json';
 import type { RawBundle } from '../engine/validate';
@@ -15,6 +16,7 @@ export function contentFiles(): RawBundle {
   return {
     config: { file: 'content/config.json', data: config },
     templates: { file: 'content/templates.json', data: templates },
+    scenes: { file: 'content/scenes.json', data: scenes },
     cards: { file: 'content/cards.json', data: cards },
     voice: { file: 'content/voice.uk.json', data: voice },
     strings: { file: 'content/strings.uk.json', data: strings },

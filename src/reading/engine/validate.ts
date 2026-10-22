@@ -4,11 +4,13 @@
 // (scripts/validate-content.ts) feeds it the files, tests feed it broken fixtures.
 import { CardsSchema, StringsSchema, VoiceSchema } from '../../core/engine/schema.ts';
 import type { TaskRegistry } from '../../core/engine/taskLogic.ts';
+import { seededRandom } from '../../core/engine/rng.ts';
 import {
   assetChecker,
   checkDuplicates,
   checkGame,
   checkGameAssets,
+  checkTasks,
   parseFile,
   type Issue,
   type RawFile,
@@ -16,16 +18,17 @@ import {
   type ValidateOptions,
 } from '../../core/engine/validate.ts';
 import { hasItem, indexContent, kindOf, poolOf, syllablesOfWords, type Content, type ItemKind } from './content.ts';
-import { expandCurriculum } from './curriculum.ts';
+import { expandCurriculum, warmupLevel } from './curriculum.ts';
 import { readingEngine } from './domain.ts';
 import { deriveLexicon, lettersOf } from './lexicon.ts';
-import { ConfigSchema, LexiconFileSchema, TemplatesSchema, WorldFileSchema, type Level } from './schema.ts';
+import { ConfigSchema, LexiconFileSchema, ScenesSchema, TemplatesSchema, WorldFileSchema, type Level } from './schema.ts';
 
 export type { Issue, RawFile, ValidateOptions } from '../../core/engine/validate.ts';
 
 export interface RawBundle {
   config: RawFile;
   templates: RawFile;
+  scenes: RawFile;
   cards: RawFile;
   voice: RawFile;
   strings: RawFile;
@@ -46,6 +49,7 @@ export function validateContent(
   // 1. Every file matches its schema.
   const config = parseFile(ConfigSchema, raw.config, error);
   const templates = parseFile(TemplatesSchema, raw.templates, error);
+  const scenes = parseFile(ScenesSchema, raw.scenes, error);
   const cards = parseFile(CardsSchema, raw.cards, error);
   const voice = parseFile(VoiceSchema, raw.voice, error);
   const strings = parseFile(StringsSchema, raw.strings, error);
@@ -53,7 +57,7 @@ export function validateContent(
     world: { file: w.world.file, data: parseFile(WorldFileSchema, w.world, error) },
     lexicon: { file: w.lexicon.file, data: parseFile(LexiconFileSchema, w.lexicon, error) },
   }));
-  if (!config || !templates || !cards || !voice || !strings) return { issues, content: null };
+  if (!config || !templates || !scenes || !cards || !voice || !strings) return { issues, content: null };
   if (worlds.some((w) => !w.world.data || !w.lexicon.data)) return { issues, content: null };
 
   // 2. Derive the lexicon and expand the curriculum (worlds in play order, so are their lexicons).
@@ -61,8 +65,14 @@ export function validateContent(
   const { lexicon, drills } = deriveLexicon(
     ordered.map((w) => ({ file: w.lexicon.file, data: w.lexicon.data! })),
     config.letters,
+    Object.keys(scenes.actions),
     error,
   );
+  // Every thing in a picture is a word with a picture of its own.
+  const pictured = new Set(lexicon.words.map((w) => w.id.slice('w-'.length)));
+  for (const s of lexicon.sentences) {
+    for (const thing of s.depicts) if (!pictured.has(thing)) error('content/worlds/*/lexicon.json', `${s.id}: its scene shows "${thing}", but there is no word w-${thing}`);
+  }
   const curriculum = expandCurriculum(
     ordered.map((w) => ({ file: w.world.file, data: w.world.data! })),
     templates,
@@ -73,7 +83,17 @@ export function validateContent(
   );
   if (issues.some((i) => i.severity === 'error')) return { issues, content: null };
 
-  const content = indexContent({ config, lexicon, cards: cards.cards, voice, strings, worlds: curriculum.worlds, plans: curriculum.plans });
+  const content = indexContent({
+    config,
+    lexicon,
+    actions: scenes.actions,
+    cards: cards.cards,
+    voice,
+    strings,
+    worlds: curriculum.worlds,
+    plans: curriculum.plans,
+    ...(templates.warmup ? { warmup: templates.warmup } : {}),
+  });
   const fileOfLevel = (id: string) => content.plans.get(id)?.file ?? 'content/worlds';
   const files = { config: raw.config.file, cards: raw.cards.file, voice: raw.voice.file, levelFile: fileOfLevel };
 
@@ -90,7 +110,14 @@ export function validateContent(
   // 5. Everything every game checks: tasks, the Magic Door, Соня's lines, config references.
   checkGame(content, files, registry, readingEngine, error, { dryBuild: options.deep ?? true });
 
-  // 6. Assets.
+  // 6. The daily warm-up builds over every level.
+  const warmup = warmupLevel(content.warmup, content.levelOrder, lexicon.sentences.at(-1)?.id);
+  if (warmup && (options.deep ?? true)) {
+    const ctx = readingEngine.createBuildContext(content, warmup, seededRandom(1));
+    checkTasks(ctx, warmup.tasks, registry, raw.templates.file, (file, message) => error(file, `warmup: ${message}`), true);
+  }
+
+  // 7. Assets.
   if (options.hasAsset) {
     const missing = assetChecker(options, issues);
     checkItemAssets(content, lexiconFiles, missing);
@@ -165,8 +192,5 @@ function checkItemAssets(content: Content, file: string, missing: ReturnType<typ
     if (w.audioSyllables) missing(file, 'audio', w.audioSyllables, `${w.id} by syllables`);
     missing(file, 'image', w.picture, w.id);
   }
-  for (const s of content.sentences.values()) {
-    missing(file, 'audio', s.audio, s.id);
-    missing(file, 'image', s.scene, s.id);
-  }
+  for (const s of content.sentences.values()) missing(file, 'audio', s.audio, s.id);
 }

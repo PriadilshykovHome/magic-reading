@@ -6,6 +6,7 @@
 //   content/worlds/<world>/world.json      the world and its units of levels
 //   content/worlds/<world>/lexicon.json    the items first taught there, one compact row each
 import { z } from 'zod';
+import type { Scene } from './scene.ts';
 import {
   CardId,
   CoreConfigSchema,
@@ -41,11 +42,13 @@ export const WordRowSchema = z.strictObject({
 export const SentenceRowSchema = z.strictObject({
   id: SentenceId,
   text: Text,
-  /** What the scene shows; a distractor scene may never show everything the target does. */
-  depicts: z.array(Text).min(1),
-  emoji: Text,
+  /** Its picture as a spec: "kit:small sleeps on dyvan" (src/reading/engine/scene.ts). */
+  scene: Text,
   wordStartsSec: z.array(z.number().nonnegative()).optional(),
 });
+
+/** content/scenes.json: the signs for what someone in a scene is doing. */
+export const ScenesSchema = z.strictObject({ actions: z.record(Key, Text) });
 
 export const LexiconFileSchema = z.strictObject({
   /** Syllables for drills, space-separated ("МА МО МУ"); closed ones come from the word splits. */
@@ -83,11 +86,12 @@ export interface Sentence {
   id: string;
   text: string;
   words: string[];
+  /** Its picture, drawn by the scene composer. */
+  scene: Scene;
+  /** The things its picture shows (word ids without "w-"). */
   depicts: string[];
   audio: string;
   wordStartsSec?: number[];
-  scene: string;
-  emoji: string;
 }
 
 export interface Lexicon {
@@ -196,3 +200,4 @@ export type LevelEntry = z.output<typeof LevelEntrySchema>;
 export type Unit = z.output<typeof UnitSchema>;
 export type WorldFile = z.output<typeof WorldFileSchema>;
 export type ItemKindName = z.output<typeof ItemKindSchema>;
+export type Scenes = z.output<typeof ScenesSchema>;

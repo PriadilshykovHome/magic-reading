@@ -7,7 +7,7 @@ import { useMusic } from '../../audio/useMusic';
 import { voice } from '../../audio/voice';
 import { Iskryk } from '../../characters/Iskryk';
 import { creatureStage, sparkBalance, type Progress } from '../../engine/progress';
-import { isLevelUnlocked } from '../../engine/rewards';
+import { isLevelUnlocked, warmupDue } from '../../engine/rewards';
 import { Scene, type CandleSpot } from '../../fx/ambient/Scene';
 import { lookOf } from '../../fx/regions/looks';
 import { useGame } from '../../store/game';
@@ -15,7 +15,7 @@ import { useProgress } from '../../store/progress';
 import { fmt, t } from '../../strings';
 import { SparkJar } from '../../ui/Candles';
 import { HomeButton } from '../../ui/HomeButton';
-import { BookIcon, LockIcon, MyDoorIcon, StarIcon } from '../../ui/Icons';
+import { BookIcon, CauldronIcon, LockIcon, MyDoorIcon, StarIcon } from '../../ui/Icons';
 import { levelPath } from '../useLevel';
 import { journeyLayout, roadSegments, samplesBetween, type JourneyLayout, type NodeKind, type Point } from './journeyLayout';
 import '../../fx/regions/regions.css';
@@ -114,9 +114,28 @@ export function JourneyScreen() {
     return () => window.removeEventListener('keydown', onKey);
   }, [nextId, open]);
 
+  // Once a day, after a few levels: the cauldron of «Чарівна розминка».
+  const warmup = warmupDue(progress, new Date()) && game.warmup(progress) !== null;
+
   return (
     <JourneyView
       worlds={worlds}
+      actions={
+        warmup && (
+          <button
+            type="button"
+            className="icon-button journey-warmup"
+            aria-label={t.map.warmup}
+            onClick={() => {
+              sfx.tap();
+              navigate('/warmup');
+            }}
+            data-warmup
+          >
+            <CauldronIcon />
+          </button>
+        )
+      }
       focus={focus}
       walk={pendingWalk}
       shaking={shaking}
@@ -136,6 +155,8 @@ interface ViewProps {
   onOpen(levelId: string): void;
   creature: number;
   jar: ReactNode;
+  /** Extra buttons in the bar (the daily warm-up). */
+  actions?: ReactNode;
 }
 
 type SegmentState = 'lit' | 'active' | 'dim';
@@ -155,7 +176,7 @@ interface Road {
 }
 
 /** The journey itself: also rendered by the test-build route with hundreds of levels. */
-export function JourneyView({ worlds, focus, walk, shaking, onOpen, creature, jar }: ViewProps) {
+export function JourneyView({ worlds, focus, walk, shaking, onOpen, creature, jar, actions }: ViewProps) {
   const scroller = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState<{ width: number; height: number } | null>(null);
   const [scroll, setScroll] = useState(0);
@@ -308,6 +329,7 @@ export function JourneyView({ worlds, focus, walk, shaking, onOpen, creature, ja
       <header className="journey-bar">
         <HomeButton />
         <div className="journey-bar-end">
+          {actions}
           {!nextInView && nextId && (
             <button type="button" className="icon-button" aria-label={t.map.toMyDoor} onClick={() => scrollToLevel(nextId, true)} data-to-my-door>
               <MyDoorIcon />

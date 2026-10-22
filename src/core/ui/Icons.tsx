@@ -93,3 +93,24 @@ export const BookIcon = () => (
     <path d="M12 7l1 2 2 .3-1.5 1.4.4 2.1L12 11.8l-1.9 1 .4-2.1L9 9.3l2-.3z" fill="currentColor" stroke="none" />
   </svg>
 );
+
+/** «Це жарт!»: a winking face, for "the picture doesn't match". */
+export const JokeIcon = () => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" {...common}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M7.6 10.2c.7-.6 1.7-.6 2.4 0" />
+    <circle cx="15.5" cy="10" r="1.1" fill="currentColor" stroke="none" />
+    <path d="M7.8 14.2c2.4 3.2 6 3.2 8.4 0" />
+    <path d="M12.6 16.4c.2 1.6 2.3 1.8 2.8.2" fill="currentColor" stroke="none" />
+  </svg>
+);
+
+/** The daily warm-up: a little cauldron with rising bubbles. */
+export const CauldronIcon = () => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" {...common}>
+    <path d="M4 11h16M5 11c0 5 3 8.5 7 8.5s7-3.5 7-8.5M7.5 19.5L6.5 21M16.5 19.5l1 1.5" />
+    <circle cx="9.5" cy="6.5" r="1.3" />
+    <circle cx="13.5" cy="4" r="1" />
+    <circle cx="14.5" cy="7.8" r=".8" />
+  </svg>
+);

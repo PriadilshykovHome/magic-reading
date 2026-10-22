@@ -3,7 +3,7 @@
 import { create } from 'zustand';
 import { game } from '@game';
 import { recordTaskResult, type Progress, type Settings, type TaskOutcome } from '../engine/progress';
-import { finishLevel, type CelebrationStep, type LevelSummary } from '../engine/rewards';
+import { finishLevel, finishWarmup, type CelebrationStep, type LevelSummary } from '../engine/rewards';
 import type { RunState } from '../engine/run';
 import type { Level } from '../engine/schema';
 import { loadProgress, saveProgress } from '../sync/localCache';
@@ -12,6 +12,7 @@ interface ProgressState {
   progress: Progress;
   recordTask(outcome: TaskOutcome): void;
   finishLevel(run: RunState, level: Level): { summary: LevelSummary; steps: CelebrationStep[] };
+  finishWarmup(run: RunState): { summary: LevelSummary; steps: CelebrationStep[] };
   updateSettings(patch: Partial<Settings>): void;
 }
 
@@ -22,6 +23,11 @@ export const useProgress = create<ProgressState>()((set, get) => ({
   },
   finishLevel(run, level) {
     const result = finishLevel({ progress: get().progress, run, level, content: game.content, now: new Date() });
+    set({ progress: result.progress });
+    return { summary: result.summary, steps: result.steps };
+  },
+  finishWarmup(run) {
+    const result = finishWarmup({ progress: get().progress, run, content: game.content, now: new Date() });
     set({ progress: result.progress });
     return { summary: result.summary, steps: result.steps };
   },

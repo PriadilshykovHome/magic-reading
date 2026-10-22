@@ -38,6 +38,7 @@ test('all three levels can be played start to finish, and progress survives a re
   await expect(page).toHaveURL(/#\/map$/);
 
   for (const levelId of LEVELS) await playLevel(page, levelId);
+  await expect(page.locator('[data-warmup]')).toBeVisible(); // after three levels: the daily warm-up
 
   const before = await page.evaluate((key) => localStorage.getItem(key), KEY);
   await page.reload();

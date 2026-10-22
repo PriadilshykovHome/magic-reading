@@ -222,11 +222,13 @@
             ]
           },
           "tasks": [
-            {"type": "hearPick", "count": 2, "itemKind": "syllable", "choices": 3},
+            {"type": "hearPick", "count": 1, "itemKind": "syllable", "choices": 3},
             {"type": "bubblePop", "count": 1},
             {"type": "readPickPicture", "count": 2, "choices": 3},
+            {"type": "missingSyllable", "count": 1, "choices": 3},
             {"type": "buildWord", "count": 1, "extraTiles": 1},
-            {"type": "sentencePicture", "count": 2, "choices": 3},
+            {"type": "sentencePicture", "count": 1, "choices": 3},
+            {"type": "trueFalse", "count": 2},
             {"type": "readAloud", "count": 1, "itemKind": "word"}
           ],
           "boss": {"type": "magicDoor", "inner": "readPickPicture", "pick": "weakest"},

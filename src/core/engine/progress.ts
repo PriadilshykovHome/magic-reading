@@ -48,6 +48,8 @@ export const ProgressSchema = z.object({
       litWindows: z.array(z.string()).default([]),
       /** One-time moments already celebrated, e.g. "firstThreeStars". */
       milestones: z.array(z.string()).default([]),
+      /** The day of his last daily warm-up (one a day). */
+      lastWarmup: z.string().nullable().default(null),
     })
     .prefault({}),
   easterEggs: z.object({ found: z.array(z.string()).default([]) }).prefault({}),

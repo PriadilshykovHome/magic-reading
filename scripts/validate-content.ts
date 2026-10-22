@@ -38,6 +38,7 @@ const worldIds = existsSync(worldsDir)
 const raw: RawBundle = {
   config: load(join(content, 'config.json')),
   templates: load(join(content, 'templates.json')),
+  scenes: load(join(content, 'scenes.json')),
   cards: load(join(content, 'cards.json')),
   voice: load(join(content, 'voice.uk.json')),
   strings: load(join(content, 'strings.uk.json')),

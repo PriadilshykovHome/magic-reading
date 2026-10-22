@@ -1,0 +1,14 @@
+{
+  "actions": {
+    "sleeps": "💤",
+    "flies": "🪽",
+    "swims": "🌊",
+    "reads": "📖",
+    "eats": "🍽️",
+    "cooks": "🍲",
+    "sings": "🎵",
+    "draws": "🖍️",
+    "runs": "💨",
+    "plays": "🎲"
+  }
+}

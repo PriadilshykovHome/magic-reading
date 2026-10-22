@@ -73,6 +73,7 @@ export function buildSession<C extends GameContent>(input: SessionInput<C>): Ses
       kind: domain.kindOf(target) ?? '',
       target,
       options: built.options,
+      ...(built.answer !== undefined ? { answer: built.answer } : {}),
       data: built.data,
       instruction: boss ? `magicDoor.${logic.id}` : logic.instruction(config),
     };

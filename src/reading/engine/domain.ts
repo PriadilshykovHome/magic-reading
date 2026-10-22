@@ -6,6 +6,7 @@ import { ShortageError } from '../../core/engine/taskLogic.ts';
 import { weightedSample, type Rng } from '../../core/engine/rng.ts';
 import { hasItem, kindOf, poolOf, reviewPoolOf, syllablesOfWords, type Content, type ItemKind } from './content.ts';
 import { sentenceScore, syllableScore, wordScore } from './distractors.ts';
+import type { Swaps } from './scene.ts';
 import type { Level } from './schema.ts';
 
 export type ReadingBuildContext = BuildContext<Content>;
@@ -70,3 +71,14 @@ export const readingEngine: DomainEngine<Content> = {
   hasItem,
   createBuildContext,
 };
+
+/** What a wrong picture may swap in: the words this level knows that have a picture, and the actions. */
+export function sceneSwaps(ctx: ReadingBuildContext): Swaps {
+  const { words, actions } = ctx.content;
+  const picture = (thing: string) => words.get(`w-${thing}`)?.emoji;
+  return {
+    things: ctx.candidates('word').map((id) => id.slice('w-'.length)).filter((thing) => picture(thing)),
+    actions: [...actions.keys()],
+    samePicture: (a, b) => picture(a) === picture(b),
+  };
+}

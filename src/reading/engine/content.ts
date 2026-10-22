@@ -2,7 +2,7 @@
 import { indexGame, type GameContent, type WorldContent } from '../../core/engine/content.ts';
 import type { Card, Strings, VoiceTree, World } from '../../core/engine/schema.ts';
 import type { LevelPlan } from './curriculum.ts';
-import type { Config, Level, Lexicon, Sentence, Syllable, Word } from './schema.ts';
+import type { Config, Level, Lexicon, Sentence, Syllable, Template, Word } from './schema.ts';
 
 export type ItemKind = 'syllable' | 'word' | 'sentence';
 export const ITEM_KINDS: readonly ItemKind[] = ['syllable', 'word', 'sentence'];
@@ -10,6 +10,10 @@ export const ITEM_KINDS: readonly ItemKind[] = ['syllable', 'word', 'sentence'];
 export interface ContentBundle {
   config: Config;
   lexicon: Lexicon;
+  /** Scene action → its sign (content/scenes.json). */
+  actions: Record<string, string>;
+  /** The daily warm-up's template, if there is one. */
+  warmup?: Template;
   cards: Card[];
   voice: VoiceTree;
   strings: Strings;
@@ -23,6 +27,8 @@ export interface Content extends GameContent<World, Level, Config> {
   sentences: Map<string, Sentence>;
   /** Per level: letters known by then and what it introduces (src/reading/engine/curriculum.ts). */
   plans: Map<string, LevelPlan>;
+  actions: Map<string, string>;
+  warmup?: Template;
 }
 
 export function indexContent(bundle: ContentBundle): Content {
@@ -32,6 +38,8 @@ export function indexContent(bundle: ContentBundle): Content {
     words: new Map(bundle.lexicon.words.map((w) => [w.id, w])),
     sentences: new Map(bundle.lexicon.sentences.map((s) => [s.id, s])),
     plans: new Map(bundle.plans.map((p) => [p.id, p])),
+    actions: new Map(Object.entries(bundle.actions)),
+    ...(bundle.warmup ? { warmup: bundle.warmup } : {}),
   };
 }
 

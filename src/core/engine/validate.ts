@@ -5,6 +5,7 @@
 import type { z } from 'zod';
 import type { GameContent, LevelOf } from './content.ts';
 import { seededRandom } from './rng.ts';
+import type { TaskEntry } from './schema.ts';
 import { ShortageError, type AnyTaskLogic, type BuildContext, type DomainEngine, type TaskRegistry } from './taskLogic.ts';
 import { TEMPLATE_KEYS, templateKeys } from './text.ts';
 
@@ -99,30 +100,9 @@ function checkLevel<C extends GameContent>(
 
   // Tasks: known type, valid config, enough content to build every possible target.
   const ctx = domain.createBuildContext(content, level, seededRandom(1));
-  let total = 0;
-  let readsAlone = false;
-  let parentTasks = 0;
-  let fallbacks = 0;
-  let tasksValid = true;
-  level.tasks.forEach((entry, i) => {
-    const where = `tasks[${i}] ${entry.type}`;
-    total += entry.count;
-    const logic = registry[entry.type];
-    if (!logic) {
-      tasksValid = false;
-      return error(file, `${where}: unknown task type`);
-    }
-    const parsed = logic.configSchema.safeParse(entry);
-    if (!parsed.success) {
-      tasksValid = false;
-      for (const issue of parsed.error.issues) error(file, `${where}: ${issue.path.join('.') || '(root)'}: ${issue.message}`);
-      return;
-    }
-    if (logic.reading && !logic.needsParent) readsAlone = true;
-    if (logic.needsParent) parentTasks += entry.count;
-    if (logic.scored && !logic.needsParent) fallbacks++;
-    if (deep) dryBuild(ctx, logic, parsed.data, where, file, error);
-  });
+  const tasks = checkTasks(ctx, level.tasks, registry, file, error, deep);
+  const { total, parentTasks, fallbacks, valid: tasksValid } = tasks;
+  let { readsAlone } = tasks;
   if (total < config.session.minTasks || total > config.session.maxTasks) {
     error(file, `tasks add up to ${total}; a level needs ${config.session.minTasks}–${config.session.maxTasks}`);
   }
@@ -148,6 +128,38 @@ function checkLevel<C extends GameContent>(
     }
   }
   if (tasksValid && !readsAlone) error(file, 'every level needs a reading task he can solve alone (reading vs listening rule)');
+}
+
+/** Each task entry: a known type, a valid config, and (deep) enough content for every target it could ask. */
+export function checkTasks<C extends GameContent>(
+  ctx: BuildContext<C>,
+  entries: readonly TaskEntry[],
+  registry: TaskRegistry,
+  file: string,
+  error: Report,
+  deep: boolean,
+) {
+  const out = { total: 0, readsAlone: false, parentTasks: 0, fallbacks: 0, valid: true };
+  entries.forEach((entry, i) => {
+    const where = `tasks[${i}] ${entry.type}`;
+    out.total += entry.count;
+    const logic = registry[entry.type];
+    if (!logic) {
+      out.valid = false;
+      return error(file, `${where}: unknown task type`);
+    }
+    const parsed = logic.configSchema.safeParse(entry);
+    if (!parsed.success) {
+      out.valid = false;
+      for (const issue of parsed.error.issues) error(file, `${where}: ${issue.path.join('.') || '(root)'}: ${issue.message}`);
+      return;
+    }
+    if (logic.reading && !logic.needsParent) out.readsAlone = true;
+    if (logic.needsParent) out.parentTasks += entry.count;
+    if (logic.scored && !logic.needsParent) out.fallbacks++;
+    if (deep) dryBuild(ctx as BuildContext<GameContent>, logic, parsed.data, where, file, error);
+  });
+  return out;
 }
 
 function dryBuild(ctx: BuildContext<GameContent>, logic: AnyTaskLogic, config: unknown, where: string, file: string, error: Report) {

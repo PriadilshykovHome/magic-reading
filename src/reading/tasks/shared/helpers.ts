@@ -13,7 +13,7 @@ export function useDisplayText(): (id: string) => string {
   );
 }
 
-/** Placeholder picture (emoji) until the illustrations exist. */
+/** A word's placeholder picture (emoji) until the illustrations exist. Sentences are drawn by SceneView. */
 export function pictureOf(id: string): string {
-  return content.words.get(id)?.emoji ?? content.sentences.get(id)?.emoji ?? '';
+  return content.words.get(id)?.emoji ?? '';
 }

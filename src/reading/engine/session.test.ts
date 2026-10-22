@@ -6,12 +6,16 @@ import { emptyProgress, type Progress } from '../../core/engine/progress';
 import { seededRandom } from '../../core/engine/rng';
 import { buildSession } from '../../core/engine/session';
 import { readingEngine } from './domain';
+import type { ScenePicksData } from '../tasks/sentencePicture/logic';
+import { sceneKey } from './scene';
 import { testContent } from './testContent';
 
 const content = testContent();
 const session = (levelId: string, seed: number, parentNearby = true, progress: Progress = emptyProgress()) =>
   buildSession({ content, level: content.levels.get(levelId)!, domain: readingEngine, progress, settings: { parentNearby }, registry: taskLogics, rng: seededRandom(seed), now: new Date(2026, 9, 21) });
 const exists = (id: string) => content.syllables.has(id) || content.words.has(id) || content.sentences.has(id);
+/** An option is an item, a composed picture (sentencePicture) or a verdict (trueFalse). */
+const validOption = (id: string) => exists(id) || id.startsWith('scene ') || id === 'yes' || id === 'no';
 
 test('every level builds valid sessions, with or without a parent nearby', () => {
   for (const levelId of content.levelOrder) {
@@ -27,10 +31,10 @@ test('every level builds valid sessions, with or without a parent nearby', () =>
         for (const t of tasks) {
           expect(t.reading).toBe(taskLogics[t.type]!.reading);
           if (t.options.length === 0) continue;
-          expect(t.options).toContain(t.target);
+          expect(t.options).toContain(t.answer ?? t.target);
           expect(new Set(t.options).size).toBe(t.options.length);
           if (t.type !== 'bubblePop') expect(t.options.length).toBeLessThanOrEqual(3);
-          expect(t.options.every(exists)).toBe(true);
+          expect(t.options.every(validOption)).toBe(true);
         }
       }
     }
@@ -62,10 +66,10 @@ test('task contents: МАМА and МИШКО doors, build-a-word tiles, bubbles,
     expect(finale.at(-1)).toMatchObject({ boss: true, target: 'w-myshko' }); // his name, behind the last door…
     expect(finale.slice(0, -1).some((t) => t.target === 'w-myshko' || t.options.includes('w-myshko'))).toBe(false); // …and nowhere before
     for (const t of session('tower-of-syllables/03', seed).tasks.filter((x) => x.type === 'sentencePicture')) {
-      const target = content.sentences.get(t.target)!;
-      for (const id of t.options.filter((o) => o !== t.target)) {
-        expect(target.depicts.every((d) => content.sentences.get(id)!.depicts.includes(d))).toBe(false);
-      }
+      const { scenes } = t.data as ScenePicksData;
+      const own = sceneKey(content.sentences.get(t.target)!.scene);
+      expect(sceneKey(scenes[t.target]!)).toBe(own); // the sentence's own picture…
+      for (const id of t.options.filter((o) => o !== t.target)) expect(sceneKey(scenes[id]!)).not.toBe(own); // …and near misses
     }
   }
 });

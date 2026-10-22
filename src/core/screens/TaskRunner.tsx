@@ -49,12 +49,13 @@ export interface StartAt {
   target?: string;
 }
 
-export function Runner({ level, startAt, seed }: { level: Level; startAt?: StartAt; seed?: number }) {
+export function Runner({ level, startAt, seed, warmup = false }: { level: Level; startAt?: StartAt; seed?: number; warmup?: boolean }) {
   const navigate = useNavigate();
   const { content, logics: taskLogics, engine } = game;
   const { config } = content;
   const recordTask = useProgress((s) => s.recordTask);
   const finishLevel = useProgress((s) => s.finishLevel);
+  const finishWarmup = useProgress((s) => s.finishWarmup);
   const balance = useProgress((s) => sparkBalance(s.progress));
   const setLastResult = useGame((s) => s.setLastResult);
   const musicInTasks = useProgress((s) => s.progress.settings.musicInTasks);
@@ -79,7 +80,7 @@ export function Runner({ level, startAt, seed }: { level: Level; startAt?: Start
       const logic = taskLogics[task.type]!;
       const entry = level.tasks.find((e) => e.type === task.type) ?? { type: task.type, count: 1 };
       const rebuilt = logic.build(engine.createBuildContext(content, level, seededRandom(seed ?? 1)), logic.configSchema.parse(entry), startAt!.target!);
-      built.tasks[at] = { ...task, target: startAt!.target!, options: rebuilt.options, data: rebuilt.data };
+      built.tasks[at] = { ...task, target: startAt!.target!, options: rebuilt.options, answer: rebuilt.answer, data: rebuilt.data };
     }
     return built;
   });
@@ -216,9 +217,14 @@ export function Runner({ level, startAt, seed }: { level: Level; startAt?: Start
       }, 420);
       return;
     }
+    if (warmup) {
+      setLastResult(finishWarmup(run.current));
+      navigate('/warmup/done', { replace: true });
+      return;
+    }
     setLastResult(finishLevel(run.current, level));
     navigate(`${levelPath(level.id)}/done`, { replace: true });
-  }, [index, session, finishLevel, level, navigate, setLastResult]);
+  }, [index, session, finishLevel, finishWarmup, warmup, level, navigate, setLastResult]);
 
   const onComplete = useCallback(() => {
     if (busy.current) return;

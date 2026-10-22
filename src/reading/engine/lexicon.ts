@@ -2,6 +2,7 @@
 // Nothing derivable is written twice: a word's text and syllables come from its hand-written
 // split, syllable ids from their letters, and every audio and picture path from the item's id.
 // The letter rules (vowels, Latin spellings, soft sign, digraphs) are data: content/config.json.
+import { parseScene, thingsOf } from './scene.ts';
 import type { Letters, Lexicon, LexiconFile, Sentence, Syllable, Word } from './schema.ts';
 
 /** Latin key for ids and file names ("МИШ" → "mysh"); anything else becomes "-". */
@@ -48,7 +49,7 @@ export interface DerivedLexicon {
 
 export type LexiconReport = (file: string, message: string) => void;
 
-export function deriveLexicon(sources: readonly LexiconSource[], letters: Letters, error: LexiconReport): DerivedLexicon {
+export function deriveLexicon(sources: readonly LexiconSource[], letters: Letters, actions: readonly string[], error: LexiconReport): DerivedLexicon {
   const { vowels } = letters;
   const syllables = new Map<string, Syllable>();
   const fileOf = new Map<string, string>();
@@ -107,15 +108,21 @@ export function deriveLexicon(sources: readonly LexiconSource[], letters: Letter
         if (row.wordStartsSec.length !== words.length) error(file, `${row.id}: wordStartsSec needs one time per word`);
         if (row.wordStartsSec.some((t, i) => i > 0 && t <= row.wordStartsSec![i - 1]!)) error(file, `${row.id}: wordStartsSec must increase`);
       }
+      let scene;
+      try {
+        scene = parseScene(row.scene, actions);
+      } catch (e) {
+        error(file, `${row.id}: scene "${row.scene}": ${e instanceof Error ? e.message : String(e)}`);
+        continue;
+      }
       sentences.push({
         id: row.id,
         text: row.text,
         words,
-        depicts: row.depicts,
+        scene,
+        depicts: thingsOf(scene),
         audio: `voice/sentences/${name}.mp3`,
         ...(row.wordStartsSec ? { wordStartsSec: row.wordStartsSec } : {}),
-        scene: `img/scenes/${name}.webp`,
-        emoji: row.emoji,
       });
       fileOf.set(row.id, file);
     }

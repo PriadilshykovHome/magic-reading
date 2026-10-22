@@ -24,9 +24,9 @@ function withGarden(units: unknown[], words?: unknown[]): RawBundle {
           { id: 'w-oleksandr', split: 'О-ЛЕК-САНДР', emoji: '👨' },
         ],
         sentences: [
-          { id: 's-tato-nese-syr', text: 'Тато несе сир.', depicts: ['tato', 'syr'], emoji: '👨🧀' },
-          { id: 's-sova-na-derevi', text: 'Сова на дереві.', depicts: ['sova', 'derevo'], emoji: '🦉🌳' },
-          { id: 's-mama-i-sestra', text: 'Мама і сестра.', depicts: ['mama', 'sestra'], emoji: '👩👧' },
+          { id: 's-tato-nese-syr', text: 'Тато несе сир.', scene: 'tato has syr' },
+          { id: 's-kit-na-derevi', text: 'Кіт на дереві.', scene: 'kit on derevo' },
+          { id: 's-mama-i-sestra', text: 'Мама і сестра.', scene: 'mama and sestra' },
         ],
       },
     },

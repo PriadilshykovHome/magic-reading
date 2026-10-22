@@ -12,10 +12,12 @@ const configSchema = z.strictObject({
 type Config = z.output<typeof configSchema>;
 
 export interface BuildWordData {
-  /** The word's syllable ids in order: one slot each. */
+  /** The word's syllable ids in order (or a sentence's words, for buildSentence): one slot each. */
   slots: string[];
-  /** Tiles to place, shuffled: the slots' syllables plus the extra ones. */
+  /** Tiles to place, shuffled: the slots' pieces plus the extra ones. */
   tiles: string[];
+  /** The tiles are a sentence's words (plain text), not syllable ids. */
+  words?: true;
 }
 
 export const buildWord: ReadingTaskLogic<Config, BuildWordData> = {

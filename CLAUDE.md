@@ -108,6 +108,13 @@ docs/PLAN.md
 - Adding a level or world means content and assets only. If a level needs a code change,
   the engine or a task type is missing something; fix that rather than special-casing the level.
 - Syllable splits are written by hand in the lexicon, never auto-hyphenated.
+- A sentence's picture is a scene spec, `"scene": "kit:small sleeps on dyvan"` (who[:size]
+  [action] [on|in|under|near|and|has what[:size]]; things are word ids without `w-`, actions come
+  from `content/scenes.json`). `SceneView` composes it from the words' pictures, and wrong pictures
+  change exactly one thing the sentence says (`src/reading/engine/scene.ts`), so no sentence needs
+  hand-made distractors.
+- The daily warm-up («Чарівна розминка», the `warmup` template) reviews finished levels once a day
+  from the map's cauldron; it lights the day's castle window and records no level progress.
 - Text is shown in UPPERCASE unless the parent turns on lowercase sentences.
 
 ## Task plug-in contract
@@ -166,8 +173,9 @@ builds the level's `boss.inner` type on the weakest/newest (or fixed) item and m
 
 - **Reading tasks never play the target audio before the answer** (otherwise they become
   listening tasks). After the answer, the target audio always plays as confirmation.
-  Reading tasks: `readPickPicture`, `sentencePicture`, `readAloud`, and `magicDoor` around any
-  of them. Listening is the point of `hearPick`, `bubblePop`, `buildWord` and `syllableMerge`.
+  Reading tasks: `readPickPicture`, `sentencePicture`, `missingSyllable`, `trueFalse`,
+  `readAloud`, and `magicDoor` around any of them. Listening is the point of `hearPick`,
+  `bubblePop`, `buildWord`, `buildSentence` and `syllableMerge`.
   Every level must include reading tasks he can solve alone, and every Magic Door is one.
 - **Personal data:** only first names (Михайло, Мишко and their case forms, мама Аліна,
   тато Олександр) and the Kharkiv connection may appear in code, content, tests or commits.

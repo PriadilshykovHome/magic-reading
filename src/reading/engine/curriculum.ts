@@ -3,6 +3,7 @@
 // letters known so far, the items it introduces, review from everything earlier, its intro and
 // Magic Door, its card and what unlocks it. Content grows by a line per word and per level.
 import type { WorldContent } from '../../core/engine/content.ts';
+import { WARMUP_ID } from '../../core/engine/rewards.ts';
 import type { World } from '../../core/engine/schema.ts';
 import { lettersOf, translit } from './lexicon.ts';
 import {
@@ -228,6 +229,27 @@ export function expandCurriculum(
     })),
     plans,
   };
+}
+
+/** Levels he must have finished before the daily warm-up has enough to review. */
+export const WARMUP_AFTER_LEVELS = 3;
+
+/**
+ * Today's warm-up: a few tasks from the warm-up template over everything he has finished (the
+ * picker favours what is most overdue), plus a small door. Null until he has finished enough.
+ */
+export function warmupLevel(template: Template | undefined, finished: readonly string[], recentSentence: string | undefined): Level | null {
+  if (!template || finished.length < WARMUP_AFTER_LEVELS || !recentSentence) return null;
+  return LevelSchema.parse({
+    id: WARMUP_ID,
+    title: template.title,
+    unlockAfter: null,
+    intro: { voice: template.intro.voice, demo: { type: 'readAlong', items: [recentSentence] } },
+    pool: {},
+    reviewFrom: [...finished],
+    tasks: template.tasks,
+    boss: { type: 'magicDoor', inner: template.boss.inner, pick: template.boss.pick },
+  });
 }
 
 export interface CurveRow {
