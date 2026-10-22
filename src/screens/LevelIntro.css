@@ -2,13 +2,6 @@
   justify-content: space-between;
 }
 
-.intro-back {
-  position: absolute;
-  top: calc(16px + env(safe-area-inset-top));
-  left: calc(16px + env(safe-area-inset-left));
-  z-index: 1;
-}
-
 .intro-stage {
   position: relative;
   display: flex;

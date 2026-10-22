@@ -4,7 +4,7 @@ import { sfx } from '../audio/sfx';
 import { useMusic } from '../audio/useMusic';
 import { voice, type Policy } from '../audio/voice';
 import { Sonya, type SonyaMood } from '../characters/Sonya';
-import { content, levelPath, mapPath } from '../content/load';
+import { content, levelPath } from '../content/load';
 import { sparkBalance } from '../engine/progress';
 import { isLevelUnlocked } from '../engine/rewards';
 import { seededRandom } from '../engine/rng';
@@ -20,8 +20,8 @@ import { fmt, t } from '../strings';
 import { taskLogics } from '../tasks/logicRegistry';
 import { taskTypes } from '../tasks/registry';
 import { CandleRow, SparkJar } from '../ui/Candles';
-import { HomeIcon, LockIcon, SpeakerIcon } from '../ui/Icons';
-import { HoldButton } from '../ui/HoldButton';
+import { HomeButton } from '../ui/HomeButton';
+import { LockIcon, SpeakerIcon } from '../ui/Icons';
 import { useLevel } from './useLevel';
 import '../tasks/tasks.css';
 import './TaskRunner.css';
@@ -283,9 +283,7 @@ export function Runner({ level, startAt, seed }: { level: Level; startAt?: Start
       <Scene candles={CANDLES} moon={false} quiet />
 
       <header className="runner-bar">
-        <HoldButton holdMs={1000} onHold={() => navigate(mapPath(level.id))} label={t.play.home}>
-          <HomeIcon />
-        </HoldButton>
+        <HomeButton hold />
         <CandleRow total={session.tasks.length} lit={lit} label={fmt(t.play.progress, { done: lit, total: session.tasks.length })} />
         <div ref={jar} className="runner-jar">
           {/* the jar counts each spark as it lands */}

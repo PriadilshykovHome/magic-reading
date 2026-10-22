@@ -30,6 +30,17 @@
   stroke-dashoffset: 0;
 }
 
+/* ---------- Home (the door) and Map, top-left on every screen ---------- */
+
+.screen-nav {
+  position: absolute;
+  top: calc(16px + env(safe-area-inset-top));
+  left: calc(16px + env(safe-area-inset-left));
+  z-index: 5;
+  display: flex;
+  gap: 16px;
+}
+
 /* ---------- big round action buttons ---------- */
 
 .big-button {

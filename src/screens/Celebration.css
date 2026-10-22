@@ -65,10 +65,11 @@
 
 /* ---------- corners: Соня and the card album ---------- */
 
+/* Next to the Home button, which owns the top-left corner. */
 .celebration-sonya {
   position: absolute;
   top: calc(16px + env(safe-area-inset-top));
-  left: calc(16px + env(safe-area-inset-left));
+  left: calc(16px + var(--tap-min) + 16px + env(safe-area-inset-left));
   width: clamp(60px, 13vmin, 110px);
 }
 

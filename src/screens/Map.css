@@ -47,8 +47,15 @@
   gap: 16px;
 }
 
-.map-bar-gap {
-  width: var(--tap-min);
+/* Both sides equally wide, so the title stays centred. */
+.map-bar-side {
+  display: flex;
+  flex: 1 1 0;
+  gap: 16px;
+}
+
+.map-bar-side.is-end {
+  justify-content: flex-end;
 }
 
 .map-next svg {

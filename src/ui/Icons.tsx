@@ -1,9 +1,12 @@
 // Small line icons (the UI is icon-driven: he can't read labels yet).
 const common = { fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' } as const;
 
-export const HomeIcon = () => (
+/** The magic door: "home" everywhere in the game. */
+export const DoorIcon = () => (
   <svg viewBox="0 0 24 24" aria-hidden="true" {...common}>
-    <path d="M4 11l8-7 8 7M6 10v10h4v-6h4v6h4V10" />
+    <path d="M6 21V10.5a6 6 0 0 1 12 0V21M3.5 21h17M12 4.5V21" />
+    <circle cx="10" cy="14" r=".9" fill="currentColor" stroke="none" />
+    <circle cx="14" cy="14" r=".9" fill="currentColor" stroke="none" />
   </svg>
 );
 

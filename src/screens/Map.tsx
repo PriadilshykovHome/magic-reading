@@ -13,6 +13,7 @@ import { useGame } from '../store/game';
 import { useProgress } from '../store/progress';
 import { fmt, t } from '../strings';
 import { SparkJar } from '../ui/Candles';
+import { HomeButton } from '../ui/HomeButton';
 import { BackIcon, LockIcon, StarIcon } from '../ui/Icons';
 import './Map.css';
 
@@ -112,21 +113,22 @@ export function MapScreen() {
       </svg>
 
       <header className="map-bar">
-        {towerIndex > 0 ? (
-          <button type="button" className="icon-button" aria-label={t.map.prevWorld} onClick={() => goTower(-1)}>
-            <BackIcon />
-          </button>
-        ) : (
-          <span className="map-bar-gap" />
-        )}
+        <div className="map-bar-side">
+          <HomeButton />
+          {towerIndex > 0 && (
+            <button type="button" className="icon-button" aria-label={t.map.prevWorld} onClick={() => goTower(-1)}>
+              <BackIcon />
+            </button>
+          )}
+        </div>
         <h1 className="map-title">{tower.world.title}</h1>
-        {towerIndex < content.worlds.length - 1 ? (
-          <button type="button" className="icon-button map-next" aria-label={t.map.nextWorld} onClick={() => goTower(1)} data-next-tower>
-            <BackIcon />
-          </button>
-        ) : (
-          <span className="map-bar-gap" />
-        )}
+        <div className="map-bar-side is-end">
+          {towerIndex < content.worlds.length - 1 && (
+            <button type="button" className="icon-button map-next" aria-label={t.map.nextWorld} onClick={() => goTower(1)} data-next-tower>
+              <BackIcon />
+            </button>
+          )}
+        </div>
       </header>
 
       {levels.map((level, i) => {

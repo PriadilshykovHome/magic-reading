@@ -17,15 +17,17 @@ import { useProgress } from '../store/progress';
 import { fmt, t } from '../strings';
 import { correctMark } from '../tasks/shared/helpers';
 import { SparkJar } from '../ui/Candles';
+import { HomeButton, ScreenNav } from '../ui/HomeButton';
 import { AgainIcon, BookIcon, CastleIcon, StarIcon } from '../ui/Icons';
 import { DoorArt } from './DoorArt';
 import { useLevel } from './useLevel';
 import './Celebration.css';
 
 const CANDLES: CandleSpot[] = [
-  { x: 6, y: 10, scale: 1 },
+  // Top left belongs to the Home button.
+  { x: 5, y: 34, scale: 0.9 },
   { x: 90, y: 22, scale: 0.8 },
-  { x: 8, y: 70, scale: 0.6 },
+  { x: 8, y: 72, scale: 0.6 },
   { x: 88, y: 78, scale: 0.7, wide: true },
 ];
 const SKIPPABLE_AFTER_MS = 2000;
@@ -279,6 +281,11 @@ export function Celebration({
   return (
     <main className="screen celebration-screen" onClick={skip}>
       <Scene candles={CANDLES} />
+      {buttons && (
+        <ScreenNav>
+          <HomeButton />
+        </ScreenNav>
+      )}
 
       <AnimatePresence>
         {!doorOpen && (

@@ -12,7 +12,8 @@ import { Scene } from '../fx/ambient/Scene';
 import { useDisplayText } from '../tasks/shared/helpers';
 import { useProgress } from '../store/progress';
 import { t } from '../strings';
-import { BackIcon, PlayIcon } from '../ui/Icons';
+import { HomeButton, MapButton, ScreenNav } from '../ui/HomeButton';
+import { PlayIcon } from '../ui/Icons';
 import { useLevel } from './useLevel';
 import './LevelIntro.css';
 
@@ -99,9 +100,10 @@ function Intro({ level }: { level: Level }) {
   return (
     <main className="screen intro-screen">
       <Scene moon={false} quiet />
-      <button type="button" className="icon-button intro-back" aria-label={t.map.backToDoor} onClick={() => navigate(mapPath(level.id))}>
-        <BackIcon />
-      </button>
+      <ScreenNav>
+        <HomeButton />
+        <MapButton to={mapPath(level.id)} />
+      </ScreenNav>
 
       <div className="intro-stage">
         <div className="intro-sonya">
