@@ -36,6 +36,16 @@ export interface JourneyRegion {
   gate: Point & { w: number; h: number };
 }
 
+/** A free place beside the road (across from a door in a side lane) for a signpost. */
+export interface JourneySpot extends Point {
+  region: number;
+  /** The widest a sign may be here (it is SIGN_H tall). */
+  maxW: number;
+}
+
+/** A signpost's height. */
+export const SIGN_H = 64;
+
 export interface JourneyLayout {
   orientation: Orientation;
   /** The track: long along the scrolling axis, the viewport's size across it. */
@@ -45,6 +55,7 @@ export interface JourneyLayout {
   door: number;
   regions: JourneyRegion[];
   nodes: JourneyNode[];
+  spots: JourneySpot[];
 }
 
 const GAP = 16;
@@ -90,6 +101,16 @@ export function journeyLayout(regions: readonly RegionInput[], viewport: { width
     });
     const length = Math.ceil(at + Math.max(H * 0.5, bigH));
     for (const { at: a, node } of rise) nodes.push({ ...node, y: length - a });
+    // Across from a door in a side lane, between the screen's edge and the centre lane.
+    const spots: JourneySpot[] = [];
+    const reach = W / 2 - big / 2 - GAP - 8;
+    if (reach >= 72) {
+      for (const node of nodes) {
+        if (node.x === W / 2) continue;
+        const left = node.x > W / 2;
+        spots.push({ x: left ? 8 + reach / 2 : W - 8 - reach / 2, y: node.y, maxW: Math.min(reach, 140), region: node.region });
+      }
+    }
     regions.forEach((region, r) => {
       const gateY = length - gateAt[r]!;
       placed.push({
@@ -100,7 +121,7 @@ export function journeyLayout(regions: readonly RegionInput[], viewport: { width
         gate: { x: W / 2, y: gateY, ...gate },
       });
     });
-    return { orientation, width: W, height: length, door, regions: placed, nodes };
+    return { orientation, width: W, height: length, door, regions: placed, nodes, spots };
   }
 
   // Landscape: doors are far enough apart along the road; the wave uses the height available.
@@ -121,7 +142,17 @@ export function journeyLayout(regions: readonly RegionInput[], viewport: { width
   });
   const length = Math.ceil(at + Math.max(W * 0.5, big));
   placed.forEach((region, r) => (region.end = r < placed.length - 1 ? placed[r + 1]!.start : length));
-  return { orientation, width: length, height: H, door, regions: placed, nodes };
+  // Above or below a door in a side lane, when the road leaves room (not on phones held sideways).
+  const spots: JourneySpot[] = [];
+  const room = H / 2 - bigH / 2 - GAP - 8;
+  if (amplitude > 0 && room >= SIGN_H + 8) {
+    for (const node of nodes) {
+      if (node.y === H / 2) continue;
+      const above = node.y > H / 2;
+      spots.push({ x: node.x, y: above ? 8 + room / 2 : H - 8 - room / 2, maxW: 140, region: node.region });
+    }
+  }
+  return { orientation, width: length, height: H, door, regions: placed, nodes, spots };
 }
 
 /**

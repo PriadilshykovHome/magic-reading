@@ -746,7 +746,7 @@ Build in 9 phases, plus the growth steps after Phase 6, each ending in something
   - the curve report, lighter startup and spaced-repetition due intervals.
 - G4. The journey map: road, regions, Іскрик walking, auto-centre. Tested with a generated 300-level fixture.
 - G5. The scene composer, `missingSyllable`, `trueFalse`, `buildSentence` and the daily warm-up. Done: W1·06 and W2·04 already use the new games.
-- G6. Props, readable signs, and Ukraine and Kharkiv touches.
+- G6. Props, readable signs, and Ukraine and Kharkiv touches. In progress: the road's free spots for signposts are done (journeyLayout `spots`).
 - G7. Content wave 1: worlds 3 to 5 (about 60 levels), with a native-speaker review list.
 
 Later waves (worlds 6 to 13) are written just in time, after Phase 9. `caseMatch` and `story` arrive with worlds 8 and 11.

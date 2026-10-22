@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { journeyLayout, type RegionInput } from './journeyLayout';
+import { journeyLayout, SIGN_H, type RegionInput } from './journeyLayout';
 
 /** The planned 13 worlds (about 290 levels), each ending in a finale, with a review every 7th. */
 const PLANNED = [6, 5, 20, 18, 22, 22, 24, 25, 25, 25, 35, 35, 25];
@@ -19,12 +19,13 @@ const VIEWPORTS = [
   { width: 1024, height: 672 },
 ];
 
-test('every door and gate on a 290-level road keeps 16 px from its neighbours and stays on screen across the road', () => {
+test('every door, gate and signpost on a 290-level road keeps 16 px from its neighbours and stays on screen across the road', () => {
   for (const viewport of VIEWPORTS) {
     const layout = journeyLayout(regions, viewport);
     const boxes = [
       ...layout.nodes.map((n) => ({ name: `door ${n.n}`, ...n })),
       ...layout.regions.map((r) => ({ name: `gate ${r.id}`, ...r.gate })),
+      ...layout.spots.map((s, i) => ({ name: `sign ${i}`, x: s.x, y: s.y, w: s.maxW, h: SIGN_H })),
     ].map((b) => ({ name: b.name, l: b.x - b.w / 2, r: b.x + b.w / 2, t: b.y - b.h / 2, b: b.y + b.h / 2 }));
     const where = `${viewport.width}×${viewport.height}`;
     expect(layout.nodes).toHaveLength(PLANNED.reduce((a, b) => a + b));
