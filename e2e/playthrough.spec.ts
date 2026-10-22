@@ -12,9 +12,12 @@ async function playLevel(page: Page, levelId: string) {
     expect(Date.now(), `${levelId} should finish`).toBeLessThan(deadline);
     const correct = page.locator('.runner-stage [data-correct]').first();
     if (await correct.count()) {
+      // The answer may be gone by now (the level just ended): every step gives up after 2 s.
+      const wait = { timeout: 2_000 };
+      const bubble = await correct.evaluate((el) => el.classList.contains('bubble'), undefined, wait).catch(() => null);
       // Bubbles keep moving, so tap them directly; everything else like a finger would.
-      if (await correct.evaluate((el) => el.classList.contains('bubble'))) await correct.evaluate((el: HTMLElement) => el.click());
-      else await correct.click({ force: true, timeout: 2_000 }).catch(() => {});
+      if (bubble) await correct.evaluate((el: HTMLElement) => el.click(), undefined, wait).catch(() => {});
+      else if (bubble === false) await correct.click({ force: true, ...wait }).catch(() => {});
     }
     await page.waitForTimeout(150);
   }
