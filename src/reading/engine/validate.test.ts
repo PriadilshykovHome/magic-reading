@@ -11,11 +11,12 @@ const lexicon = (raw: RawBundle, w = 0) => raw.worlds[w]!.lexicon.data as { word
 
 test('the real content is valid; missing audio/pictures are warnings (errors with --strict)', () => {
   expect(errorsOf(rawBundle())).toBe('');
-  const lenient = validateContent(rawBundle(), taskLogics, { hasAsset: () => false }).issues;
+  // Asset checks only: the deep dry-build above already covered the content.
+  const lenient = validateContent(rawBundle(), taskLogics, { hasAsset: () => false, deep: false }).issues;
   expect(lenient.length).toBeGreaterThan(0);
   expect(lenient.every((i) => i.severity === 'warning')).toBe(true);
-  expect(validateContent(rawBundle(), taskLogics, { hasAsset: () => false, strictAssets: true }).issues.some((i) => i.severity === 'error')).toBe(true);
-});
+  expect(validateContent(rawBundle(), taskLogics, { hasAsset: () => false, strictAssets: true, deep: false }).issues.some((i) => i.severity === 'error')).toBe(true);
+}, 60_000); // grows with the curriculum
 
 test('a broken content file is caught, with a message pointing at the problem', () => {
   const cases: [string, (raw: RawBundle) => void, RegExp][] = [
