@@ -1,8 +1,7 @@
-// All user-facing text comes from here. Never hard-code it in components.
-import strings from '../../content/strings.uk.json';
+// All user-facing text comes from here (the active game's strings file). Never hard-code it in components.
+import { game } from '@game';
 
-export type Strings = typeof strings;
-export const t: Strings = strings;
+export const t = game.strings;
 
 /** Fills {placeholders} in a UI string: fmt(t.map.level, { n: 2 }). */
 export function fmt(template: string, vars: Record<string, string | number>): string {

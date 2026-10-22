@@ -1,0 +1,54 @@
+{
+  "config": {
+    "session": { "minTasks": 8, "maxTasks": 10, "reviewShare": 0.25 },
+    "answers": { "maxChoices": 3, "hintAfterMisses": 2 },
+    "boxes": { "max": 3, "weights": [3, 2, 1], "intervalDays": [0, 2, 7] },
+    "stars": { "three": 0.9, "two": 0.7 },
+    "sparks": { "perCorrect": 1, "goldenChance": 0, "goldenValue": 5, "praiseEvery": [2, 3] },
+    "streaks": { "wand": 3, "wave": 5 },
+    "mastery": { "firstTryOk": 3, "distinctDays": 2 },
+    "creature": { "hatchAfterLevel": "sky/01", "youngAtSparks": 150, "bigAtSparks": 400 },
+    "windows": { "surpriseEvery": 7, "surpriseCard": "card-comet" },
+    "eggs": { "pysankyDaysBefore": 3, "pysankyDaysAfter": 7, "pysankyCount": 5, "pysankyCard": "card-comet", "eveningFromHour": 19, "morningUntilHour": 10 },
+    "props": { "perScreen": 0, "dates": {}, "chance": {} },
+    "grammar": { "patronymicVocative": [["ovych", "ovychu"]] }
+  },
+  "cards": [{ "id": "card-comet", "name": "Comet", "emoji": "☄️", "art": "img/cards/comet.webp" }],
+  "voice": {
+    "greeting": "Hello, {nameVoc}!",
+    "praise": ["Well done!", "Great!"],
+    "retry": "Try again!",
+    "hint": "Count slowly.",
+    "streak": { "wand": "Three in a row!", "wave": "Five in a row!" },
+    "goldenSpark": "A golden spark!",
+    "intro": { "sky": "Let's count the stars." },
+    "instructions": { "countPick": "How many stars?" },
+    "magicDoor": { "countPick": "Count them to open the door." }
+  },
+  "strings": {
+    "app": { "title": "Counting Stars" },
+    "child": { "name": "Mykhailo", "short": "Mishko", "vocative": "Mishko", "vocativeFull": "Mykhailyku", "genitive": "Mishka" },
+    "family": { "mom": "Alina", "dad": "Oleksandr" },
+    "places": { "birthCity": "Kharkiv" },
+    "names": { "mascot": "Sonya", "companion": "Iskryk" }
+  },
+  "world": { "id": "sky", "order": 1, "title": "The Night Sky", "look": "tower" },
+  "levels": [
+    {
+      "id": "sky/01", "title": "One to three", "unlockAfter": null,
+      "intro": { "voice": "intro.sky", "demo": { "type": "count", "items": ["n-1"] } },
+      "pool": { "numbers": ["n-1", "n-2", "n-3"] },
+      "tasks": [{ "type": "countPick", "count": 9 }],
+      "boss": { "type": "magicDoor", "inner": "countPick", "pick": "newest" }
+    },
+    {
+      "id": "sky/02", "title": "Four and five", "unlockAfter": "sky/01",
+      "intro": { "voice": "intro.sky", "demo": { "type": "count", "items": ["n-4"] } },
+      "pool": { "numbers": ["n-4", "n-5"] },
+      "reviewEarlier": true,
+      "tasks": [{ "type": "countPick", "count": 9 }],
+      "boss": { "type": "magicDoor", "inner": "countPick", "item": "n-5" },
+      "reward": { "card": "card-comet" }
+    }
+  ]
+}

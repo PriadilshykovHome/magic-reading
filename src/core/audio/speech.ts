@@ -1,5 +1,6 @@
-// Fallback voice: the browser's Ukrainian speech, for every line or item that has no recording
-// yet. The voice scheduler decides when it plays; this only knows how.
+// Fallback voice: the browser's speech in the game's language, for every line or item that has
+// no recording yet. The voice scheduler decides when it plays; this only knows how.
+import { game } from '@game';
 import { SILENT } from '../testMode';
 import type { Playback } from './scheduler';
 
@@ -17,7 +18,8 @@ let refused: Refused[] = [];
 let refusedAt = 0;
 
 function pickVoice() {
-  voice = speechSynthesis.getVoices().find((v) => v.lang.toLowerCase().startsWith('uk')) ?? null;
+  const language = game.locale.split('-')[0]!.toLowerCase();
+  voice = speechSynthesis.getVoices().find((v) => v.lang.toLowerCase().startsWith(language)) ?? null;
 }
 
 if (supported) {
@@ -30,7 +32,7 @@ export function speechPlayback(text: string, rate: number, volume: number): Play
   let finish = () => {};
   const done = new Promise<void>((resolve) => (finish = resolve));
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'uk-UA';
+  u.lang = game.locale;
   if (voice) u.voice = voice;
   u.rate = rate;
   u.pitch = 1.1;

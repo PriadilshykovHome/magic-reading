@@ -10,13 +10,20 @@ import type { Level } from './engine/schema';
 import type { DomainEngine, TaskRegistry } from './engine/taskLogic';
 import type { TaskType } from './tasks/types';
 
-export interface GameData {
+export interface GameData<Strings extends object = object> {
   /** Also the cloud progress document: players/{uid}/games/{id}. */
   id: string;
+  /** Its language, for speech and lower-casing ('uk-UA'). */
+  locale: string;
+  /** Its recordings' folder under public/audio/ ('uk'). */
+  audioRoot: string;
+  /** All UI text (core reads it as `t`, src/core/strings.ts). A game declares
+   *  `GameData<typeof itsStrings>`, so core's screens are type-checked against its keys. */
+  strings: Strings;
   content: GameContent;
   engine: DomainEngine;
   logics: TaskRegistry;
-  /** What Соня says for an item, and its recording under public/audio/uk/ if it has one. */
+  /** What Соня says for an item, and its recording under public/audio/<audioRoot>/ if it has one. */
   item(id: string): { text: string; audio?: string };
   /** Every item a level may ask about, so its audio can preload. */
   levelItems(level: Level): string[];

@@ -1,5 +1,6 @@
 // The reading game as the shared shell sees it (imported as '@game'): content, the domain
 // engine, task logic and what Соня says for each item. No UI here; that's '@game-ui'.
+import strings from '../../content/strings.uk.json';
 import type { GameData } from '../core/game';
 import { content } from './content/load';
 import { ITEM_KINDS, itemText, poolOf, reviewPoolOf } from './engine/content';
@@ -9,8 +10,11 @@ import { lettersOf } from './engine/lexicon';
 import type { Level } from './engine/schema';
 import { taskLogics } from './tasks/logicRegistry';
 
-export const game: GameData = {
+export const game: GameData<typeof strings> = {
   id: 'reading-uk',
+  locale: 'uk-UA',
+  audioRoot: 'uk',
+  strings,
   content,
   engine: readingEngine,
   logics: taskLogics,

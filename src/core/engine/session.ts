@@ -70,6 +70,7 @@ export function buildSession<C extends GameContent>(input: SessionInput<C>): Ses
       boss,
       scored: logic.scored,
       reading: logic.reading,
+      sayTarget: !logic.reading && !logic.playsTarget,
       kind: domain.kindOf(target) ?? '',
       target,
       options: built.options,

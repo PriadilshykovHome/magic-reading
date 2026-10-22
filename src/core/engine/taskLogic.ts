@@ -43,6 +43,9 @@ export interface TaskLogic<Config extends TaskConfigBase = TaskConfigBase, Data 
   scored: boolean;
   /** A reading task: the target audio plays only after he answers. */
   reading: boolean;
+  /** A listening task that plays the target itself (syllableMerge: "М… А… МА"), so Соня's
+   *  instruction doesn't end with it. */
+  playsTarget?: boolean;
   /** Only offered when the parent-nearby setting is on (readAloud). */
   needsParent: boolean;
   /** May show more than the usual 3 options (bubblePop's bubbles are the one exception). */
@@ -81,6 +84,8 @@ export interface TaskInstance<Data = unknown> {
   boss: boolean;
   scored: boolean;
   reading: boolean;
+  /** Соня's instruction ends with the target (listening tasks, unless they play it themselves). */
+  sayTarget: boolean;
   kind: string;
   target: string;
   options: string[];

@@ -1,5 +1,5 @@
-// What Соня says: voice lines by id (content/voice.uk.json, names filled in) and the game's
-// items. Recorded clips when they exist (public/audio/uk/...), browser speech until then.
+// What Соня says: voice lines by id (the game's voice file, names filled in) and the game's
+// items. Recorded clips when they exist (public/audio/<game.audioRoot>/...), browser speech until then.
 // Every request goes through the scheduler, so lines never overlap or get chopped.
 import { game } from '@game';
 import type { Level } from '../engine/schema';
@@ -11,7 +11,7 @@ import { pause, ShuffleBag, type Policy, type Starter } from './scheduler';
 export { unlockAudio } from './manager';
 export type { Policy } from './scheduler';
 
-const { content } = game;
+const { content, audioRoot, locale } = game;
 let vars = templateVars(content.strings, content.config, useAccount.getState().profile ?? undefined);
 // His patronymic (formal Соня) comes from the private profile once the cloud has sent it.
 useAccount.subscribe((state, prev) => {
@@ -20,7 +20,7 @@ useAccount.subscribe((state, prev) => {
 const rotation = new ShuffleBag();
 
 /** Where a voice line's recording lives: lists are numbered from 1 ("praise.3"). */
-const linePath = (name: string) => `uk/voice/sonya/${name}.mp3`;
+const linePath = (name: string) => `${audioRoot}/voice/sonya/${name}.mp3`;
 
 /** What a level is about (e.g. its new letter): fills {topic}; such lines are recorded per topic. */
 export interface Topic {
@@ -43,7 +43,7 @@ function lineStarter(id: string, topic?: Topic): Starter | null {
 /** Speech engines read capitals as letter names ("ЕМ А"), so items are spoken in lower case. */
 function itemStarter(id: string): Starter {
   const { text, audio } = game.item(id);
-  return clipStarter(audio ? `uk/${audio}` : undefined, text.toLocaleLowerCase('uk-UA'), 0.8);
+  return clipStarter(audio ? `${audioRoot}/${audio}` : undefined, text.toLocaleLowerCase(locale), 0.8);
 }
 
 const spaced = (starters: (Starter | null)[], gapMs: number): Starter[] =>
@@ -64,7 +64,7 @@ export const voice = {
   },
   /** Free text, for reading a sentence word by word. */
   text(text: string, policy: Policy = 'after'): Promise<boolean> {
-    return scheduler.say([clipStarter(undefined, text.toLocaleLowerCase('uk-UA'), 0.8)], policy);
+    return scheduler.say([clipStarter(undefined, text.toLocaleLowerCase(locale), 0.8)], policy);
   },
   stop(): void {
     scheduler.stop();
@@ -76,7 +76,7 @@ export function preloadLevel(level: Level): void {
   const paths = game
     .levelItems(level)
     .flatMap((id) => game.item(id).audio ?? [])
-    .map((a) => `uk/${a}`);
+    .map((a) => `${audioRoot}/${a}`);
   const lines = [...content.voice.keys()].filter(
     (id) => id.startsWith('instructions.') || id === `magicDoor.${level.boss.inner}` || ['praise', 'retry', 'hint'].includes(id),
   );

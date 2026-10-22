@@ -15,6 +15,7 @@ export const syllableMerge: ReadingTaskLogic<Config, SyllableMergeData> = {
   configSchema,
   scored: false,
   reading: false,
+  playsTarget: true,
   needsParent: false,
   instruction: () => 'instructions.syllableMerge',
   // Only this level's new consonant + vowel syllables.

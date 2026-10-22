@@ -5,7 +5,7 @@ import { testContent } from '../../reading/engine/testContent';
 
 const { config } = testContent();
 const task = (over: Partial<TaskInstance> = {}): TaskInstance => ({
-  key: 'k', index: 0, type: 'hearPick', boss: false, scored: true, reading: false, kind: 'syllable',
+  key: 'k', index: 0, type: 'hearPick', boss: false, scored: true, reading: false, sayTarget: true, kind: 'syllable',
   target: 'syl-ma', options: [], data: {}, instruction: '', ...over,
 });
 const noGold = () => 0.5;

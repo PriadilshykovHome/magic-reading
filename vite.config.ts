@@ -8,6 +8,14 @@ import { defineConfig } from 'vitest/config';
 // GitHub Pages serves the project site at https://<user>.github.io/<repo>/
 const REPO_BASE = '/magic-reading/';
 
+// The active game (see src/core/game.ts): swap these to build another game (and the same two
+// aliases in tsconfig.app.json).
+const GAME = {
+  data: './src/reading/game.ts',
+  ui: './src/reading/gameUi.ts',
+  strings: './content/strings.uk.json',
+};
+
 const pkg = JSON.parse(readFileSync('./package.json', 'utf8')) as { version: string };
 
 // index.html is not a component, but its text still comes from the strings file.
@@ -15,7 +23,7 @@ function htmlStrings(): Plugin {
   return {
     name: 'html-strings',
     transformIndexHtml(html) {
-      const strings = JSON.parse(readFileSync('./content/strings.uk.json', 'utf8')) as {
+      const strings = JSON.parse(readFileSync(GAME.strings, 'utf8')) as {
         app: { title: string; description: string };
       };
       return html
@@ -69,11 +77,10 @@ function globCacheKey(): Plugin {
 export default defineConfig({
   base: REPO_BASE,
   plugins: [react(), htmlStrings(), audioManifest(), globCacheKey()],
-  // The active game's domain pack (see src/core/game.ts): swap these two to build another game.
   resolve: {
     alias: {
-      '@game': fileURLToPath(new URL('./src/reading/game.ts', import.meta.url)),
-      '@game-ui': fileURLToPath(new URL('./src/reading/gameUi.ts', import.meta.url)),
+      '@game': fileURLToPath(new URL(GAME.data, import.meta.url)),
+      '@game-ui': fileURLToPath(new URL(GAME.ui, import.meta.url)),
     },
   },
   define: {

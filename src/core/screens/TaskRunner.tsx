@@ -144,10 +144,7 @@ export function Runner({ level, startAt, seed, warmup = false }: { level: Level;
   const instruct = useCallback(
     (policy: Policy = 'after') => {
     setMood('talk');
-    const said =
-      task.reading || task.type === 'syllableMerge'
-        ? voice.say(task.instruction, policy)
-        : voice.lineThenItem(task.instruction, task.target, policy);
+    const said = task.sayTarget ? voice.lineThenItem(task.instruction, task.target, policy) : voice.say(task.instruction, policy);
     void said.then(() => setMood((m) => (m === 'talk' ? 'idle' : m)));
     },
     [task],

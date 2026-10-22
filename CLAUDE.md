@@ -85,6 +85,10 @@ docs/PLAN.md
   Anything about letters, syllables, words or sentences belongs in `src/reading/`. A domain pack
   implements `DomainEngine` (`kindOf`, `hasItem`, `createBuildContext`: candidates, review,
   distractors); core owns ordering, spaced repetition, fallbacks, the Magic Door and rewards.
+  `GameData` also carries the game's `locale` (speech, lower-casing), `audioRoot` (its folder under
+  `public/audio/`) and `strings` (core's `t`); the paths of the active game sit in one `GAME`
+  constant in `vite.config.ts`. `src/core/engine/secondGame.test.ts` runs a tiny second game
+  (`fixtures/countStars/`) through core alone: the template for the maths game.
 
 ## Content
 
@@ -144,6 +148,7 @@ interface TaskLogic<Config, Data> {
   configSchema: ZodType<Config>;      // validates its entry in a level file
   scored: boolean;                    // counts toward stars
   reading: boolean;                   // target audio only after the answer
+  playsTarget?: boolean;              // syllableMerge: says the target itself, not the instruction
   needsParent: boolean;               // readAloud: replaced when no parent is nearby
   manyOptions?: boolean;              // bubblePop: may show more than 3 options
   instructionVariants?: Partial<Config>[];  // configs whose instruction line must exist
