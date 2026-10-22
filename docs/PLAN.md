@@ -212,7 +212,7 @@ v1 uses only 5 consonants (М, Л, Н, Т, С) and 5 vowels (А, О, У, И, І)
 - **Runtime budgets.**
   - The app only parses and expands content at startup; dry-building every task runs in CI.
   - The content chunk stays under 150 KB gzip.
-  - A test asserts that a 300-level progress document stays under 300 KB.
+  - A test asserts that a 300-level progress document stays under 350 KB.
 - **Spaced repetition at scale.** Boxes get intervals in days (same day, 1, 3, 7, 21). Review draws from the 50 most overdue items.
 - **Tests.** They grow with rules, not content: about 30 unit tests and 6 e2e tests.
 - **Core and domain.** `src/core/` is game-agnostic: engine skeleton, spaced repetition, feedback events, rewards, progress, audio, effects, characters, UI, sync and the shared screens. `src/reading/` is this game's domain pack: lexicon, letters, distractors, curriculum, task types and intro demos.
@@ -482,10 +482,9 @@ public/
   audio/sfx/  audio/music/
   img/                 word pictures, scenes, characters, map
 content/
-  lexicon.json         every syllable, word, sentence + its audio and picture
-  strings.uk.json      names and voice-line ids
-  worlds/tower-of-syllables/world.json
-  worlds/tower-of-syllables/levels/01-syllables.json  02-words.json  03-sentences.json
+  config.json  templates.json  strings.uk.json  voice.uk.json  cards.json
+  worlds/tower-of-syllables/world.json     units of levels
+  worlds/tower-of-syllables/lexicon.json   items first taught there
 src/
   app/                 main.tsx, router.tsx
   core/                the game-agnostic shell, shared later with the English and maths games
@@ -535,7 +534,7 @@ service cloud.firestore {
 }
 ```
 
-**Data model.** `players/{uid}` holds the private profile, shared by all of his games (the English and maths games come later). Each game's progress is one small document under it, `players/{uid}/games/reading-uk`; the security rule above matches `players/{uid}/{document=**}`. Items are keyed by lexicon id rather than by Cyrillic text, so field paths stay simple. To stay far below Firestore's 1 MiB limit at 300 levels (about 2,500 items), an item keeps only its last `mastery.distinctDays` okDays as day keys, and writes update changed field paths only (about 175 KB in total).
+**Data model.** `players/{uid}` holds the private profile, shared by all of his games (the English and maths games come later). Each game's progress is one small document under it, `players/{uid}/games/reading-uk`; the security rule above matches `players/{uid}/{document=**}`. Items are keyed by lexicon id rather than by Cyrillic text, so field paths stay simple. To stay far below Firestore's 1 MiB limit at 300 levels (about 2,500 items), an item keeps only its last `mastery.distinctDays` okDays, dates are day keys, and writes update changed field paths only (under 350 KB in total, checked by a unit test).
 
 ```json
 {
@@ -566,68 +565,90 @@ These merge rules are enough because one child plays on one device at a time. A 
 
 ## Content format & adding levels
 
-All learning content lives in JSON under `content/`. A new level is a new JSON file plus its audio and pictures. A new world is a folder. Neither needs code changes.
+All learning content lives in JSON under `content/`. A new word is one line in a lexicon, a new level is one line in a world, and a new world is a folder. None of it needs code changes.
 
-**Lexicon (`content/lexicon.json`).** Every syllable, word and sentence is defined once, with its audio and picture (and an emoji placeholder until the art exists). Syllable splits are written by hand, never auto-hyphenated. Each sentence lists what its scene `depicts`, so a wrong scene can never also fit the sentence.
+**Files.**
 
-**Other content files.** `config.json` holds every tunable number (boxes, stars, sparks, streaks, Іскрик's thresholds, Easter egg dates). `voice.uk.json` holds all of Соня's lines, with placeholders such as `{nameVoc}` filled from `strings.uk.json` and the private profile. `cards.json` lists the creature cards.
+- `config.json`: every tunable number, plus the letter rules (vowels, Latin spellings for ids, the soft sign and digraphs).
+- `templates.json`: what each kind of level does.
+- `voice.uk.json`: Соня's lines, with placeholders such as `{nameVoc}` and `{topic}` (a level's letter).
+- `strings.uk.json`, `cards.json`.
+- Per world: `worlds/<world>/world.json` and `worlds/<world>/lexicon.json`.
+
+**Lexicon (`worlds/<world>/lexicon.json`).** It holds the items first taught in that world, one compact row each. Syllable splits are written by hand, never auto-hyphenated, and every syllable has exactly one vowel. Everything else is derived:
+
+- a word's text and syllables come from its split;
+- syllable ids come from their letters (`МИШ` → `syl-mysh`);
+- every audio and picture path comes from the id (`w-mama` → `voice/words/mama.mp3`, `img/words/mama.webp`);
+- drill syllables are one string;
+- closed syllables come from the splits.
+
+Each sentence lists what its scene `depicts`, so a wrong scene can never also fit the sentence.
 
 ```json
 {
-  "syllables": [
-    { "id": "syl-ma", "text": "МА", "parts": ["М", "А"], "audio": "voice/syl/ma.mp3" }
-  ],
+  "syllables": "МА МО МУ МИ МІ ЛА ЛО ЛУ ЛИ ЛІ",
   "words": [
-    { "id": "w-mama", "text": "МАМА", "syllables": ["syl-ma", "syl-ma"],
-      "audio": "voice/words/mama.mp3", "picture": "img/words/mama.webp" }
+    { "id": "w-mama", "split": "МА-МА", "emoji": "👩", "tags": ["family"] },
+    { "id": "w-myshka", "split": "МИШ-КА", "emoji": "🐭", "stress": 0 }
   ],
   "sentences": [
-    { "id": "s-u-mamy-mylo", "text": "У мами мило.", "words": ["У", "мами", "мило"],
-      "audio": "voice/sentences/u-mamy-mylo.mp3", "wordStartsSec": [0.0, 0.35, 0.9],
-      "scene": "img/scenes/u-mamy-mylo.webp" }
+    { "id": "s-u-mamy-mylo", "text": "У мами мило.", "depicts": ["mama", "mylo"], "emoji": "👩🧼", "wordStartsSec": [0.0, 0.35, 0.9] }
   ]
 }
 ```
 
 `wordStartsSec` lets Соня read a sentence while each word lights up in turn.
 
-**Level file (`content/worlds/<world>/levels/02-words.json`).**
+**World (`worlds/<world>/world.json`).** A world is a list of units. Each unit names the letters it teaches and a row of level templates:
 
 ```json
 {
-  "id": "tower-of-syllables/02",
-  "title": "Перші слова",
-  "unlockAfter": "tower-of-syllables/01",
-  "intro": { "voice": "sonya/l02-intro", "demo": { "type": "syllableMerge", "items": ["syl-na", "syl-ta", "syl-sa"] } },
-  "pool": { "syllables": ["syl-na", "syl-ta", "syl-sa"], "words": ["w-mama", "w-tato", "w-lysa", "w-mylo"] },
-  "reviewFrom": ["tower-of-syllables/01"],
-  "tasks": [
-    { "type": "readPickPicture", "count": 3, "choices": 3 },
-    { "type": "buildWord", "count": 3, "extraTiles": 1 },
-    { "type": "hearPick", "count": 1, "itemKind": "word", "choices": 3 },
-    { "type": "readAloud", "count": 1 }
-  ],
-  "boss": { "type": "magicDoor", "inner": "buildWord", "pick": "weakest" },
-  "reward": { "card": "fox-01" }
+  "id": "garden", "order": 3, "title": "Сад Соняшників", "look": "garden",
+  "units": [
+    { "key": "practice", "levels": ["words", "sentences"] },
+    { "key": "e", "letters": "Е", "card": "card-stork", "levels": ["letters", "words", "words", "sentences"] },
+    { "key": "rev1", "levels": ["review"] },
+    { "key": "finale", "levels": [{ "t": "finale", "door": "w-oleksandr", "line": "magicDoor.dadName" }] }
+  ]
 }
 ```
 
-`world.json` lists the levels in order, plus the world's title, map art, colours and music.
+**What each level gets.** Expanding the units gives every level:
 
-**Item picking (spaced repetition).** Each item sits in a box from 1 to 5. A first-try correct answer moves it up one box; a wrong answer sends it back to box 1. The picker favours low boxes and items not seen for a while. `reviewFrom` mixes in about 25% of items from earlier levels.
+- the letters known by then;
+- the items that just became readable, shared evenly over the unit's levels that teach that kind;
+- review from every earlier level;
+- Соня's intro about its letter;
+- its Magic Door;
+- a card (the unit's last level);
+- what unlocks it.
 
-**Adding a level, step by step.**
+**Level ids and overrides.**
 
-1. Add any new syllables, words or sentences to `lexicon.json`.
-2. Add their audio and pictures with exactly the filenames in the lexicon.
-3. Create the level file and add it to `world.json`.
-4. Run `npm run validate-content`. It checks that:
-   - the JSON matches the schemas;
-   - every id referenced exists;
-   - every audio and picture file exists;
-   - every task config is valid;
-   - each pool has enough items for the requested number of choices.
-5. Commit and push; GitHub Actions validates, builds and deploys.
+- Generated ids are `world/unitkey-template` (`garden/e-words-2` for a repeat), so a played unit key is never renamed.
+- A finale's door item stays out of every pool before its door.
+- Any level can override its pool, tasks or door, or be written out in full. The first 11 levels are written out in full, keeping their ids, which his saved progress is keyed by.
+
+**Item picking (spaced repetition).** Each item sits in a box from 1 to 5, and each box has an interval in days (same day, 1, 3, 7, 21).
+
+- A first-try correct answer moves an item up one box; a wrong answer sends it back to box 1.
+- The picker favours low boxes and overdue items.
+- About 25% of tasks review earlier levels, drawing from their 50 most overdue items.
+
+**Adding content, step by step.**
+
+1. Add the new words and sentences to the world's `lexicon.json`, and the unit to its `world.json`.
+2. Run `npm run validate-content -- --report`. It checks:
+   - the schemas, ids and splits;
+   - that every level uses only letters taught by then;
+   - the pace: a letter unit brings at least 6 new words, and no level more than 12 new items;
+   - every task config and pool size;
+   - Соня's lines and the assets.
+
+   It prints the progress curve, so you can see that progress stays steady.
+3. Add the audio and pictures with the filenames the validator lists as missing.
+4. Commit and push; GitHub Actions validates, builds and deploys.
 
 **Adding a task type.** Create a folder in `src/reading/tasks/` that implements the plug-in contract and register it. Level files can then use its id.
 

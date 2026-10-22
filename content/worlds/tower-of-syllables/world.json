@@ -2,17 +2,237 @@
   "id": "tower-of-syllables",
   "order": 1,
   "title": "Вежа Складів",
-  "allowedLetters": "МЛНТСАОУИІ",
-  "levels": [
-    "levels/01-syllables.json",
-    "levels/02-words.json",
-    "levels/03-sentences.json",
-    "levels/04-longer-words.json",
-    "levels/05-new-sentences.json",
-    "levels/06-review.json"
-  ],
-  "map": {
-    "art": "img/maps/tower-of-syllables.webp",
-    "music": "music/tower-of-syllables.mp3"
-  }
+  "look": "stone-tower",
+  "units": [
+    {
+      "key": "basics",
+      "letters": "МЛНТСАОУИІ",
+      "levels": [
+        {
+          "id": "tower-of-syllables/01",
+          "title": "Перші склади",
+          "intro": {"voice": "levelIntro.l01", "demo": {"type": "syllableMerge", "items": ["syl-ma", "syl-la"]}},
+          "pool": {
+            "syllables": [
+              "syl-ma",
+              "syl-mo",
+              "syl-mu",
+              "syl-my",
+              "syl-mi",
+              "syl-la",
+              "syl-lo",
+              "syl-lu",
+              "syl-ly",
+              "syl-li"
+            ],
+            "words": ["w-mama", "w-lama", "w-mylo"]
+          },
+          "tasks": [
+            {"type": "syllableMerge", "count": 1},
+            {"type": "hearPick", "count": 3, "itemKind": "syllable", "choices": 3},
+            {"type": "bubblePop", "count": 2},
+            {"type": "readPickPicture", "count": 1, "choices": 3},
+            {"type": "readAloud", "count": 2, "itemKind": "syllable"}
+          ],
+          "boss": {"type": "magicDoor", "inner": "readPickPicture", "item": "w-mama"},
+          "card": "card-hedgehog"
+        },
+        {
+          "id": "tower-of-syllables/02",
+          "title": "Перші слова",
+          "intro": {
+            "voice": "levelIntro.l02",
+            "demo": {"type": "syllableMerge", "items": ["syl-na", "syl-ta", "syl-sa"]}
+          },
+          "pool": {
+            "syllables": [
+              "syl-na",
+              "syl-no",
+              "syl-nu",
+              "syl-ny",
+              "syl-ni",
+              "syl-ta",
+              "syl-to",
+              "syl-tu",
+              "syl-ty",
+              "syl-ti",
+              "syl-sa",
+              "syl-so",
+              "syl-su",
+              "syl-sy",
+              "syl-si"
+            ],
+            "words": ["w-mama", "w-tato", "w-lysa", "w-mylo", "w-noty", "w-sany", "w-lama", "w-osa", "w-lis", "w-nis"]
+          },
+          "reviewFrom": ["tower-of-syllables/01"],
+          "tasks": [
+            {"type": "readPickPicture", "count": 3, "choices": 3},
+            {"type": "buildWord", "count": 3, "extraTiles": 1},
+            {"type": "hearPick", "count": 1, "itemKind": "word", "choices": 3},
+            {"type": "readAloud", "count": 1, "itemKind": "word"}
+          ],
+          "boss": {"type": "magicDoor", "inner": "buildWord", "pick": "weakest"},
+          "card": "card-squirrel"
+        },
+        {
+          "id": "tower-of-syllables/03",
+          "title": "Перші речення",
+          "intro": {"voice": "levelIntro.l03", "demo": {"type": "readAlong", "items": ["s-mama-i-tato"]}},
+          "pool": {
+            "sentences": [
+              "s-tato-tut",
+              "s-mama-tam",
+              "s-lama-tut",
+              "s-osa-tam",
+              "s-lysa-u-lisi",
+              "s-osa-na-nosi",
+              "s-mama-i-tato",
+              "s-u-mamy-mylo",
+              "s-u-mamy-noty",
+              "s-u-tata-noty"
+            ],
+            "words": ["w-mama", "w-tato", "w-lysa", "w-mylo", "w-noty", "w-sany", "w-lama", "w-osa"]
+          },
+          "reviewFrom": ["tower-of-syllables/02"],
+          "tasks": [
+            {"type": "sentencePicture", "count": 3, "choices": 3},
+            {"type": "readPickPicture", "count": 2, "choices": 3},
+            {"type": "buildWord", "count": 1, "extraTiles": 1},
+            {"type": "readAloud", "count": 2, "itemKind": "sentence"}
+          ],
+          "boss": {"type": "magicDoor", "inner": "sentencePicture", "pick": "weakest"},
+          "card": "card-bunny"
+        },
+        {
+          "id": "tower-of-syllables/04",
+          "title": "Довші слова",
+          "intro": {"voice": "levelIntro.l04", "demo": {"type": "wordMerge", "items": ["w-lymon", "w-tomat"]}},
+          "pool": {
+            "syllables": [],
+            "words": ["w-lymon", "w-tomat", "w-salat", "w-maslo", "w-namysto", "w-mist"],
+            "sentences": []
+          },
+          "reviewFrom": ["tower-of-syllables/02"],
+          "tasks": [
+            {"type": "readPickPicture", "count": 3, "choices": 3},
+            {"type": "buildWord", "count": 3, "extraTiles": 1},
+            {"type": "hearPick", "count": 1, "itemKind": "word", "choices": 3},
+            {"type": "readAloud", "count": 1, "itemKind": "word"}
+          ],
+          "boss": {"type": "magicDoor", "inner": "buildWord", "pick": "newest"},
+          "card": "card-turtle"
+        },
+        {
+          "id": "tower-of-syllables/05",
+          "title": "Нові речення",
+          "intro": {"voice": "levelIntro.l05", "demo": {"type": "readAlong", "items": ["s-osa-na-lymoni"]}},
+          "pool": {
+            "syllables": [],
+            "words": ["w-lymon", "w-tomat", "w-salat", "w-maslo", "w-namysto", "w-mist"],
+            "sentences": [
+              "s-osa-na-lymoni",
+              "s-osa-na-tomati",
+              "s-u-tata-lymon",
+              "s-u-mamy-salat",
+              "s-u-mamy-namysto",
+              "s-lama-na-mostu",
+              "s-lysa-na-mostu",
+              "s-tomat-u-salati"
+            ]
+          },
+          "reviewFrom": ["tower-of-syllables/03", "tower-of-syllables/04"],
+          "tasks": [
+            {"type": "sentencePicture", "count": 3, "choices": 3},
+            {"type": "readPickPicture", "count": 2, "choices": 3},
+            {"type": "buildWord", "count": 1, "extraTiles": 1},
+            {"type": "readAloud", "count": 2, "itemKind": "sentence"}
+          ],
+          "boss": {"type": "magicDoor", "inner": "sentencePicture", "pick": "weakest"},
+          "card": "card-butterfly"
+        },
+        {
+          "id": "tower-of-syllables/06",
+          "title": "Велике повторення",
+          "intro": {"voice": "levelIntro.l06", "demo": {"type": "readAlong", "items": ["s-tomat-u-salati"]}},
+          "pool": {
+            "syllables": [
+              "syl-ma",
+              "syl-mo",
+              "syl-mu",
+              "syl-my",
+              "syl-mi",
+              "syl-la",
+              "syl-lo",
+              "syl-lu",
+              "syl-ly",
+              "syl-li",
+              "syl-na",
+              "syl-no",
+              "syl-nu",
+              "syl-ny",
+              "syl-ni",
+              "syl-ta",
+              "syl-to",
+              "syl-tu",
+              "syl-ty",
+              "syl-ti",
+              "syl-sa",
+              "syl-so",
+              "syl-su",
+              "syl-sy",
+              "syl-si"
+            ],
+            "words": [
+              "w-mama",
+              "w-tato",
+              "w-lysa",
+              "w-mylo",
+              "w-noty",
+              "w-sany",
+              "w-lama",
+              "w-osa",
+              "w-lis",
+              "w-nis",
+              "w-lymon",
+              "w-tomat",
+              "w-salat",
+              "w-maslo",
+              "w-namysto",
+              "w-mist"
+            ],
+            "sentences": [
+              "s-tato-tut",
+              "s-mama-tam",
+              "s-lama-tut",
+              "s-osa-tam",
+              "s-lysa-u-lisi",
+              "s-osa-na-nosi",
+              "s-mama-i-tato",
+              "s-u-mamy-mylo",
+              "s-u-mamy-noty",
+              "s-u-tata-noty",
+              "s-osa-na-lymoni",
+              "s-osa-na-tomati",
+              "s-u-tata-lymon",
+              "s-u-mamy-salat",
+              "s-u-mamy-namysto",
+              "s-lama-na-mostu",
+              "s-lysa-na-mostu",
+              "s-tomat-u-salati"
+            ]
+          },
+          "tasks": [
+            {"type": "hearPick", "count": 2, "itemKind": "syllable", "choices": 3},
+            {"type": "bubblePop", "count": 1},
+            {"type": "readPickPicture", "count": 2, "choices": 3},
+            {"type": "buildWord", "count": 1, "extraTiles": 1},
+            {"type": "sentencePicture", "count": 2, "choices": 3},
+            {"type": "readAloud", "count": 1, "itemKind": "word"}
+          ],
+          "boss": {"type": "magicDoor", "inner": "readPickPicture", "pick": "weakest"},
+          "card": "card-frog"
+        }
+      ]
+    }
+  ]
 }

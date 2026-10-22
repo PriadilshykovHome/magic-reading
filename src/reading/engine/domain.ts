@@ -19,15 +19,21 @@ const asKind = (kind: string): ItemKind => {
 export function createBuildContext(content: Content, level: Level, rng: Rng): ReadingBuildContext {
   const exists = (kind: ItemKind, id: string) =>
     (kind === 'syllable' ? content.syllables : kind === 'word' ? content.words : content.sentences).has(id);
+  // Review spans every earlier level, so each kind is gathered once per level and remembered.
+  const cache = new Map<ItemKind, string[]>();
   const candidates = (kindName: string): string[] => {
     const kind = asKind(kindName);
+    const cached = cache.get(kind);
+    if (cached) return cached;
     const own = poolOf(level, kind);
     const review = reviewPoolOf(content, level, kind);
     // Syllables also come from the level's words (e.g. the О in ОСА) for tiles and distractors.
     const fromWords =
       kind === 'syllable' ? syllablesOfWords(content, [...poolOf(level, 'word'), ...reviewPoolOf(content, level, 'word')]) : [];
     // Unknown ids are the validator's to report; never let them reach a task.
-    return [...new Set([...own, ...review, ...fromWords])].filter((id) => exists(kind, id));
+    const all = [...new Set([...own, ...review, ...fromWords])].filter((id) => exists(kind, id));
+    cache.set(kind, all);
+    return all;
   };
 
   const score = (kind: ItemKind, target: string, other: string): number => {

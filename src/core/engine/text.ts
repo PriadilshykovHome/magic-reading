@@ -13,6 +13,8 @@ export const TEMPLATE_KEYS = [
   'birthCity',
   'mascot',
   'companion',
+  /** What a level is about, e.g. its new letter (from the level, not the strings file). */
+  'topic',
 ] as const;
 export type TemplateKey = (typeof TEMPLATE_KEYS)[number];
 export type TemplateVars = Partial<Record<TemplateKey, string>>;

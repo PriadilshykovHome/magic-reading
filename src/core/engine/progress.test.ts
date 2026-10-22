@@ -32,3 +32,12 @@ test('Іскрик: egg until Level 1 is done, then grows at 150 and 400 sparks'
   p.levels['tower-of-syllables/01'] = { bestStars: 1, plays: 1, completedAt: null };
   expect([20, 150, 400].map((s) => creatureStage({ ...p, rewards: { ...p.rewards, sparksEarned: s } }, config))).toEqual([1, 2, 3]);
 });
+
+test('after 300 levels and 2,500 items practised for months, the saved document stays small', () => {
+  let one = emptyProgress();
+  for (let d = 1; d <= 20; d++) one = recordTaskResult(one, answer('w-item', d % 4 !== 0), day(d), config);
+  const p = emptyProgress();
+  for (let i = 0; i < 2500; i++) p.items[`w-item-${i}`] = one.items['w-item']!;
+  for (let i = 0; i < 300; i++) p.levels[`world-${Math.floor(i / 25)}/unit-${i}-words-2`] = { bestStars: 3, plays: 9, completedAt: day(20).toISOString() };
+  expect(JSON.stringify(p).length).toBeLessThan(350_000); // a third of Firestore's 1 MiB document limit
+});

@@ -1,0 +1,49 @@
+{
+  "syllables": "КА КО КУ КИ КІ РА РО РУ РИ РІ ВА ВО ВУ ВИ ВІ ДА ДО ДУ ДИ ДІ ПА ПО ПУ ПИ ПІ ША ШО ШУ ШИ ШІ",
+  "words": [
+    {"id": "w-ruka", "split": "РУ-КА", "emoji": "✋"},
+    {"id": "w-korona", "split": "КО-РО-НА", "emoji": "👑"},
+    {"id": "w-komar", "split": "КО-МАР", "emoji": "🦟"},
+    {"id": "w-kit", "split": "КІТ", "emoji": "🐈"},
+    {"id": "w-rak", "split": "РАК", "emoji": "🦞"},
+    {"id": "w-syr", "split": "СИР", "emoji": "🧀"},
+    {"id": "w-rot", "split": "РОТ", "emoji": "👄"},
+    {"id": "w-rys", "split": "РИС", "emoji": "🍚"},
+    {"id": "w-voda", "split": "ВО-ДА", "emoji": "💧"},
+    {"id": "w-dim", "split": "ДІМ", "emoji": "🏠"},
+    {"id": "w-dyvan", "split": "ДИ-ВАН", "emoji": "🛋️"},
+    {"id": "w-vovk", "split": "ВОВК", "emoji": "🐺"},
+    {"id": "w-drakon", "split": "ДРА-КОН", "emoji": "🐉"},
+    {"id": "w-vydra", "split": "ВИД-РА", "emoji": "🦦"},
+    {"id": "w-radio", "split": "РА-ДІ-О", "emoji": "📻"},
+    {"id": "w-myshka", "split": "МИШ-КА", "emoji": "🐭"},
+    {"id": "w-pavuk", "split": "ПА-ВУК", "emoji": "🕷️"},
+    {"id": "w-kasha", "split": "КА-ША", "emoji": "🥣"},
+    {"id": "w-poshta", "split": "ПОШ-ТА", "emoji": "📮"},
+    {"id": "w-panda", "split": "ПАН-ДА", "emoji": "🐼"},
+    {"id": "w-lapa", "split": "ЛА-ПА", "emoji": "🐾"},
+    {"id": "w-shokolad", "split": "ШО-КО-ЛАД", "emoji": "🍫"},
+    {"id": "w-kapusta", "split": "КА-ПУС-ТА", "emoji": "🥬"},
+    {"id": "w-myshko", "split": "МИШ-КО", "emoji": "👦"}
+  ],
+  "sentences": [
+    {"id": "s-kit-na-dyvani", "text": "Кіт на дивані.", "depicts": ["kit", "dyvan"], "emoji": "🐈🛋️"},
+    {"id": "s-panda-na-dyvani", "text": "Панда на дивані.", "depicts": ["panda", "dyvan"], "emoji": "🐼🛋️"},
+    {"id": "s-vovk-u-lisi", "text": "Вовк у лісі.", "depicts": ["vovk", "lis"], "emoji": "🐺🌲"},
+    {"id": "s-vydra-u-vodi", "text": "Видра у воді.", "depicts": ["vydra", "voda"], "emoji": "🦦💧"},
+    {
+      "id": "s-u-myshky-shokolad",
+      "text": "У мишки шоколад.",
+      "depicts": ["myshka", "shokolad"],
+      "emoji": "🐭🍫"
+    },
+    {
+      "id": "s-u-drakona-shokolad",
+      "text": "У дракона шоколад.",
+      "depicts": ["drakon", "shokolad"],
+      "emoji": "🐉🍫"
+    },
+    {"id": "s-u-drakona-kasha", "text": "У дракона каша.", "depicts": ["drakon", "kasha"], "emoji": "🐉🥣"},
+    {"id": "s-kit-i-myshka", "text": "Кіт і мишка.", "depicts": ["kit", "myshka"], "emoji": "🐈🐭"}
+  ]
+}

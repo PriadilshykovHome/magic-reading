@@ -13,7 +13,7 @@ test('wrong options are look-alikes on purpose, never the answer or the same pic
   expect(syllableScore(syl('syl-ma'), syl('syl-la'), v)).toBeGreaterThan(syllableScore(syl('syl-ma'), syl('syl-ty'), v));
   expect(syllableScore(syl('syl-ma'), syl('syl-ma'), v)).toBe(-Infinity);
   expect(wordScore(word('w-mama'), word('w-lama'))).toBeGreaterThan(wordScore(word('w-mama'), word('w-noty')));
-  expect(wordScore(word('w-mama'), word('w-alina'))).toBe(-Infinity); // same picture
+  expect(wordScore(word('w-mama'), { ...word('w-mama'), id: 'w-alina', text: 'АЛІНА' })).toBe(-Infinity); // same picture
 });
 
 test('a wrong scene never also fits the sentence; one-word differences are preferred', () => {

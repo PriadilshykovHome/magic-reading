@@ -30,10 +30,13 @@ public/audio/uk/voice/   syllables, words, sentences, Соня's lines
 public/audio/sfx/  public/audio/music/
 public/img/              word pictures, scenes, characters, map
 content/
-  lexicon.json           every syllable, word, sentence + audio + picture (ids like syl-ma, w-mama, s-…)
-  strings.uk.json        all UI text, names, voice-line ids
-  worlds/<world>/world.json
-  worlds/<world>/levels/NN-name.json
+  config.json            every tunable number + the letter rules (vowels, Latin spellings, digraphs)
+  templates.json         what each kind of level does: letters, words, sentences, review, finale
+  strings.uk.json        all UI text, names
+  voice.uk.json          Соня's lines
+  cards.json
+  worlds/<world>/world.json     the world: units (letters taught + a row of templates)
+  worlds/<world>/lexicon.json   items first taught there, one compact row each
 src/
   app/                   main.tsx, router.tsx (wiring)
   core/                  the game-agnostic shell (shared later with the English and maths games)
@@ -78,21 +81,34 @@ docs/PLAN.md
 
 ## Content
 
-- All learning content lives in `content/*.json` and is validated by Zod schemas
-  (`src/core/engine/schema.ts`, extended in `src/reading/engine/schema.ts`): `lexicon.json`, `worlds/<world>/world.json` + `levels/*.json`,
-  `cards.json`, `config.json` (every tunable number: boxes, stars, sparks, streaks, creature
-  thresholds, Easter egg dates), `voice.uk.json` (Соня's lines, with `{nameVoc}`-style
-  placeholders filled from `strings.uk.json` and the private profile) and `strings.uk.json`.
-- `npm run validate-content` checks schemas, referenced ids, hand-written splits, allowed
-  letters, task configs, pool sizes (it dry-builds every possible task), voice lines and assets.
-  Missing audio/pictures are warnings (`--strict` makes them errors). A broken content file
-  must fail the build, not the game.
+- All learning content lives in `content/` and is validated by Zod schemas
+  (`src/core/engine/schema.ts`, extended in `src/reading/engine/schema.ts`). `config.json` holds
+  every tunable number (boxes and their intervals, stars, sparks, streaks, creature thresholds,
+  Easter egg dates) and the letter rules; `voice.uk.json` holds Соня's lines, with `{nameVoc}`-style
+  placeholders filled from `strings.uk.json` and the private profile, and `{topic}` (a level's
+  letter) for template lines, which then need a `…Fallback` line.
+- **Content grows linearly; derive, don't duplicate.** A word is one row
+  (`{ "id": "w-mama", "split": "МА-МА", "emoji": "👩", "tags": [], "stress": 0 }`); its text,
+  syllables and every audio/picture path are derived (`src/reading/engine/lexicon.ts`). Syllable
+  ids come from their letters (`syl-mysh`). Drill syllables are one string per world lexicon.
+- **Levels are units × templates** (`src/reading/engine/curriculum.ts`). A unit is
+  `{ "key", "letters", "card"?, "levels": ["letters", "words", "words", "sentences"] }`; each
+  level gets the cumulative known letters, the items that just became readable (shared over the
+  unit's levels that teach that kind), review from every earlier level, an intro about its
+  letter, a door, a card (unit's last level) and its unlock. Generated ids are
+  `world/unitkey-template[-n]`: never rename a played unit key. A finale is
+  `{ "t": "finale", "door": "w-…", "line": "…" }`; its door item stays out of every earlier pool.
+  A level can override anything, or be written out in full (the first 11 levels are, keeping their
+  ids `tower-of-syllables/01`…, which his saved progress is keyed by).
+- `npm run validate-content` checks schemas, ids, splits (one vowel per syllable), that every level
+  uses only letters taught by then, the pace (a letter unit brings ≥ 6 new words, no level more
+  than 12 new items), task configs, pool sizes (it dry-builds every possible task), voice lines
+  and assets. `-- --report` prints the progress curve. Missing audio/pictures are warnings
+  (`--strict` makes them errors). A broken content file must fail the build, not the game.
 - Adding a level or world means content and assets only. If a level needs a code change,
   the engine or a task type is missing something; fix that rather than special-casing the level.
 - Syllable splits are written by hand in the lexicon, never auto-hyphenated.
-- Every word in a world uses only that world's `allowedLetters` (v1: М Л Н Т С + А О У И І);
-  the validator enforces it. Text is shown in UPPERCASE unless the parent turns on lowercase
-  sentences.
+- Text is shown in UPPERCASE unless the parent turns on lowercase sentences.
 
 ## Task plug-in contract
 

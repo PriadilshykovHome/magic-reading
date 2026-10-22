@@ -17,14 +17,22 @@ const rotation = new ShuffleBag();
 /** Where a voice line's recording lives: lists are numbered from 1 ("praise.3"). */
 const linePath = (name: string) => `uk/voice/sonya/${name}.mp3`;
 
-function lineStarter(id: string): Starter | null {
+/** What a level is about (e.g. its new letter): fills {topic}; such lines are recorded per topic. */
+export interface Topic {
+  text: string;
+  key: string;
+}
+
+function lineStarter(id: string, topic?: Topic): Starter | null {
   const value = content.voice.get(id);
   if (!value) return null;
   const list = Array.isArray(value) ? value : [value];
   const index = list.length > 1 ? rotation.next(id, list.length) : 0;
-  const { text, missing } = fillTemplate(list[index]!, vars);
-  if (missing.length > 0) return content.voice.has(`${id}Fallback`) ? lineStarter(`${id}Fallback`) : null;
-  return clipStarter(linePath(Array.isArray(value) ? `${id}.${index + 1}` : id), text);
+  const line = list[index]!;
+  const { text, missing } = fillTemplate(line, { ...vars, topic: topic?.text });
+  if (missing.length > 0) return content.voice.has(`${id}Fallback`) ? lineStarter(`${id}Fallback`, topic) : null;
+  const name = Array.isArray(value) ? `${id}.${index + 1}` : id;
+  return clipStarter(linePath(topic && line.includes('{topic}') ? `${name}.${topic.key}` : name), text);
 }
 
 /** Speech engines read capitals as letter names ("ЕМ А"), so items are spoken in lower case. */
@@ -38,8 +46,8 @@ const spaced = (starters: (Starter | null)[], gapMs: number): Starter[] =>
 
 export const voice = {
   /** One or more voice lines in a row. */
-  say(ids: string | string[], policy: Policy = 'after'): Promise<boolean> {
-    return scheduler.say(spaced((Array.isArray(ids) ? ids : [ids]).map(lineStarter), 200), policy);
+  say(ids: string | string[], policy: Policy = 'after', topic?: Topic): Promise<boolean> {
+    return scheduler.say(spaced((Array.isArray(ids) ? ids : [ids]).map((id) => lineStarter(id, topic)), 200), policy);
   },
   /** One of the game's items (a syllable, word or sentence). */
   item(id: string, policy: Policy = 'after'): Promise<boolean> {

@@ -1,0 +1,66 @@
+{
+  "letters": {
+    "title": "Нова літера",
+    "intro": {"voice": "levelIntro.letters", "demo": "syllableMerge"},
+    "teaches": ["syllable", "word"],
+    "tasks": [
+      {"type": "syllableMerge", "count": 1},
+      {"type": "hearPick", "count": 3, "itemKind": "syllable", "choices": 3},
+      {"type": "bubblePop", "count": 2},
+      {"type": "readPickPicture", "count": 2, "choices": 3},
+      {"type": "readAloud", "count": 1, "itemKind": "syllable"}
+    ],
+    "boss": {"inner": "readPickPicture", "pick": "newest"}
+  },
+  "words": {
+    "title": "Нові слова",
+    "intro": {"voice": "levelIntro.words", "demo": "wordMerge"},
+    "teaches": ["word"],
+    "tasks": [
+      {"type": "readPickPicture", "count": 3, "choices": 3},
+      {"type": "buildWord", "count": 2, "extraTiles": 1},
+      {"type": "hearPick", "count": 1, "itemKind": "word", "choices": 3},
+      {"type": "hearPick", "count": 1, "itemKind": "syllable", "choices": 3},
+      {"type": "readAloud", "count": 1, "itemKind": "word"}
+    ],
+    "boss": {"inner": "readPickPicture", "pick": "newest"}
+  },
+  "sentences": {
+    "title": "Речення",
+    "intro": {"voice": "levelIntro.sentences", "demo": "readAlong"},
+    "teaches": ["sentence"],
+    "tasks": [
+      {"type": "sentencePicture", "count": 3, "choices": 3},
+      {"type": "readPickPicture", "count": 2, "choices": 3},
+      {"type": "buildWord", "count": 1, "extraTiles": 1},
+      {"type": "hearPick", "count": 1, "itemKind": "word", "choices": 3},
+      {"type": "readAloud", "count": 1, "itemKind": "sentence"}
+    ],
+    "boss": {"inner": "sentencePicture", "pick": "newest"}
+  },
+  "review": {
+    "title": "Повторення",
+    "intro": {"voice": "levelIntro.review", "demo": "readAlong", "from": "recent"},
+    "tasks": [
+      {"type": "hearPick", "count": 1, "itemKind": "syllable", "choices": 3},
+      {"type": "bubblePop", "count": 1},
+      {"type": "readPickPicture", "count": 2, "choices": 3},
+      {"type": "buildWord", "count": 2, "extraTiles": 1},
+      {"type": "sentencePicture", "count": 2, "choices": 3},
+      {"type": "readAloud", "count": 1, "itemKind": "word"}
+    ],
+    "boss": {"inner": "readPickPicture", "pick": "weakest"}
+  },
+  "finale": {
+    "title": "Чарівні двері",
+    "intro": {"voice": "levelIntro.finale", "demo": "readAlong", "from": "recent"},
+    "tasks": [
+      {"type": "readPickPicture", "count": 3, "choices": 3},
+      {"type": "buildWord", "count": 2, "extraTiles": 1},
+      {"type": "sentencePicture", "count": 2, "choices": 3},
+      {"type": "hearPick", "count": 1, "itemKind": "word", "choices": 3},
+      {"type": "readAloud", "count": 1, "itemKind": "sentence"}
+    ],
+    "boss": {"inner": "readPickPicture", "pick": "weakest"}
+  }
+}

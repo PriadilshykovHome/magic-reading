@@ -72,7 +72,7 @@ export function finishLevel({ progress, run, level, content, now }: FinishInput)
   );
 
   const rewards = progress.rewards;
-  const card = rewards.cards.includes(level.reward.card) ? null : level.reward.card;
+  const card = level.reward.card && !rewards.cards.includes(level.reward.card) ? level.reward.card : null;
   const firstThreeStars = stars === 3 && !rewards.milestones.includes('firstThreeStars');
   const today = dayKey(now);
   const windowLit = !rewards.litWindows.includes(today);
@@ -91,7 +91,7 @@ export function finishLevel({ progress, run, level, content, now }: FinishInput)
     },
     rewards: {
       ...rewards,
-      cards: [...new Set([...rewards.cards, level.reward.card, ...(weeklyCard ? [weeklyCard] : [])])],
+      cards: [...new Set([...rewards.cards, ...(card ? [card] : []), ...(weeklyCard ? [weeklyCard] : [])])],
       litWindows,
       milestones: firstThreeStars ? [...rewards.milestones, 'firstThreeStars'] : rewards.milestones,
     },

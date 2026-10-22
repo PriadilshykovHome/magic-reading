@@ -1,7 +1,8 @@
 // The reading game's content: the shared game index plus the lexicon, and item helpers.
 import { indexGame, type GameContent, type WorldContent } from '../../core/engine/content.ts';
-import type { Card, Strings, VoiceTree } from '../../core/engine/schema.ts';
-import type { Config, Level, Lexicon, Sentence, Syllable, Word, World } from './schema.ts';
+import type { Card, Strings, VoiceTree, World } from '../../core/engine/schema.ts';
+import type { LevelPlan } from './curriculum.ts';
+import type { Config, Level, Lexicon, Sentence, Syllable, Word } from './schema.ts';
 
 export type ItemKind = 'syllable' | 'word' | 'sentence';
 export const ITEM_KINDS: readonly ItemKind[] = ['syllable', 'word', 'sentence'];
@@ -13,12 +14,15 @@ export interface ContentBundle {
   voice: VoiceTree;
   strings: Strings;
   worlds: WorldContent<World, Level>[];
+  plans: LevelPlan[];
 }
 
 export interface Content extends GameContent<World, Level, Config> {
   syllables: Map<string, Syllable>;
   words: Map<string, Word>;
   sentences: Map<string, Sentence>;
+  /** Per level: letters known by then and what it introduces (src/reading/engine/curriculum.ts). */
+  plans: Map<string, LevelPlan>;
 }
 
 export function indexContent(bundle: ContentBundle): Content {
@@ -27,6 +31,7 @@ export function indexContent(bundle: ContentBundle): Content {
     syllables: new Map(bundle.lexicon.syllables.map((s) => [s.id, s])),
     words: new Map(bundle.lexicon.words.map((w) => [w.id, w])),
     sentences: new Map(bundle.lexicon.sentences.map((s) => [s.id, s])),
+    plans: new Map(bundle.plans.map((p) => [p.id, p])),
   };
 }
 

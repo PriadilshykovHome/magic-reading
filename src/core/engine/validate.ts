@@ -52,16 +52,20 @@ export interface GameFiles {
   levelFile(levelId: string): string;
 }
 
-/** Every check that doesn't depend on what the game teaches. */
+/**
+ * Every check that doesn't depend on what the game teaches. `dryBuild` builds every task each
+ * level could ask (seconds at 300 levels), so CI, tests and dev do it; production startup doesn't.
+ */
 export function checkGame<C extends GameContent>(
   content: C,
   files: GameFiles,
   registry: TaskRegistry,
   domain: DomainEngine<C>,
   error: Report,
+  { dryBuild = true }: { dryBuild?: boolean } = {},
 ) {
   for (const level of content.levels.values()) {
-    checkLevel(content, level as LevelOf<C>, files.levelFile(level.id), registry, domain, error);
+    checkLevel(content, level as LevelOf<C>, files.levelFile(level.id), registry, domain, error, dryBuild);
   }
   checkVoice(content, files.voice, registry, error);
 
@@ -80,6 +84,7 @@ function checkLevel<C extends GameContent>(
   registry: TaskRegistry,
   domain: DomainEngine<C>,
   error: Report,
+  deep: boolean,
 ) {
   const { config } = content;
   const order = content.levelOrder;
@@ -90,7 +95,7 @@ function checkLevel<C extends GameContent>(
   if (level.unlockAfter === null && at > 0) error(file, 'unlockAfter: only the very first level may be open from the start');
   for (const id of level.reviewFrom) if (!earlier(id)) error(file, `reviewFrom: ${id} must be an earlier level`);
   if (!content.voice.has(level.intro.voice)) error(file, `intro.voice: no voice line ${level.intro.voice}`);
-  if (!content.cards.has(level.reward.card)) error(file, `reward.card: unknown card ${level.reward.card}`);
+  if (level.reward.card && !content.cards.has(level.reward.card)) error(file, `reward.card: unknown card ${level.reward.card}`);
 
   // Tasks: known type, valid config, enough content to build every possible target.
   const ctx = domain.createBuildContext(content, level, seededRandom(1));
@@ -116,7 +121,7 @@ function checkLevel<C extends GameContent>(
     if (logic.reading && !logic.needsParent) readsAlone = true;
     if (logic.needsParent) parentTasks += entry.count;
     if (logic.scored && !logic.needsParent) fallbacks++;
-    dryBuild(ctx, logic, parsed.data, where, file, error);
+    if (deep) dryBuild(ctx, logic, parsed.data, where, file, error);
   });
   if (total < config.session.minTasks || total > config.session.maxTasks) {
     error(file, `tasks add up to ${total}; a level needs ${config.session.minTasks}–${config.session.maxTasks}`);
@@ -137,8 +142,8 @@ function checkLevel<C extends GameContent>(
       if (level.boss.item) {
         // A fixed door item may stay out of the pool (a surprise kept for the door), but must build.
         if (!domain.hasItem(content, level.boss.item)) error(file, `boss.item: unknown item ${level.boss.item}`);
-        else dryBuildOne(ctx, inner, parsed.data, level.boss.item, 'boss', file, error);
-      } else if (inner.eligible(ctx, parsed.data).length === 0) error(file, `boss: ${inner.id} has nothing to ask about`);
+        else if (deep) dryBuildOne(ctx, inner, parsed.data, level.boss.item, 'boss', file, error);
+      } else if (deep && inner.eligible(ctx, parsed.data).length === 0) error(file, `boss: ${inner.id} has nothing to ask about`);
       if (level.boss.openedLine && !content.voice.has(level.boss.openedLine)) error(file, `boss.openedLine: no voice line ${level.boss.openedLine}`);
     }
   }
@@ -206,11 +211,18 @@ export function assetChecker(options: ValidateOptions, issues: Issue[]) {
 /** Card art and Соня's recorded lines. */
 export function checkGameAssets(content: GameContent, files: GameFiles, missing: ReturnType<typeof assetChecker>) {
   for (const c of content.cards.values()) missing(files.cards, 'image', c.art, c.id);
+  const topics = new Map<string, Set<string>>(); // line id → topic keys it is said with
+  for (const level of content.levels.values()) {
+    const { voice, topic } = level.intro;
+    if (topic) topics.set(voice, (topics.get(voice) ?? new Set()).add(topic.key));
+  }
   for (const [id, value] of content.voice) {
-    const count = Array.isArray(value) ? value.length : 1;
-    for (let i = 0; i < count; i++) {
+    const list = Array.isArray(value) ? value : [value];
+    list.forEach((line, i) => {
       const name = Array.isArray(value) ? `${id}.${i + 1}` : id;
-      missing(files.voice, 'audio', `voice/sonya/${name}.mp3`, `voice line ${name}`);
-    }
+      // A line about a level's topic ("…літера {topic}") is recorded once per topic.
+      const variants = line.includes('{topic}') ? [...(topics.get(id) ?? [])].map((key) => `${name}.${key}`) : [name];
+      for (const variant of variants) missing(files.voice, 'audio', `voice/sonya/${variant}.mp3`, `voice line ${variant}`);
+    });
   }
 }

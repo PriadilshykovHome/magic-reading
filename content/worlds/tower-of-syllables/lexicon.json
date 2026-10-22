@@ -1,0 +1,41 @@
+{
+  "syllables": "МА МО МУ МИ МІ ЛА ЛО ЛУ ЛИ ЛІ НА НО НУ НИ НІ ТА ТО ТУ ТИ ТІ СА СО СУ СИ СІ",
+  "words": [
+    {"id": "w-mama", "split": "МА-МА", "emoji": "👩"},
+    {"id": "w-lama", "split": "ЛА-МА", "emoji": "🦙"},
+    {"id": "w-mylo", "split": "МИ-ЛО", "emoji": "🧼"},
+    {"id": "w-tato", "split": "ТА-ТО", "emoji": "👨"},
+    {"id": "w-lysa", "split": "ЛИ-СА", "emoji": "🦊"},
+    {"id": "w-noty", "split": "НО-ТИ", "emoji": "🎼"},
+    {"id": "w-sany", "split": "СА-НИ", "emoji": "🛷"},
+    {"id": "w-osa", "split": "О-СА", "emoji": "🐝"},
+    {"id": "w-lis", "split": "ЛІС", "emoji": "🌲"},
+    {"id": "w-nis", "split": "НІС", "emoji": "👃"},
+    {"id": "w-lymon", "split": "ЛИ-МОН", "emoji": "🍋"},
+    {"id": "w-tomat", "split": "ТО-МАТ", "emoji": "🍅"},
+    {"id": "w-salat", "split": "СА-ЛАТ", "emoji": "🥗"},
+    {"id": "w-maslo", "split": "МАС-ЛО", "emoji": "🧈"},
+    {"id": "w-namysto", "split": "НА-МИС-ТО", "emoji": "📿"},
+    {"id": "w-mist", "split": "МІСТ", "emoji": "🌉"}
+  ],
+  "sentences": [
+    {"id": "s-tato-tut", "text": "Тато тут.", "depicts": ["tato"], "emoji": "👨"},
+    {"id": "s-mama-tam", "text": "Мама там.", "depicts": ["mama"], "emoji": "👩"},
+    {"id": "s-lama-tut", "text": "Лама тут.", "depicts": ["lama"], "emoji": "🦙"},
+    {"id": "s-osa-tam", "text": "Оса там.", "depicts": ["osa"], "emoji": "🐝"},
+    {"id": "s-lysa-u-lisi", "text": "Лиса у лісі.", "depicts": ["lysa", "lis"], "emoji": "🦊🌲"},
+    {"id": "s-osa-na-nosi", "text": "Оса на носі.", "depicts": ["osa", "nis"], "emoji": "🐝👃"},
+    {"id": "s-mama-i-tato", "text": "Мама і тато.", "depicts": ["mama", "tato"], "emoji": "👩👨"},
+    {"id": "s-u-mamy-mylo", "text": "У мами мило.", "depicts": ["mama", "mylo"], "emoji": "👩🧼"},
+    {"id": "s-u-mamy-noty", "text": "У мами ноти.", "depicts": ["mama", "noty"], "emoji": "👩🎼"},
+    {"id": "s-u-tata-noty", "text": "У тата ноти.", "depicts": ["tato", "noty"], "emoji": "👨🎼"},
+    {"id": "s-osa-na-lymoni", "text": "Оса на лимоні.", "depicts": ["osa", "lymon"], "emoji": "🐝🍋"},
+    {"id": "s-osa-na-tomati", "text": "Оса на томаті.", "depicts": ["osa", "tomat"], "emoji": "🐝🍅"},
+    {"id": "s-u-tata-lymon", "text": "У тата лимон.", "depicts": ["tato", "lymon"], "emoji": "👨🍋"},
+    {"id": "s-u-mamy-salat", "text": "У мами салат.", "depicts": ["mama", "salat"], "emoji": "👩🥗"},
+    {"id": "s-u-mamy-namysto", "text": "У мами намисто.", "depicts": ["mama", "namysto"], "emoji": "👩📿"},
+    {"id": "s-lama-na-mostu", "text": "Лама на мосту.", "depicts": ["lama", "mist"], "emoji": "🦙🌉"},
+    {"id": "s-lysa-na-mostu", "text": "Лиса на мосту.", "depicts": ["lysa", "mist"], "emoji": "🦊🌉"},
+    {"id": "s-tomat-u-salati", "text": "Томат у салаті.", "depicts": ["tomat", "salat"], "emoji": "🍅🥗"}
+  ]
+}

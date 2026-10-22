@@ -66,8 +66,6 @@ export function sparkBalance(progress: Progress): number {
   return progress.rewards.sparksEarned - progress.rewards.sparksSpent;
 }
 
-const MAX_OK_DAYS = 14;
-
 export interface TaskOutcome {
   target: string;
   scored: boolean;
@@ -82,14 +80,16 @@ export interface TaskOutcome {
 export function recordTaskResult(progress: Progress, outcome: TaskOutcome, now: Date, config: Config): Progress {
   const prev = progress.items[outcome.target] ?? ItemProgressSchema.parse({});
   const today = dayKey(now);
-  let item: ItemProgress = { ...prev, seen: prev.seen + 1, lastSeen: now.toISOString() };
+  // Day keys, not timestamps: spaced repetition counts days, and the saved document stays small.
+  let item: ItemProgress = { ...prev, seen: prev.seen + 1, lastSeen: today };
   if (outcome.scored) {
     item = outcome.firstTry
       ? {
           ...item,
           box: Math.min(config.boxes.max, prev.box + 1),
           firstTryOk: prev.firstTryOk + 1,
-          okDays: prev.okDays.includes(today) ? prev.okDays : [...prev.okDays, today].slice(-MAX_OK_DAYS),
+          // Mastery only needs the last few distinct days, which keeps the saved document small.
+          okDays: prev.okDays.includes(today) ? prev.okDays : [...prev.okDays, today].slice(-config.mastery.distinctDays),
         }
       : { ...item, box: 1, wrong: prev.wrong + 1 };
   }

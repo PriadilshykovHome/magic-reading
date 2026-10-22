@@ -38,7 +38,7 @@ function Intro({ level }: { level: Level }) {
     void (async () => {
       await wait(500);
       setTalking(true);
-      await voice.say(level.intro.voice);
+      await voice.say(level.intro.voice, 'after', level.intro.topic);
       if (cancelled) return;
       setTalking(false);
       setPlaying(true);

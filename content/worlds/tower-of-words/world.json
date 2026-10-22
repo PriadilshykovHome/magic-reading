@@ -2,16 +2,225 @@
   "id": "tower-of-words",
   "order": 2,
   "title": "Вежа Слів",
-  "allowedLetters": "МЛНТСАОУИІКРВДПШ",
-  "levels": [
-    "levels/01-k-r.json",
-    "levels/02-v-d.json",
-    "levels/03-p-sh.json",
-    "levels/04-sentences.json",
-    "levels/05-name.json"
-  ],
-  "map": {
-    "art": "img/maps/tower-of-words.webp",
-    "music": "music/tower-of-words.mp3"
-  }
+  "look": "scroll-tower",
+  "units": [
+    {
+      "key": "name",
+      "letters": "КРВДПШ",
+      "levels": [
+        {
+          "id": "tower-of-words/01",
+          "title": "Літери К і Р",
+          "intro": {"voice": "levelIntro.w2l01", "demo": {"type": "syllableMerge", "items": ["syl-ka", "syl-ra"]}},
+          "pool": {
+            "syllables": [
+              "syl-ka",
+              "syl-ko",
+              "syl-ku",
+              "syl-ky",
+              "syl-ki",
+              "syl-ra",
+              "syl-ro",
+              "syl-ru",
+              "syl-ry",
+              "syl-ri"
+            ],
+            "words": ["w-ruka", "w-korona", "w-komar", "w-kit", "w-rak", "w-syr", "w-rot", "w-rys"],
+            "sentences": []
+          },
+          "reviewFrom": ["tower-of-syllables/06"],
+          "tasks": [
+            {"type": "syllableMerge", "count": 1},
+            {"type": "hearPick", "count": 2, "itemKind": "syllable", "choices": 3},
+            {"type": "bubblePop", "count": 1},
+            {"type": "readPickPicture", "count": 2, "choices": 3},
+            {"type": "buildWord", "count": 1, "extraTiles": 1},
+            {"type": "readAloud", "count": 1, "itemKind": "word"}
+          ],
+          "boss": {"type": "magicDoor", "inner": "readPickPicture", "pick": "newest"},
+          "card": "card-penguin"
+        },
+        {
+          "id": "tower-of-words/02",
+          "title": "Літери В і Д",
+          "intro": {"voice": "levelIntro.w2l02", "demo": {"type": "syllableMerge", "items": ["syl-va", "syl-da"]}},
+          "pool": {
+            "syllables": [
+              "syl-va",
+              "syl-vo",
+              "syl-vu",
+              "syl-vy",
+              "syl-vi",
+              "syl-da",
+              "syl-do",
+              "syl-du",
+              "syl-dy",
+              "syl-di"
+            ],
+            "words": ["w-voda", "w-dim", "w-dyvan", "w-vovk", "w-drakon", "w-vydra", "w-radio"],
+            "sentences": []
+          },
+          "reviewFrom": ["tower-of-words/01"],
+          "tasks": [
+            {"type": "syllableMerge", "count": 1},
+            {"type": "hearPick", "count": 2, "itemKind": "syllable", "choices": 3},
+            {"type": "bubblePop", "count": 1},
+            {"type": "readPickPicture", "count": 2, "choices": 3},
+            {"type": "buildWord", "count": 1, "extraTiles": 1},
+            {"type": "readAloud", "count": 1, "itemKind": "word"}
+          ],
+          "boss": {"type": "magicDoor", "inner": "readPickPicture", "pick": "newest"},
+          "card": "card-bear"
+        },
+        {
+          "id": "tower-of-words/03",
+          "title": "Літери П і Ш",
+          "intro": {"voice": "levelIntro.w2l03", "demo": {"type": "syllableMerge", "items": ["syl-pa", "syl-sha"]}},
+          "pool": {
+            "syllables": [
+              "syl-pa",
+              "syl-po",
+              "syl-pu",
+              "syl-py",
+              "syl-pi",
+              "syl-sha",
+              "syl-sho",
+              "syl-shu",
+              "syl-shy",
+              "syl-shi"
+            ],
+            "words": ["w-myshka", "w-pavuk", "w-kasha", "w-poshta", "w-panda", "w-lapa", "w-shokolad", "w-kapusta"],
+            "sentences": []
+          },
+          "reviewFrom": ["tower-of-words/02"],
+          "tasks": [
+            {"type": "syllableMerge", "count": 1},
+            {"type": "hearPick", "count": 2, "itemKind": "syllable", "choices": 3},
+            {"type": "bubblePop", "count": 1},
+            {"type": "readPickPicture", "count": 2, "choices": 3},
+            {"type": "buildWord", "count": 1, "extraTiles": 1},
+            {"type": "readAloud", "count": 1, "itemKind": "word"}
+          ],
+          "boss": {"type": "magicDoor", "inner": "readPickPicture", "pick": "newest"},
+          "card": "card-unicorn"
+        },
+        {
+          "id": "tower-of-words/04",
+          "title": "Речення з новими словами",
+          "intro": {"voice": "levelIntro.w2l04", "demo": {"type": "readAlong", "items": ["s-kit-na-dyvani"]}},
+          "pool": {
+            "syllables": [],
+            "words": ["w-voda", "w-dim", "w-dyvan", "w-vovk", "w-drakon", "w-myshka", "w-pavuk", "w-kasha", "w-poshta"],
+            "sentences": [
+              "s-kit-na-dyvani",
+              "s-panda-na-dyvani",
+              "s-vovk-u-lisi",
+              "s-vydra-u-vodi",
+              "s-u-myshky-shokolad",
+              "s-u-drakona-shokolad",
+              "s-u-drakona-kasha",
+              "s-kit-i-myshka"
+            ]
+          },
+          "reviewFrom": ["tower-of-words/03"],
+          "tasks": [
+            {"type": "sentencePicture", "count": 3, "choices": 3},
+            {"type": "readPickPicture", "count": 2, "choices": 3},
+            {"type": "buildWord", "count": 1, "extraTiles": 1},
+            {"type": "readAloud", "count": 2, "itemKind": "sentence"}
+          ],
+          "boss": {"type": "magicDoor", "inner": "sentencePicture", "pick": "weakest"},
+          "card": "card-fox"
+        },
+        {
+          "id": "tower-of-words/05",
+          "title": "Чарівне ім’я",
+          "intro": {"voice": "levelIntro.w2l05", "demo": {"type": "readAlong", "items": ["s-kit-i-myshka"]}},
+          "pool": {
+            "syllables": [
+              "syl-ka",
+              "syl-ko",
+              "syl-ku",
+              "syl-ky",
+              "syl-ki",
+              "syl-ra",
+              "syl-ro",
+              "syl-ru",
+              "syl-ry",
+              "syl-ri",
+              "syl-va",
+              "syl-vo",
+              "syl-vu",
+              "syl-vy",
+              "syl-vi",
+              "syl-da",
+              "syl-do",
+              "syl-du",
+              "syl-dy",
+              "syl-di",
+              "syl-pa",
+              "syl-po",
+              "syl-pu",
+              "syl-py",
+              "syl-pi",
+              "syl-sha",
+              "syl-sho",
+              "syl-shu",
+              "syl-shy",
+              "syl-shi"
+            ],
+            "words": [
+              "w-ruka",
+              "w-korona",
+              "w-komar",
+              "w-kit",
+              "w-rak",
+              "w-syr",
+              "w-rot",
+              "w-rys",
+              "w-voda",
+              "w-dim",
+              "w-dyvan",
+              "w-vovk",
+              "w-drakon",
+              "w-vydra",
+              "w-radio",
+              "w-myshka",
+              "w-pavuk",
+              "w-kasha",
+              "w-poshta",
+              "w-panda",
+              "w-lapa",
+              "w-shokolad",
+              "w-kapusta"
+            ],
+            "sentences": [
+              "s-kit-na-dyvani",
+              "s-panda-na-dyvani",
+              "s-vovk-u-lisi",
+              "s-vydra-u-vodi",
+              "s-u-myshky-shokolad",
+              "s-u-drakona-shokolad",
+              "s-u-drakona-kasha",
+              "s-kit-i-myshka"
+            ]
+          },
+          "tasks": [
+            {"type": "hearPick", "count": 1, "itemKind": "syllable", "choices": 3},
+            {"type": "readPickPicture", "count": 3, "choices": 3},
+            {"type": "buildWord", "count": 2, "extraTiles": 1},
+            {"type": "sentencePicture", "count": 2, "choices": 3},
+            {"type": "readAloud", "count": 1, "itemKind": "word"}
+          ],
+          "boss": {
+            "type": "magicDoor",
+            "inner": "readPickPicture",
+            "item": "w-myshko",
+            "openedLine": "magicDoor.ownName"
+          },
+          "card": "card-golden-dragon"
+        }
+      ]
+    }
+  ]
 }

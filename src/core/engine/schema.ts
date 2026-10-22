@@ -7,7 +7,7 @@ export const slugId = (prefix: string) =>
   z.string().regex(new RegExp(`^${prefix}[a-z0-9]+(-[a-z0-9]+)*$`), `must look like ${prefix}name`);
 
 export const CardId = slugId('card-');
-export const LevelId = z.string().regex(/^[a-z0-9-]+\/\d{2}$/, 'must look like world-id/01');
+export const LevelId = z.string().regex(/^[a-z0-9-]+\/[a-z0-9-]+$/, 'must look like world-id/level-key');
 
 export const AssetPath = z.string().regex(/^[a-z0-9_-]+(\/[a-z0-9_.-]+)+$/, 'lower-case relative path');
 export const Text = z.string().trim().min(1);
@@ -21,8 +21,13 @@ export const CoreConfigSchema = z.strictObject({
   session: z.strictObject({ minTasks: Count, maxTasks: Count, reviewShare: Ratio }),
   answers: z.strictObject({ maxChoices: z.number().int().min(2).max(3), hintAfterMisses: Count }),
   boxes: z
-    .strictObject({ max: z.number().int().min(2), weights: z.array(z.number().positive()) })
-    .refine((b) => b.weights.length === b.max, 'boxes.weights needs one weight per box'),
+    .strictObject({
+      max: z.number().int().min(2),
+      weights: z.array(z.number().positive()),
+      /** Days until an item in each box is due again (box 1 is always due). */
+      intervalDays: z.array(z.number().min(0)),
+    })
+    .refine((b) => b.weights.length === b.max && b.intervalDays.length === b.max, 'boxes needs one weight and one interval per box'),
   stars: z.strictObject({ three: Ratio, two: Ratio }),
   sparks: z.strictObject({
     perCorrect: Count,
@@ -82,6 +87,8 @@ export const TaskEntrySchema = z.looseObject({ type: z.string().min(1), count: C
 
 export const IntroSchema = z.strictObject({
   voice: z.string().min(1),
+  /** What the level is about (e.g. a new letter), filling {topic} in Соня's line; `key` names its recording. */
+  topic: z.strictObject({ text: Text, key: z.string().regex(/^[a-z0-9-]+$/) }).optional(),
   /** The domain defines the demo types and which items they take. */
   demo: z.strictObject({ type: z.string().min(1), items: z.array(z.string().min(1)).min(1) }),
 });
@@ -103,7 +110,8 @@ export const LevelSchema = z.strictObject({
     /** Соня's line when this door opens (default: magicDoor.opened). */
     openedLine: z.string().optional(),
   }),
-  reward: z.strictObject({ card: CardId }),
+  /** A card for finishing the level (not every level has one). */
+  reward: z.strictObject({ card: CardId.optional() }).prefault({}),
 });
 
 export const WorldSchema = z.strictObject({
@@ -111,8 +119,8 @@ export const WorldSchema = z.strictObject({
   /** Worlds are played in this order (1, 2, …). */
   order: z.number().int().min(1),
   title: Text,
-  levels: z.array(z.string().regex(/^levels\/[a-z0-9-]+\.json$/)).min(1),
-  map: z.strictObject({ art: AssetPath, music: AssetPath }),
+  /** The scenery preset of its stretch of the journey road. */
+  look: z.string().regex(/^[a-z0-9-]+$/),
 });
 
 export type CoreConfig = z.output<typeof CoreConfigSchema>;
