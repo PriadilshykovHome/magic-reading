@@ -20,7 +20,8 @@
     "check-prod-build": "node --disable-warning=ExperimentalWarning scripts/check-prod-build.ts",
     "test:rules": "firebase emulators:exec --only firestore --project demo-magic-reading 'vitest run --config vitest.rules.config.ts'",
     "deploy:rules": "firebase deploy --only firestore:rules",
-    "bundle-report": "node --disable-warning=ExperimentalWarning scripts/bundle-report.ts"
+    "bundle-report": "node --disable-warning=ExperimentalWarning scripts/bundle-report.ts",
+    "review-list": "node --disable-warning=ExperimentalWarning scripts/review-list.ts"
   },
   "dependencies": {
     "@tsparticles/confetti": "^4.4.0",

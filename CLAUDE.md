@@ -250,6 +250,7 @@ npm run check-prod-build  # dist/ has no data-correct, /dev routes or __audio, a
 npm run audio:generate    # regenerate effects sprite + music (MP3, needs ffmpeg) from scripts/make-audio.ts
 npm run bundle-report     # what each package and folder costs in the production build
 npm run validate-content  # content checks; -- --strict (assets are errors), --verbose, --root <dir>
+npm run review-list -- <world>  # docs/review/<world>.md: the native-speaker check of a world's words, sentences, lines, cards
 npm run test:rules        # Firestore security rules in the emulator (needs Java 21)
 npm run deploy:rules      # publish firestore.rules to the Firebase project (firebase login first)
 ```

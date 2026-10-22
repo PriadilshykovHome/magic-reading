@@ -82,7 +82,8 @@ sentence is longer than any before, point a layout screen at it in `e2e/layout.s
 
 ## 5. Hand over a review list
 
-End with a native-speaker review list in `docs/review/wave-<n>.md` (see `wave-1.md`): every new
-word with its split and stress mark, every new sentence with its scene, any new Соня line and
-card name, and a short list of the choices you were unsure about. Check stress and у/в yourself
-first (бо́бер, авто́бус, не́бо, моро́зиво, пи́санка, ка́мінь, чо́боти were all wrong in the first draft).
+Run `npm run review-list -- <world-id> …`: it writes `docs/review/<world-id>.md` for each world
+(every new word with its split and stress mark, every sentence with its scene, Соня's new lines,
+new cards). Add a short "Words I was unsure about" list at the end by hand, and give the user the
+files. Check stress and у/в yourself first (бо́бер, авто́бус, не́бо, моро́зиво, пи́санка, ка́мінь,
+чо́боти were all wrong in the first draft).

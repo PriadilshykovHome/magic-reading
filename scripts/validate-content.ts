@@ -2,12 +2,13 @@
 // Checks every file in content/ (schemas, ids, letters, the curriculum's pace, task configs, pool
 // sizes) and that the audio and pictures it names exist under public/. Exit code 1 on any error.
 // --report prints the progress curve: what each level introduces and how much he can read by then.
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { curve } from '../src/reading/engine/curriculum.ts';
-import { validateContent, type Issue, type RawBundle, type RawFile } from '../src/reading/engine/validate.ts';
+import { validateContent, type Issue } from '../src/reading/engine/validate.ts';
 import { taskLogics } from '../src/reading/tasks/logicRegistry.ts';
+import { readContent } from './content-files.ts';
 
 const args = process.argv.slice(2);
 const rootArg = args.indexOf('--root');
@@ -16,37 +17,7 @@ const strict = args.includes('--strict');
 const verbose = args.includes('--verbose');
 const report = args.includes('--report');
 
-const loadErrors: Issue[] = [];
-const rel = (path: string) => path.slice(root.length + 1);
-
-function load(path: string): RawFile {
-  const file = rel(path);
-  try {
-    return { file, data: JSON.parse(readFileSync(path, 'utf8')) };
-  } catch (e) {
-    loadErrors.push({ severity: 'error', file, message: e instanceof Error ? e.message : String(e) });
-    return { file, data: undefined };
-  }
-}
-
-const content = join(root, 'content');
-const worldsDir = join(content, 'worlds');
-const worldIds = existsSync(worldsDir)
-  ? readdirSync(worldsDir, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name).sort()
-  : [];
-
-const raw: RawBundle = {
-  config: load(join(content, 'config.json')),
-  templates: load(join(content, 'templates.json')),
-  scenes: load(join(content, 'scenes.json')),
-  cards: load(join(content, 'cards.json')),
-  voice: load(join(content, 'voice.uk.json')),
-  strings: load(join(content, 'strings.uk.json')),
-  worlds: worldIds.map((id) => ({
-    world: load(join(worldsDir, id, 'world.json')),
-    lexicon: existsSync(join(worldsDir, id, 'lexicon.json')) ? load(join(worldsDir, id, 'lexicon.json')) : { file: rel(join(worldsDir, id, 'lexicon.json')), data: {} },
-  })),
-};
+const { raw, worldIds, loadErrors } = readContent(root);
 
 const { issues, content: valid } = loadErrors.length
   ? { issues: loadErrors, content: null }
