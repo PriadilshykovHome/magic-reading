@@ -19,15 +19,16 @@ const WRITE_EVERY_MS = 5000;
 
 /** The web config is public by design (the security rules protect the data); none in e2e runs. */
 function firebaseConfig(): FirebaseOptions | null {
-  const env = import.meta.env;
-  if (SILENT || !env.VITE_FIREBASE_API_KEY || !env.VITE_FIREBASE_PROJECT_ID) return null;
+  // Trimmed: a value pasted into the repository variables can carry a stray line break.
+  const env = (name: string): string | undefined => (import.meta.env[`VITE_FIREBASE_${name}`] as string | undefined)?.trim() || undefined;
+  if (SILENT || !env('API_KEY') || !env('PROJECT_ID')) return null;
   return {
-    apiKey: env.VITE_FIREBASE_API_KEY,
-    authDomain: env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: env.VITE_FIREBASE_APP_ID,
+    apiKey: env('API_KEY'),
+    authDomain: env('AUTH_DOMAIN'),
+    projectId: env('PROJECT_ID'),
+    storageBucket: env('STORAGE_BUCKET'),
+    messagingSenderId: env('MESSAGING_SENDER_ID'),
+    appId: env('APP_ID'),
   };
 }
 
