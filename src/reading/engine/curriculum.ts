@@ -224,7 +224,7 @@ export function expandCurriculum(
   const byId = new Map(levels.map((l) => [l.id, l]));
   return {
     worlds: sorted.map(({ data }) => ({
-      world: { id: data.id, order: data.order, title: data.title, look: data.look },
+      world: { id: data.id, order: data.order, title: data.title, look: data.look, signs: data.signs },
       levels: slots.filter((s) => s.source.data === data).flatMap((s) => byId.get(s.id) ?? []),
     })),
     plans,

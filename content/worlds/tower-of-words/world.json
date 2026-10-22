@@ -3,6 +3,7 @@
   "order": 2,
   "title": "Вежа Слів",
   "look": "scroll-tower",
+  "signs": ["w-dim", "w-voda", "w-poshta"],
   "units": [
     {
       "key": "name",

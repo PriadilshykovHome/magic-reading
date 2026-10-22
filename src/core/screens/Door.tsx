@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { unlockAudio } from '../audio/voice';
-import { currentSeason } from '../fx/currentSeason';
-import { Pumpkin } from '../fx/ambient/Pumpkin';
+import { Kharkiv } from '../fx/ambient/Kharkiv';
 import { Scene, type CandleSpot } from '../fx/ambient/Scene';
+import { PropLayer } from '../fx/props/Props';
+import { useProps } from '../fx/props/useProps';
 import { t } from '../strings';
 import { FullscreenIcon } from '../ui/Icons';
 import { DoorArt } from './DoorArt';
@@ -20,7 +21,6 @@ const CANDLES: CandleSpot[] = [
   { x: 3, y: 42, scale: 0.5 },
   { x: 12, y: 60, scale: 0.8 },
   { x: 92, y: 62, scale: 0.6 },
-  { x: 89, y: 84, scale: 0.7 },
   { x: 22, y: 14, scale: 0.6, wide: true },
   { x: 25, y: 52, scale: 0.45, wide: true },
   { x: 78, y: 10, scale: 0.5, wide: true },
@@ -33,7 +33,7 @@ const CANDLES: CandleSpot[] = [
 export function DoorScreen() {
   const navigate = useNavigate();
   const [opening, setOpening] = useState(false);
-  const [season] = useState(currentSeason);
+  const props = useProps('door');
 
   function enter() {
     if (opening) return;
@@ -49,6 +49,8 @@ export function DoorScreen() {
   return (
     <main className={`screen door-screen ${opening ? 'is-opening' : ''}`}>
       <Scene candles={CANDLES} />
+      <Kharkiv />
+      <PropLayer ids={props} slots={['sky', 'moon', 'roofs', 'corner']} />
 
       <div className="door-layout">
         <div className="door-text">
@@ -72,12 +74,7 @@ export function DoorScreen() {
           <button type="button" className="door" aria-label={t.door.doorLabel} onClick={enter}>
             <DoorArt />
           </button>
-          {season === 'autumn' && (
-            <>
-              <Pumpkin className="pumpkin-left" />
-              <Pumpkin className="pumpkin-right" />
-            </>
-          )}
+          <PropLayer ids={props} slots={['ground-left', 'ground-right']} />
         </div>
       </div>
 

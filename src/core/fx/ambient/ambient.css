@@ -281,3 +281,148 @@
     display: none;
   }
 }
+
+/* ---------- Kharkiv on the horizon (door screen) ---------- */
+
+:root {
+  /* the skyline's height; Держпром is 4/3 as wide, at right: 14% (props.css puts a stork on it) */
+  --kharkiv-h: clamp(72px, 15vmin, 150px);
+}
+
+.kharkiv {
+  position: absolute;
+  inset: auto 0 0;
+  height: var(--kharkiv-h);
+  pointer-events: none;
+}
+
+.kharkiv-roofs,
+.kharkiv-landmark {
+  position: absolute;
+  bottom: 0;
+  fill: #1d1727;
+  /* the foot of the city melts into the mist */
+  -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent);
+  mask-image: linear-gradient(to bottom, #000 70%, transparent);
+}
+
+.kharkiv-roofs {
+  left: 0;
+  width: 100%;
+  height: 40px;
+  opacity: 0.85;
+}
+
+.kharkiv-landmark {
+  height: 100%;
+  width: auto;
+  overflow: visible;
+}
+
+.kharkiv-landmark > path {
+  fill: #221b2e;
+  filter: drop-shadow(0 -1px 0 rgb(240 214 138 / 0.08));
+}
+
+.kharkiv-cathedral {
+  left: 24%;
+  height: 92%;
+}
+
+.kharkiv-derzhprom {
+  right: 14%;
+}
+
+.kharkiv-windows rect {
+  fill: #f0c86a;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+.kharkiv-windows rect.is-on {
+  opacity: 0.35;
+}
+
+.kharkiv.is-lit .kharkiv-windows rect {
+  opacity: 0.85;
+}
+
+/* stagger the egg's lights a little, window by window */
+.kharkiv.is-lit .kharkiv-windows rect:nth-child(3n) {
+  transition-delay: 0.3s;
+}
+
+.kharkiv.is-lit .kharkiv-windows rect:nth-child(3n + 1) {
+  transition-delay: 0.6s;
+}
+
+.kharkiv-wheel {
+  position: absolute;
+  left: calc(14px + env(safe-area-inset-left));
+  bottom: calc(6px + env(safe-area-inset-bottom));
+  width: clamp(64px, 13vmin, 116px);
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  z-index: 2; /* above the door layout, which covers the screen */
+  pointer-events: auto;
+  opacity: 0.8;
+}
+
+.kharkiv-wheel svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.kharkiv-wheel-legs,
+.kharkiv-wheel-turn line,
+.kharkiv-wheel-turn > circle:not(.kharkiv-cabin, .kharkiv-hub) {
+  fill: none;
+  stroke: #3a2f47;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.kharkiv-wheel-turn > circle:first-child {
+  stroke: #4a3d58;
+  stroke-width: 2.6;
+}
+
+.kharkiv-cabin {
+  fill: #3a2f47;
+  stroke: rgb(240 200 106 / 0.35);
+  stroke-width: 1;
+  transition: fill 1.2s ease;
+}
+
+.kharkiv-hub {
+  fill: #4a3d58;
+}
+
+.kharkiv.is-lit .kharkiv-cabin {
+  fill: #f0c86a;
+}
+
+.kharkiv-wheel-turn {
+  transform-origin: 50px 50px;
+  animation: wheel-turn 120s linear infinite;
+}
+
+@keyframes wheel-turn {
+  to { transform: rotate(360deg); }
+}
+
+.kharkiv-wheel:focus-visible {
+  outline: 2px solid var(--gold-light);
+  outline-offset: 4px;
+  border-radius: 50%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kharkiv-wheel-turn {
+    animation: none;
+  }
+}

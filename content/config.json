@@ -59,6 +59,20 @@
     "eveningFromHour": 19,
     "morningUntilHour": 10
   },
+  "props": {
+    "perScreen": 2,
+    "dates": {
+      "pumpkins": ["10-01", "11-10"],
+      "mykolai": ["12-05", "12-07"],
+      "carolStar": ["12-25", "01-19"],
+      "stork": ["04-01", "06-30"],
+      "kalyna": ["09-01", "12-31"]
+    },
+    "chance": {
+      "sleepyOwl": 0.5,
+      "owlMoon": 0.35
+    }
+  },
   "grammar": {
     "patronymicVocative": [["ович", "овичу"], ["івна", "івно"], ["ївна", "ївно"]]
   }

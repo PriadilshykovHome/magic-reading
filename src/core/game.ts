@@ -20,6 +20,8 @@ export interface GameData {
   item(id: string): { text: string; audio?: string };
   /** Every item a level may ask about, so its audio can preload. */
   levelItems(level: Level): string[];
+  /** Which items he can read by now (every letter known from the levels he has finished). */
+  canRead(progress: Progress): (id: string) => boolean;
   /** How its door looks on the journey road. */
   nodeKind(level: Level): 'door' | 'review' | 'finale';
   /** Today's warm-up over what he has finished, or null if there's not enough yet. */

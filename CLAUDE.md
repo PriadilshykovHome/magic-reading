@@ -113,6 +113,11 @@ docs/PLAN.md
   from `content/scenes.json`). `SceneView` composes it from the words' pictures, and wrong pictures
   change exactly one thing the sentence says (`src/reading/engine/scene.ts`), so no sentence needs
   hand-made distractors.
+- A world's `signs` (word ids in world.json) become signposts on the journey road once he knows
+  all their letters; tapping one has Соня read it.
+- Ambient props (`src/core/fx/props/`: `pick.ts` chooses, `Props.tsx` draws): at most
+  `config.props.perScreen` a screen, seasonal ones on their `props.dates`, the rest by daily
+  `props.chance`. Preview with `?date=YYYY-MM-DD` or `?props=owlMoon,stork` before the `#/`.
 - The daily warm-up («Чарівна розминка», the `warmup` template) reviews finished levels once a day
   from the map's cauldron; it lights the day's castle window and records no level progress.
 - Text is shown in UPPERCASE unless the parent turns on lowercase sentences.

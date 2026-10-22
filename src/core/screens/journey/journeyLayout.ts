@@ -108,7 +108,7 @@ export function journeyLayout(regions: readonly RegionInput[], viewport: { width
       for (const node of nodes) {
         if (node.x === W / 2) continue;
         const left = node.x > W / 2;
-        spots.push({ x: left ? 8 + reach / 2 : W - 8 - reach / 2, y: node.y, maxW: Math.min(reach, 140), region: node.region });
+        spots.push({ x: left ? 8 + reach / 2 : W - 8 - reach / 2, y: node.y, maxW: Math.min(reach, 200), region: node.region });
       }
     }
     regions.forEach((region, r) => {
@@ -149,7 +149,7 @@ export function journeyLayout(regions: readonly RegionInput[], viewport: { width
     for (const node of nodes) {
       if (node.y === H / 2) continue;
       const above = node.y > H / 2;
-      spots.push({ x: node.x, y: above ? 8 + room / 2 : H - 8 - room / 2, maxW: 140, region: node.region });
+      spots.push({ x: node.x, y: above ? 8 + room / 2 : H - 8 - room / 2, maxW: 200, region: node.region });
     }
   }
   return { orientation, width: length, height: H, door, regions: placed, nodes, spots };

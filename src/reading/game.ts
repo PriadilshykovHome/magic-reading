@@ -5,6 +5,7 @@ import { content } from './content/load';
 import { ITEM_KINDS, itemText, poolOf, reviewPoolOf } from './engine/content';
 import { warmupLevel } from './engine/curriculum';
 import { readingEngine } from './engine/domain';
+import { lettersOf } from './engine/lexicon';
 import type { Level } from './engine/schema';
 import { taskLogics } from './tasks/logicRegistry';
 
@@ -25,6 +26,14 @@ export const game: GameData = {
     const finished = content.levelOrder.filter((id) => (progress.levels[id]?.bestStars ?? 0) > 0);
     const recent = finished.flatMap((id) => (content.levels.get(id) as Level).pool.sentences).at(-1);
     return warmupLevel(content.warmup, finished, recent);
+  },
+  canRead(progress) {
+    const last = content.levelOrder.findLast((id) => (progress.levels[id]?.bestStars ?? 0) > 0);
+    const known = new Set(last ? content.plans.get(last)?.known : '');
+    return (id) => {
+      const text = content.words.get(id)?.text ?? content.sentences.get(id)?.text;
+      return text !== undefined && lettersOf(text).every((ch) => known.has(ch));
+    };
   },
   nodeKind(level) {
     const template = content.plans.get(level.id)?.template;

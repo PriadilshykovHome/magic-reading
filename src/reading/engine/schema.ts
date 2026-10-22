@@ -170,6 +170,8 @@ export const WorldFileSchema = z.strictObject({
   order: z.number().int().min(1),
   title: Text,
   look: Key,
+  /** Words on signposts along its stretch of the road, shown once he knows their letters. */
+  signs: z.array(WordId).default([]),
   units: z.array(UnitSchema).min(1),
 });
 

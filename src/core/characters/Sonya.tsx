@@ -1,9 +1,18 @@
 import './characters.css';
 
+// Her вишиванка scarf: a band of linen around her neck, embroidered in red and black (rhombi and
+// little crosses, never stripes), with one end hanging down over her chest.
+const BAND = (t: number) => {
+  const u = 1 - t;
+  return { x: u * u * 23 + 2 * u * t * 60 + t * t * 97, y: u * u * 88 + 2 * u * t * 104 + t * t * 88 };
+};
+const STITCHES = Array.from({ length: 9 }, (_, i) => ({ ...BAND(0.1 + i * 0.1), cross: i % 2 === 1 }));
+const rhombus = (x: number, y: number, r: number) => `M${x} ${y - r}l${r} ${r}-${r} ${r}-${r}-${r}z`;
+
 export type SonyaMood = 'idle' | 'happy' | 'shrug' | 'talk' | 'celebrate';
 
 /**
- * Сова Соня: a small round purple owl with glasses and a tiny hat (never white). A layered SVG
+ * Сова Соня: a small round purple owl with glasses, a tiny hat and a вишиванка scarf (never white). A layered SVG
  * whose parts Phase 6 animates properly; for now simple CSS moods.
  */
 export function Sonya({ mood = 'idle', className = '' }: { mood?: SonyaMood; className?: string }) {
@@ -46,6 +55,24 @@ export function Sonya({ mood = 'idle', className = '' }: { mood?: SonyaMood; cla
             <circle cx="44" cy="66" r="15" />
             <circle cx="76" cy="66" r="15" />
             <path d="M59 64q1-2 2 0" />
+          </g>
+          <g className="sonya-scarf">
+            <path d="M22 84Q60 100 98 84l1 8Q60 109 21 92z" fill="#efe6d2" />
+            <path d="M66 97l13-4 3 27-14 3z" fill="#e6dcc6" />
+            <path d="M68 123l1 4M71.5 122.4l1 4M75 121.8l1 4M78.5 121.2l1 4" stroke="#d8cdb4" strokeWidth="1.2" strokeLinecap="round" />
+            {STITCHES.map(({ x, y, cross }, i) =>
+              cross ? (
+                <path key={i} d={`M${x - 1.6} ${y - 1.6}l3.2 3.2m0-3.2l-3.2 3.2`} stroke="#2b1d10" strokeWidth="1" />
+              ) : (
+                <g key={i}>
+                  <path d={rhombus(x, y, 2.8)} fill="#a83232" />
+                  <circle cx={x} cy={y} r="0.8" fill="#2b1d10" />
+                </g>
+              ),
+            )}
+            <path d={rhombus(74, 108, 4.4)} fill="#a83232" />
+            <path d={rhombus(74, 108, 2)} fill="#efe6d2" />
+            <path d="M74 101.6v-1.8M74 114.4v1.8M67.6 108h-1.8M80.4 108h1.8" stroke="#2b1d10" strokeWidth="1.1" />
           </g>
           <path d="M55 78l5 9 5-9z" fill="#f0b55a" />
           <path d="M48 124l-4 6M54 125v6M66 125v6M72 124l4 6" stroke="#f0b55a" strokeWidth="3" strokeLinecap="round" />

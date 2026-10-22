@@ -3,6 +3,7 @@
   "order": 1,
   "title": "Вежа Складів",
   "look": "stone-tower",
+  "signs": ["w-lis", "w-mist", "w-sany"],
   "units": [
     {
       "key": "basics",

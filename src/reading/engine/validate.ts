@@ -106,6 +106,7 @@ export function validateContent(
   // 4. Every level uses only letters known by then; pools and demos name real items of the right kind.
   for (const level of content.levels.values()) checkLevelItems(content, level, fileOfLevel(level.id), error);
   checkPace(content, error);
+  checkSigns(content, error);
 
   // 5. Everything every game checks: tasks, the Magic Door, Соня's lines, config references.
   checkGame(content, files, registry, readingEngine, error, { dryBuild: options.deep ?? true });
@@ -193,4 +194,17 @@ function checkItemAssets(content: Content, file: string, missing: ReturnType<typ
     missing(file, 'image', w.picture, w.id);
   }
   for (const s of content.sentences.values()) missing(file, 'audio', s.audio, s.id);
+}
+
+/** A world's signposts name real words he can read by the end of that world. */
+function checkSigns(content: Content, error: Report) {
+  for (const { world, levels } of content.worlds) {
+    const file = content.plans.get(levels[0]?.id ?? '')?.file ?? 'content/worlds';
+    const known = content.plans.get(levels.at(-1)?.id ?? '')?.known ?? '';
+    for (const id of world.signs) {
+      const word = content.words.get(id);
+      if (!word) error(file, `signs: unknown word ${id}`);
+      else if (lettersOf(word.text).some((ch) => !known.includes(ch))) error(file, `signs: ${id} uses letters not taught by the end of ${world.id}`);
+    }
+  }
 }

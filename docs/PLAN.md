@@ -348,9 +348,10 @@ Totals: about 115 levels to all 33 letters, then about 175 levels of fluency and
 - **Magic props:**
   - a sleepy owl on a ledge, and owl silhouettes crossing the moon;
   - Соня's вишиванка-embroidered scarf;
-  - a broom by the door, and a far-off Баба Яга broom flight;
+  - a broom by the door;
   - a quill writing letters in the air, a bubbling казан, stacked spell books, a wand drawing each new road segment;
-  - **Сузір’я літер:** the letters he has learned as faint constellations.
+  - **Сузір’я літер:** the letters he has learned as faint constellations, opening the Book of Spells (Phase 9). The door screen's sky is already full of candles, so they don't go there.
+  - No Баба Яга (decided 22 Oct 2026).
 - **Readable signs:** a sign shows its word only once all its letters are known, so text he can read appears around the world as he learns. Tapping a sign says its word.
 - **Ukraine:**
   - sunflowers along the road, калина, a stork's nest in spring, Petrykivka-style borders on the Book and the cards;
@@ -746,22 +747,32 @@ Build in 9 phases, plus the growth steps after Phase 6, each ending in something
   - the curve report, lighter startup and spaced-repetition due intervals.
 - G4. The journey map: road, regions, Іскрик walking, auto-centre. Tested with a generated 300-level fixture.
 - G5. The scene composer, `missingSyllable`, `trueFalse`, `buildSentence` and the daily warm-up. Done: W1·06 and W2·04 already use the new games.
-- G6. Props, readable signs, and Ukraine and Kharkiv touches. In progress: the road's free spots for signposts are done (journeyLayout `spots`).
+- G6. Props, readable signs, and Ukraine and Kharkiv touches. Done:
+  - readable signposts on the road (`signs` in world.json, shown once he knows every letter; tap → Соня reads it). They need a 48 px word, so they show on tablets and laptops, not on phones;
+  - Kharkiv on the door screen's horizon (the Annunciation Cathedral, rooftops, Держпром, the Ferris wheel; tapping the wheel says `eggs.kharkiv` and lights the windows);
+  - the props registry (`src/core/fx/props/`, dates and chances in `config.json` → `props`): pumpkins, Миколай's gift, the carol star, a stork on Держпром, калина, a sleepy owl (tap → hoot), an owl across the moon. `?date=YYYY-MM-DD` and `?props=a,b` preview them;
+  - Соня's вишиванка scarf.
 - G7. Content wave 1: worlds 3 to 5 (about 60 levels), with a native-speaker review list.
 
 Later waves (worlds 6 to 13) are written just in time, after Phase 9. `caseMatch` and `story` arrive with worlds 8 and 11.
 
+**Order: 7 → 9 → 8.** Phase 8 is postponed to the very end (decided 22 Oct 2026). Until it exists, the private profile (surname, patronymic, birthday) is typed by hand in the Firestore console under `players/{uid}` → `profile`.
+
 7. **Login & cloud sync.** Write step-by-step Firebase setup notes for you. Build the login screen, the security rules file and the sync engine with merge and play-without-cloud mode, and show sync status.
    - Done when: progress made on the laptop appears on the phone after login, offline play uploads once back online, and a rules test in the Firebase emulator shows another user can't read the document.
-8. **Parent area & recording studio.** Build the gate, progress views and settings, including the private child profile.
+
+9\. **Collections, Easter eggs & PWA.** Build the Book of Spells (one chapter per letter, opening with «Сузір’я літер»), card album (one page per world), castle windows (lit by the daily warm-up) and every Easter egg (ambient ones use the props system), including the seasonal ones with the Orthodox Easter date calculation and all Personal touches (Чарівна пошта, family portraits, formal Соня; Kharkiv on the horizon is done in G6). Make the app installable and offline-capable.
+   - Done when: it installs on a tablet and phone and launches offline, and a debug date override (`?date=YYYY-MM-DD`, already there for props) can trigger each seasonal surprise.
+
+Then, last:
+
+8\. **Parent area & recording studio.** Build the gate, progress views and settings, including the private child profile.
    - Progress views are grouped by world and letter, with a "words he can read" curve.
    - Add the recording studio (with family messages). It works one world at a time ("record the next world") and has zip export.
    - Add JSON export/import and the `audio:prepare` script.
    - Done when: dropping your recorded zip into the project replaces the placeholder voice with no code change.
-9. **Collections, Easter eggs & PWA.** Build the Book of Spells (one chapter per letter), card album (one page per world), castle windows (lit by the daily warm-up) and every Easter egg (ambient ones use the props system), including the seasonal ones with the Orthodox Easter date calculation and all Personal touches (Чарівна пошта, family portraits, Kharkiv on the horizon, formal Соня). Make the app installable and offline-capable.
-   - Done when: it installs on a tablet and phone and launches offline, and a debug date override can trigger each seasonal surprise.
 
-After phase 9, run a final check: a Playwright playthrough of every level at phone, tablet and laptop sizes, a Lighthouse audit, credits complete, and a real session with your son.
+After phases 7, 9 and 8, run a final check: a Playwright playthrough of every level at phone, tablet and laptop sizes, a Lighthouse audit, credits complete, and a real session with your son.
 
 ## Testing & deployment
 

@@ -7,6 +7,7 @@ const task = (num: string, type: string, extra = '', world = L) => `#/dev/task/$
 /** Every screen, and every task type once (with its longest content where it matters). */
 const SCREENS: [string, string][] = [
   ['door', '#/'],
+  ['door: owl, gift, калина, carol star', '?props=sleepyOwl,mykolai,kalyna,carolStar,stork#/'],
   ['journey', '#/map/tower-of-syllables'],
   ['journey: second world', '#/map/tower-of-words'],
   ['journey: 290 levels', '#/dev/journey'],

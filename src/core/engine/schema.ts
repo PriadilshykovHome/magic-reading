@@ -17,6 +17,8 @@ export const Count = z.number().int().min(1);
 
 const Ratio = z.number().min(0).max(1);
 
+const MonthDay = z.string().regex(/^(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/, 'MM-DD');
+
 export const CoreConfigSchema = z.strictObject({
   session: z.strictObject({ minTasks: Count, maxTasks: Count, reviewShare: Ratio }),
   answers: z.strictObject({ maxChoices: z.number().int().min(2).max(3), hintAfterMisses: Count }),
@@ -46,6 +48,14 @@ export const CoreConfigSchema = z.strictObject({
     pysankyCard: CardId,
     eveningFromHour: z.number().int().min(0).max(23),
     morningUntilHour: z.number().int().min(0).max(23),
+  }),
+  /** Small ambient details (src/core/fx/props): when the seasonal ones show, how often the others do. */
+  props: z.strictObject({
+    perScreen: z.number().int().min(0).max(3),
+    /** Seasonal props: [from, to] as MM-DD, both inclusive; may wrap the new year. */
+    dates: z.record(z.string(), z.tuple([MonthDay, MonthDay])),
+    /** Other props: the chance of showing on a given day. */
+    chance: z.record(z.string(), Ratio),
   }),
   grammar: z.strictObject({
     /** [ending, vocative ending] pairs for patronymics, e.g. -ович → -овичу */
@@ -121,6 +131,8 @@ export const WorldSchema = z.strictObject({
   title: Text,
   /** The scenery preset of its stretch of the journey road. */
   look: z.string().regex(/^[a-z0-9-]+$/),
+  /** Items on signposts along its stretch of the road, shown once he knows their letters. */
+  signs: z.array(z.string()).default([]),
 });
 
 export type CoreConfig = z.output<typeof CoreConfigSchema>;

@@ -9,6 +9,8 @@ import { Iskryk } from '../../characters/Iskryk';
 import { creatureStage, sparkBalance, type Progress } from '../../engine/progress';
 import { isLevelUnlocked, warmupDue } from '../../engine/rewards';
 import { Scene, type CandleSpot } from '../../fx/ambient/Scene';
+import { PropLayer } from '../../fx/props/Props';
+import { useProps } from '../../fx/props/useProps';
 import { lookOf } from '../../fx/regions/looks';
 import { useGame } from '../../store/game';
 import { useProgress } from '../../store/progress';
@@ -17,7 +19,7 @@ import { SparkJar } from '../../ui/Candles';
 import { HomeButton } from '../../ui/HomeButton';
 import { BookIcon, CauldronIcon, LockIcon, MyDoorIcon, StarIcon } from '../../ui/Icons';
 import { levelPath } from '../useLevel';
-import { journeyLayout, roadSegments, samplesBetween, type JourneyLayout, type NodeKind, type Point } from './journeyLayout';
+import { journeyLayout, roadSegments, samplesBetween, SIGN_H, type JourneyLayout, type NodeKind, type Point } from './journeyLayout';
 import '../../fx/regions/regions.css';
 import './journey.css';
 
@@ -33,6 +35,8 @@ export interface JourneyWorld {
   title: string;
   look: string;
   levels: { id: string; kind: NodeKind; state: NodeState; stars: number }[];
+  /** Signposts he can already read. */
+  signs: { id: string; text: string }[];
 }
 
 /** Іскрик walks from a finished door to the one it opened. */
@@ -55,6 +59,7 @@ export function JourneyScreen() {
   const [shaking, setShaking] = useState<string | null>(null);
   const [pendingWalk] = useState(() => walk);
   useMusic('map');
+  const props = useProps('map');
   useEffect(() => {
     if (pendingWalk) takeWalk();
   }, [pendingWalk, takeWalk]);
@@ -68,17 +73,20 @@ export function JourneyScreen() {
 
   const nextId = nextLevelToPlay(progress);
   const worlds = useMemo<JourneyWorld[]>(
-    () =>
-      game.content.worlds.map(({ world, levels }) => ({
+    () => {
+      const canRead = game.canRead(progress);
+      return game.content.worlds.map(({ world, levels }) => ({
         id: world.id,
         title: world.title,
         look: world.look,
+        signs: world.signs.filter(canRead).map((id) => ({ id, text: game.item(id).text })),
         levels: levels.map((level) => {
           const stars = progress.levels[level.id]?.bestStars ?? 0;
           const state: NodeState = !isLevelUnlocked(progress, level) ? 'locked' : level.id === nextId ? 'next' : stars > 0 ? 'done' : 'open';
           return { id: level.id, kind: game.nodeKind(level), state, stars };
         }),
-      })),
+      }));
+    },
     [progress, nextId],
   );
 
@@ -140,7 +148,12 @@ export function JourneyScreen() {
       walk={pendingWalk}
       shaking={shaking}
       onOpen={open}
+      onSign={(id) => {
+        sfx.tap();
+        void voice.item(id, 'interrupt');
+      }}
       creature={creatureStage(progress, game.content.config)}
+      props={<PropLayer ids={props} slots={['sky', 'moon']} />}
       jar={<SparkJar count={sparkBalance(progress)} label={fmt(t.map.sparks, { n: sparkBalance(progress) })} />}
     />
   );
@@ -153,13 +166,35 @@ interface ViewProps {
   walk?: Walk | null;
   shaking?: string | null;
   onOpen(levelId: string): void;
+  /** He tapped a signpost: Соня reads it to him. */
+  onSign?(id: string): void;
   creature: number;
   jar: ReactNode;
   /** Extra buttons in the bar (the daily warm-up). */
   actions?: ReactNode;
+  /** Ambient details in the sky behind the road. */
+  props?: ReactNode;
 }
 
 type SegmentState = 'lit' | 'active' | 'dim';
+
+interface PlacedSign extends Point {
+  id: string;
+  text: string;
+  w: number;
+  region: number;
+}
+
+/** A signpost's width for its word at the reading size (48 px, see .journey-sign). */
+let measure: CanvasRenderingContext2D | null = null;
+function signWidth(text: string): number {
+  measure ??= document.createElement('canvas').getContext('2d');
+  const family = getComputedStyle(document.documentElement).getPropertyValue('--font-reading') || 'sans-serif';
+  if (measure) measure.font = `800 48px ${family}`;
+  const glyphs = measure ? measure.measureText(text).width : text.length * 36;
+  // letter-spacing 0.04em, the board's padding and border, and a little slack for font fallback
+  return Math.max(SIGN_H, Math.ceil(glyphs * 1.06 + text.length * 48 * 0.04 + 2 * 14 + 4));
+}
 
 /** The road: every world's gate then its doors, as points; one smooth segment between each pair. */
 interface Road {
@@ -176,7 +211,7 @@ interface Road {
 }
 
 /** The journey itself: also rendered by the test-build route with hundreds of levels. */
-export function JourneyView({ worlds, focus, walk, shaking, onOpen, creature, jar, actions }: ViewProps) {
+export function JourneyView({ worlds, focus, walk, shaking, onOpen, onSign, creature, jar, actions, props }: ViewProps) {
   const scroller = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState<{ width: number; height: number } | null>(null);
   const [scroll, setScroll] = useState(0);
@@ -230,6 +265,26 @@ export function JourneyView({ worlds, focus, walk, shaking, onOpen, creature, ja
     const active = state.indexOf('active');
     return { points, doorPoint, gatePoint, paths: roadSegments(points), state, active: active >= 0 ? active : undefined };
   }, [layout, flat]);
+
+  // Each world's readable signposts, spread over its free spots wide enough for the word.
+  const signs = useMemo(() => {
+    if (!layout) return [];
+    const out: PlacedSign[] = [];
+    worlds.forEach((world, r) => {
+      const spots = layout.spots.filter((s) => s.region === r);
+      const used = new Set<number>();
+      world.signs.forEach((sign, k) => {
+        const w = signWidth(sign.text);
+        const ideal = Math.floor(((k + 0.5) * spots.length) / world.signs.length);
+        const order = spots.map((_, i) => i).sort((a, b) => Math.abs(a - ideal) - Math.abs(b - ideal));
+        const at = order.find((i) => !used.has(i) && spots[i]!.maxW >= w);
+        if (at === undefined) return;
+        used.add(at);
+        out.push({ ...sign, x: spots[at]!.x, y: spots[at]!.y, w, region: r });
+      });
+    });
+    return out;
+  }, [layout, worlds]);
 
   const along = (p: Point) => (layout?.orientation === 'portrait' ? p.y : p.x);
   const viewLen = layout ? (layout.orientation === 'portrait' ? size!.height : size!.width) : 0;
@@ -326,6 +381,7 @@ export function JourneyView({ worlds, focus, walk, shaking, onOpen, creature, ja
   return (
     <main className="screen journey-screen">
       <Scene candles={CANDLES} />
+      {props}
       <header className="journey-bar">
         <HomeButton />
         <div className="journey-bar-end">
@@ -359,8 +415,10 @@ export function JourneyView({ worlds, focus, walk, shaking, onOpen, creature, ja
                     region={region.index}
                     world={worlds[region.index]!}
                     road={road}
+                    signs={signs}
                     shaking={shaking}
                     onOpen={onOpen}
+                    onSign={onSign}
                   />
                 )),
             )}
@@ -389,16 +447,20 @@ function Region({
   region: r,
   world,
   road,
+  signs,
   shaking,
   onOpen,
+  onSign,
 }: {
   layer: 'scenery' | 'road' | 'doors';
   layout: JourneyLayout;
   region: number;
   world: JourneyWorld;
   road: Road;
+  signs: PlacedSign[];
   shaking?: string | null;
   onOpen(levelId: string): void;
+  onSign?(id: string): void;
 }) {
   const region = layout.regions[r]!;
   const look = lookOf(world.look);
@@ -462,6 +524,21 @@ function Region({
       >
         <span className="journey-gate-title">{world.title}</span>
       </button>
+
+      {signs
+        .filter((s) => s.region === r)
+        .map((sign) => (
+          <button
+            key={sign.id}
+            type="button"
+            className="journey-sign"
+            style={{ left: sign.x, top: sign.y, width: sign.w, height: SIGN_H }}
+            onClick={() => onSign?.(sign.id)}
+            data-sign={sign.id}
+          >
+            <span className="read-word">{sign.text}</span>
+          </button>
+        ))}
 
       {nodes.map((node) => {
         const level = levels.get(node.id)!;

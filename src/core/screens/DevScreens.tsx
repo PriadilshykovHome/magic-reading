@@ -58,6 +58,7 @@ export function DevJourneyScreen() {
       id: `world-${w + 1}`,
       title: game.content.worlds[w % game.content.worlds.length]!.world.title,
       look: LOOKS[w % LOOKS.length]!,
+      signs: game.content.worlds[w % game.content.worlds.length]!.world.signs.map((id) => ({ id, text: game.item(id).text })),
       levels: Array.from({ length: count }, (_, i) => {
         n++;
         const kind = i === count - 1 ? 'finale' : i % 7 === 6 ? 'review' : 'door';

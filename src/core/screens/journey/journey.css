@@ -360,3 +360,52 @@
   border-color: rgb(240 214 138 / 0.85);
   background: radial-gradient(circle at 50% 70%, rgb(255 190 110 / 0.28), rgb(26 20 36 / 0.85) 70%);
 }
+
+/* ---------- signposts: words he can already read ---------- */
+
+.journey-sign {
+  position: absolute;
+  translate: -50% -50%;
+  display: grid;
+  place-items: center;
+  padding: 0 14px;
+  border: 2px solid #6b4a2b;
+  border-radius: 6px 10px 6px 10px;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgb(255 246 220 / 0.35), transparent 60%),
+    linear-gradient(180deg, var(--parchment), #d4c097);
+  box-shadow: 0 6px 14px rgb(0 0 0 / 0.5), inset 0 -2px 0 rgb(107 74 43 / 0.3);
+  /* candlelit, not glaring: the next door stays the brightest thing on the road */
+  filter: brightness(0.88);
+  color: var(--ink);
+  cursor: pointer;
+  rotate: -1.5deg;
+}
+
+.journey-sign:nth-of-type(even) {
+  rotate: 1.5deg;
+}
+
+/* the post it hangs on, below the board */
+.journey-sign::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 8px;
+  height: 14px;
+  translate: -50% 0;
+  border-radius: 0 0 3px 3px;
+  background: linear-gradient(90deg, #2e1b0e, #5a3a22 50%, #2e1b0e);
+}
+
+.journey-sign .read-word {
+  font-size: 48px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.journey-sign:focus-visible {
+  outline: 3px solid var(--gold-light);
+  outline-offset: 4px;
+}
