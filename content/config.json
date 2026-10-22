@@ -70,7 +70,8 @@
     },
     "chance": {
       "sleepyOwl": 0.5,
-      "owlMoon": 0.35
+      "owlMoon": 0.35,
+      "cat": 0.3
     }
   },
   "grammar": {

@@ -88,6 +88,15 @@ export const BookIcon = () => (
   </svg>
 );
 
+/** The card album: two fanned cards, the front one with a star. */
+export const CardsIcon = () => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" {...common}>
+    <path d="M7.5 5.2L4 6.6l3.6 13.2 3-1" />
+    <rect x="9" y="3.5" width="11" height="16" rx="1.8" />
+    <path d="M14.5 8.2l1 2 2.1.3-1.5 1.5.4 2.1-2-1-1.9 1 .4-2.1-1.5-1.5 2.1-.3z" fill="currentColor" stroke="none" />
+  </svg>
+);
+
 /** «Це жарт!»: a winking face, for "the picture doesn't match". */
 export const JokeIcon = () => (
   <svg viewBox="0 0 24 24" aria-hidden="true" {...common}>

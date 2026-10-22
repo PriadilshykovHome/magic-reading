@@ -60,7 +60,56 @@
   .journey-shelf {
     bottom: auto;
     top: calc(16px + env(safe-area-inset-top));
+    left: calc(96px + env(safe-area-inset-left));
+    translate: none;
   }
+}
+
+.journey-castle {
+  display: grid;
+  place-items: center;
+  width: 92px;
+  height: var(--tap-min);
+  padding: 4px 10px 6px;
+  border-radius: 32px;
+  border: 1.5px solid rgb(201 162 74 / 0.6);
+  background: rgb(26 20 36 / 0.75);
+  color: rgb(201 162 74 / 0.85);
+  cursor: pointer;
+}
+
+.journey-castle svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.castle-window {
+  fill: rgb(14 11 20);
+  stroke: rgb(201 162 74 / 0.45);
+  stroke-width: 0.5;
+}
+
+.castle-window.is-lit {
+  fill: #ffd98a;
+  stroke: none;
+  filter: drop-shadow(0 0 1.6px rgb(255 190 110 / 0.9));
+}
+
+/* After 19:00 the lit windows glow warmer and brighter. */
+.journey-castle.is-evening .castle-window.is-lit {
+  fill: #ffe7a8;
+  filter: drop-shadow(0 0 2.6px rgb(255 170 80)) drop-shadow(0 0 5px rgb(255 156 72 / 0.6));
+}
+
+.castle-cat {
+  animation: castle-cat-peek 6s ease-in-out infinite;
+  transform-box: fill-box;
+}
+
+@keyframes castle-cat-peek {
+  0%, 70%, 100% { translate: 0 0; }
+  78%, 92% { translate: 0 -0.6px; }
 }
 
 .journey-scroll::-webkit-scrollbar {

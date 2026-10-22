@@ -7,18 +7,21 @@ import { useMusic } from '../../audio/useMusic';
 import { voice } from '../../audio/voice';
 import { Iskryk } from '../../characters/Iskryk';
 import { creatureStage, sparkBalance, type Progress } from '../../engine/progress';
-import { isLevelUnlocked, warmupDue } from '../../engine/rewards';
+import { timeOfDay } from '../../engine/calendar';
+import { castleWindows, isLevelUnlocked, warmupDue } from '../../engine/rewards';
 import { Scene, type CandleSpot } from '../../fx/ambient/Scene';
 import { PropLayer } from '../../fx/props/Props';
 import { useProps } from '../../fx/props/useProps';
+import { today } from '../../fx/today';
 import { lookOf } from '../../fx/regions/looks';
 import { useGame } from '../../store/game';
 import { useProgress } from '../../store/progress';
 import { fmt, t } from '../../strings';
 import { SparkJar } from '../../ui/Candles';
 import { HomeButton } from '../../ui/HomeButton';
-import { BookIcon, CauldronIcon, LockIcon, MyDoorIcon, StarIcon } from '../../ui/Icons';
+import { BookIcon, CardsIcon, CauldronIcon, LockIcon, MyDoorIcon, StarIcon } from '../../ui/Icons';
 import { levelPath } from '../useLevel';
+import { CastleWindows } from './CastleWindows';
 import { journeyLayout, roadSegments, samplesBetween, SIGN_H, type JourneyLayout, type NodeKind, type Point } from './journeyLayout';
 import '../../fx/regions/regions.css';
 import './journey.css';
@@ -155,18 +158,37 @@ export function JourneyScreen() {
       creature={creatureStage(progress, game.content.config)}
       props={<PropLayer ids={props} slots={['sky', 'moon']} />}
       shelf={
-        <button
-          type="button"
-          className="icon-button journey-book"
-          aria-label={t.book.open}
-          onClick={() => {
-            sfx.tap();
-            navigate('/book');
-          }}
-          data-book
-        >
-          <BookIcon />
-        </button>
+        <>
+          <button
+            type="button"
+            className="icon-button journey-book"
+            aria-label={t.book.open}
+            onClick={() => {
+              sfx.tap();
+              navigate('/book');
+            }}
+            data-book
+          >
+            <BookIcon />
+          </button>
+          <CastleWindows
+            lit={castleWindows(progress.rewards.litWindows, new Date(), game.content.config)}
+            evening={['evening', 'night'].includes(timeOfDay(today(), game.content.config.eggs))}
+            cat={props.includes('cat')}
+          />
+          <button
+            type="button"
+            className="icon-button journey-album"
+            aria-label={t.album.open}
+            onClick={() => {
+              sfx.tap();
+              navigate('/album');
+            }}
+            data-album
+          >
+            <CardsIcon />
+          </button>
+        </>
       }
       jar={<SparkJar count={sparkBalance(progress)} label={fmt(t.map.sparks, { n: sparkBalance(progress) })} />}
     />

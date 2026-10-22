@@ -22,6 +22,7 @@ export const router = createHashRouter([
   { path: '/level/:world/:num/play', element: <TaskRunnerScreen /> },
   { path: '/level/:world/:num/done', lazy: async () => ({ Component: (await celebration()).CelebrationScreen }) },
   { path: '/book/:page?', lazy: async () => ({ Component: (await import('../core/screens/book/Book')).BookScreen }) },
+  { path: '/album/:page?', lazy: async () => ({ Component: (await import('../core/screens/album/Album')).AlbumScreen }) },
   { path: '/warmup', lazy: async () => ({ Component: (await warmup()).WarmupScreen }) },
   { path: '/warmup/done', lazy: async () => ({ Component: (await warmup()).WarmupDoneScreen }) },
   ...(TEST_BUILD

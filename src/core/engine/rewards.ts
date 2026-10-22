@@ -161,6 +161,14 @@ export function finishWarmup({ progress, run, content, now }: Omit<FinishInput, 
   return { progress: updated, summary, steps };
 }
 
+/** How many of the castle's windows are lit now: this week's days so far, all of them on the day
+ *  the last one lit (the weekly card's day), then a new week starts dark. */
+export function castleWindows(litWindows: readonly string[], now: Date, config: Config): number {
+  const every = config.windows.surpriseEvery;
+  const n = litWindows.length % every;
+  return n === 0 && litWindows.length > 0 && litWindows.includes(dayKey(now)) ? every : n;
+}
+
 /** Each day he plays lights one castle window; every 7th lit window brings the weekly card. */
 function lightWindow(rewards: Progress['rewards'], now: Date, config: Config) {
   const today = dayKey(now);

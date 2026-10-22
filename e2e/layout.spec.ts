@@ -48,6 +48,10 @@ const SCREENS: [string, string][] = [
   ['Book of Spells: cover', '#/book'],
   ['Book of Spells: Р', '#/book/12'],
   ['Book of Spells: Ь (31 pages)', '#/book/21'],
+  ['album: family', '#/album'],
+  ['album: a world', '#/album/2'],
+  ['album: special cards', '#/album/6'],
+  ['journey: the castle with its cat', '?props=cat#/map/magic-kitchen'],
 ];
 
 test('every screen keeps the layout rules', async ({ page }, info) => {

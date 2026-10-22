@@ -7,7 +7,7 @@ import type { CoreConfig } from '../../engine/schema.ts';
 
 export type PropScreen = 'door' | 'map';
 /** Where a prop sits; two props never share one. */
-export type PropSlot = 'ground-left' | 'ground-right' | 'corner' | 'sky' | 'moon' | 'roofs';
+export type PropSlot = 'ground-left' | 'ground-right' | 'corner' | 'sky' | 'moon' | 'roofs' | 'castle';
 
 export interface PropDef {
   id: string;
@@ -24,6 +24,8 @@ export const PROPS: readonly PropDef[] = [
   { id: 'kalyna', screens: ['door'], slots: ['ground-right'] },
   { id: 'sleepyOwl', screens: ['door'], slots: ['corner'] },
   { id: 'owlMoon', screens: ['door', 'map'], slots: ['moon'] },
+  // Drawn by the map's castle (CastleWindows), not by PropLayer.
+  { id: 'cat', screens: ['map'], slots: ['castle'] },
 ];
 
 const monthDay = (date: Date) => dayKey(date).slice(5);

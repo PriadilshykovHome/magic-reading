@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 import { emptyProgress, type Progress } from './progress';
-import { finishLevel, isLevelUnlocked, starsFor } from './rewards';
+import { castleWindows, finishLevel, isLevelUnlocked, starsFor } from './rewards';
 import { startRun, type RunState } from './run';
 import { testContent } from '../../reading/engine/testContent';
 
@@ -40,4 +40,9 @@ test('Іскрик grows when sparks cross a threshold; every 7th lit window bri
   }
   expect(weekly.indexOf('card-week')).toBe(6);
   expect(weekly.filter(Boolean)).toHaveLength(1);
+  // The castle shows this week's windows: all 7 on the weekly card's day, then a new week.
+  const seven = q.rewards.litWindows.slice(0, 7);
+  expect(castleWindows(seven, day(7), config)).toBe(7);
+  expect(castleWindows(seven, day(8), config)).toBe(0);
+  expect(castleWindows(q.rewards.litWindows, day(8), config)).toBe(1);
 });
