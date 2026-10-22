@@ -5,7 +5,7 @@ description: Add or change reading content for Чарівні пригоди М�
 
 # Writing content for the reading game
 
-The curriculum lives in `docs/PLAN.md` → "Growth plan" → "Curriculum" (the worlds table, the
+The curriculum lives in `docs/curriculum.md` → "Curriculum" (the worlds table, the
 sentence-frame ladder and the Ukrainian checklist). Read that section first; it is the brief.
 How content is expanded: `src/reading/engine/curriculum.ts` and `lexicon.ts`.
 

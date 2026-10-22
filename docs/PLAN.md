@@ -1,6 +1,8 @@
 # Чарівні пригоди Мишка — Implementation Plan
 
-Oct 21, 2026 · @Oleksandr
+Oct 21, 2026 (roadmap updated Oct 22) · @Oleksandr
+
+This file is the vision and the roadmap; "Build phases" at the end says where things stand. What he learns and how content is written: [curriculum.md](curriculum.md). How the code works: [architecture.md](architecture.md). The rules for every change: [CLAUDE.md](../CLAUDE.md).
 
 ## Overview & goals
 
@@ -143,33 +145,11 @@ The mini-boss **Magic Door** (`magicDoor`) is a wrapper. It takes any scored typ
 - Every drag also works as tap-to-place: tap a tile and it jumps to the next empty slot; tap a placed tile to send it back.
 - `readAloud` appears only when the "parent nearby" setting is on. Otherwise each one is replaced by another scored task from the level's mix, so a level always has 8 to 10 tasks.
 
-## Starter content (v1 levels)
-
-v1 uses only 5 consonants (М, Л, Н, Т, С) and 5 vowels (А, О, У, И, І). That is enough for 25 syllables (plus vowel-only syllables such as the О in О-СА), 10 picture words and 10 sentences, and it puts the И / І contrast in from day one.
-
-| Level | New material | Items | Task mix (about 9 tasks) |
-| --- | --- | --- | --- |
-| 1 · Перші склади | М, Л with А О У И І | МА МО МУ МИ МІ, ЛА ЛО ЛУ ЛИ ЛІ; first words МАМА, ЛАМА, МИЛО (М and Л only) | Intro merge (МА, ЛА); hearPick ×3, bubblePop ×2, syllableMerge ×1, readPickPicture ×1 (МАМА / ЛАМА / МИЛО), readAloud ×2; Magic Door: readPickPicture with МАМА, the first word he reads alone |
-| 2 · Перші слова | Н, Т, С with the same vowels | НА…НІ, ТА…ТІ, СА…СІ; words МАМА, ТАТО, ЛИСА, МИЛО, НОТИ, САНИ, ЛАМА, ОСА, plus closed words ЛІС, НІС | Intro merge (НА, ТА, СА); readPickPicture ×3, buildWord ×3, hearPick ×1, readAloud ×1; Magic Door: buildWord |
-| 3 · Перші речення | Short sentences from known words | Тато тут. Мама там. Лама тут. Оса там. Лиса у лісі. Оса на носі. Мама і тато. У мами мило. У мами ноти. У тата ноти. | Intro: Соня reads a sentence while each word lights up; sentencePicture ×3, readPickPicture ×2 (review), buildWord ×1, readAloud ×2; Magic Door: sentencePicture |
-
-**Added after the first playtest (same 10 letters).** Level 4 · Довші слова (ЛИ-МОН, ТО-МАТ, СА-ЛАТ, МАС-ЛО, НА-МИС-ТО, МІСТ), Level 5 · Нові речення («Оса на лимоні.», «Лама на мосту.», «У мами намисто.» …), Level 6 · Велике повторення (mixed review). New intro demo `wordMerge`: syllables slide together into the word.
-
-**World 2 · Вежа Слів (new letters К Р, В Д, П Ш).** Five levels: К і Р (РУ-КА, КО-РО-НА, КО-МАР, КІТ…), В і Д (ВО-ДА, ДИ-ВАН, ДРА-КОН, ВИД-РА…), П і Ш (МИШ-КА, ПОШ-ТА, ШО-КО-ЛАД, КА-ПУС-ТА…), sentences («Кіт на дивані.», «У мишки шоколад.» …), and «Чарівне ім’я»: its Magic Door is his own name, МИШКО (with МИШКА as the look-alike), kept out of the level's pool so it stays a surprise, and Соня says "Це твоє ім’я, Мишку! Ти сам його прочитав!". Closed and cluster syllables (МИШ, ДРА, КОН) are hand-split for reading; please check them as a native speaker.
-
-**Only v1 letters.** Every word in v1 uses only М, Л, Н, Т, С and А, О, У, И, І. The earlier "Ось лиса" and "Ось сани" were replaced because "Ось" needs Ь. Each `world.json` lists its `allowedLetters`, and the content validator rejects any word that uses other letters.
-
-**Closed words.** ЛІС and НІС are single closed syllables, so they appear only in `readPickPicture` and `hearPick`, never in `buildWord`.
-
-**How sentence choices are built.** The 2 or 3 scenes differ in exactly what he must read, never in things like тут / там that a picture can't show. For example, "У мами мило", "У мами ноти" and "У тата ноти" differ by who and what.
-
-**Letter case.** Everything is shown in UPPERCASE by default, like a children's alphabet book. A parent setting, "Show lowercase in sentences", switches Level 3 to normal sentence case once he recognises the small letters too (м, л, н, т, с, а, о, у, и, і).
-
-**Pictures needed (v1).** 10 word pictures, 9 sentence scenes, and art for Соня, Іскрик (4 growth stages), the castle map and 3 creature cards. Use one consistent illustration style. For prototyping, open-licensed emoji sets such as OpenMoji or Twemoji are fine placeholders, with their attribution kept in the credits.
-
 ## Growth plan (after the first playtest)
 
 Мишко played the first 11 levels and liked them. The game now grows to about 300 levels, with a steady curriculum of realistic Ukrainian. The structure is built so content grows linearly while code stays flat, and so its core can later carry an English game and a maths game.
+
+The structure for scale and the curriculum (the worlds, the sentence-frame ladder, the Ukrainian checklist) are in [curriculum.md](curriculum.md); the core / domain split is in [architecture.md](architecture.md).
 
 ### Navigation
 
@@ -184,139 +164,6 @@ v1 uses only 5 consonants (М, Л, Н, Т, С) and 5 vowels (А, О, У, И, І)
   - Іскрик waits at the next door and walks along the road to each newly opened one.
   - Node kinds: level door, bigger Magic Door (world finale), book (review), scroll (story) and cauldron (daily warm-up). Level numbers count globally (1…300).
   - The road scrolls inside its own element. Only regions near the viewport are rendered, and tasks never scroll.
-
-### Structure for scale
-
-**Content grows linearly, code stays flat.** A new word is one line, a new level is one line, and a new world is one file plus an art preset. Code changes only for a new mechanic. Nothing is written twice: what can be derived is derived.
-
-- **Per-world folders.** `content/worlds/<world>/world.json` holds the world and its levels, and `content/worlds/<world>/lexicon.json` holds the items first taught there. There are no per-level files.
-- **Compact lexicon rows.** Ids stay explicit, because they are the stable keys for his progress.
-  - Word: `{ "id": "w-mama", "split": "МА-МА", "emoji": "👩", "tags": ["family"], "stress": 0 }`. The text, the syllable ids (from the hand-written split), the audio and picture paths (from the id) are derived. Paths are written only to override.
-  - Syllable drills: one string per world (`"КА КО КУ КИ КІ"`). Closed syllables (МИШ, ПУС) come from the word splits.
-  - Sentence: `{ "id": "s-kit-na-dyvani", "text": "Кіт на дивані.", "scene": "w-kit on w-dyvan" }`. The word list comes from the text, and the picture, `depicts` and distractor scenes come from the scene spec.
-- **Levels are units × templates.**
-  - A world lists units, and each unit is the letters it teaches plus a row of template names: `{ "key": "e", "letters": "Е", "levels": ["letters", "words", "words", "sentences"] }`.
-  - `content/templates.json` defines each template's intro demo, task mix and door.
-  - Level ids are stable under insertions (`garden/e-words-2`). The first 11 levels keep their ids, so his progress is untouched.
-  - Any level can override its pool, tasks or door, as the МИШКО door does.
-- **Curriculum module.** `curriculum.ts` (pure) expands worlds, units and templates into levels and derives for each level:
-  - the cumulative known letters;
-  - the new items (those containing the unit's letter);
-  - automatic review from everything earlier, weighted by spaced repetition;
-  - each item's `introducedAt`.
-- **Validator additions.**
-  - Each letter unit teaches at least 6 new words, and no level brings more than 12 new items.
-  - Sentence length stays within the world's stage limit, and scene specs are valid.
-  - Door words stay out of pools and use known letters.
-  - `validate-content -- --report` prints the progress curve (new and known items per level), so steady progress is measurable.
-- **Runtime budgets.**
-  - The app only parses and expands content at startup; dry-building every task runs in CI.
-  - The content chunk stays under 150 KB gzip.
-  - A test asserts that a 300-level progress document stays under 350 KB.
-- **Spaced repetition at scale.** Boxes get intervals in days (same day, 1, 3, 7, 21). Review draws from the 50 most overdue items.
-- **Tests.** They grow with rules, not content: about 30 unit tests and 6 e2e tests.
-- **Core and domain.** `src/core/` is game-agnostic: engine skeleton, spaced repetition, feedback events, rewards, progress, audio, effects, characters, UI, sync and the shared screens. `src/reading/` is this game's domain pack: lexicon, letters, distractors, curriculum, task types and intro demos.
-  - A lint rule stops core from importing reading.
-  - The English and maths games will reuse core, Соня, Іскрик and the private profile, each with its own domain pack and progress document. Core moves to a shared package only when game 2 starts.
-
-### Curriculum
-
-**Principles.**
-
-- Letters gate everything: every item uses only letters known at that level.
-- One new thing at a time: a letter, or one skill.
-- A fixed unit rhythm, so only the material is new.
-- About 25% review plus a daily warm-up.
-- One difficulty knob turns at a time:
-  - word length: 2 → 4 syllables;
-  - syllable shape: CV → CVC → CCV;
-  - sentence length: 2 → 7 words;
-  - sentence frame;
-  - letter case: upper → sentence case;
-  - choices: 2 → 3;
-  - answers: pictures → words.
-- Growth is visible:
-  - Іскрик walks the road;
-  - Book of Spells pages appear;
-  - a "words Мишко can read" counter appears in the parent area and the Book;
-  - signs he can read appear in the world.
-- Content is written in waves of 25–50 levels, just before he reaches them, and each wave is checked by a native speaker.
-
-**Unit rhythm (templates).**
-
-| Template | Intro | Task mix (about 9) | Door |
-| --- | --- | --- | --- |
-| `letters` · Нові склади | syllableMerge | merge 1, hearPick 3, bubblePop 2, readPickPicture 1, readAloud 1 | readPickPicture, newest word |
-| `words` · Нові слова | wordMerge | readPickPicture 3, buildWord 2, missingSyllable 2, hearPick 1, readAloud 1 | readPickPicture or buildWord |
-| `sentences` · Речення | readAlong | sentencePicture 3, trueFalse 2, buildSentence 1, readPickPicture 1, readAloud 1 | sentencePicture |
-| `review` · Повторення | readAlong | spaced-repetition mix across all kinds | weakest item |
-| `finale` · Чарівні двері | Соня's special intro | review mix | a fixed personal word or sentence |
-
-A letter unit is usually letters → words → words → sentences. A review follows every 2 units, and each world ends with a finale.
-
-**Worlds (about 290 levels, roughly 10 months at a level a day).**
-
-| # | World | New | Levels | Examples | Personal door |
-| --- | --- | --- | --- | --- | --- |
-| 1 | Вежа Складів | М Л Н Т С + А О У И І | 6 | done | МАМА |
-| 2 | Вежа Слів | К Р В Д П Ш | 5 | done | МИШКО |
-| 3 | Сад Соняшників | practice, then Е Б З | 20 | СОВА, МІТЛА, ШАЛИК, КАЛИНА, ПИСАНКА, ВИШИВАНКА, НЕБО, ДЕРЕВО, ЗІРКА, КАЗАН, ЛЕЛЕКА, ВАРЕНИКИ, МЕТРО · «Сова на мітлі.» «Тато несе банан.» | ОЛЕКСАНДР ("Олександр — це тато!") |
-| 4 | Зоряна Обсерваторія | Й Ь Я | 18 | Я, МІЙ, МОЯ, ЯБЛУКО, ВЕДМІДЬ, ТРАМВАЙ, СОНЯШНИК · «Кіт спить.» «Малий кіт спить на дивані.» | «Я МИШКО!» |
-| 5 | Чарівна Кухня | Г Ж Х Ч | 22 | ХЛІБ, ЧАШКА, ЛОЖКА, ПИРІЖКИ, КНИГА, ЧАРІВНА ПАЛИЧКА, ЧАРІВНИК · «Жук на грибі.» «У сови книга.» | ХАРКІВ, then МИХАЙЛО ("Великий чарівник Михайло!") |
-| 6 | Ліс Єдинорогів | Ю Є Ї, apostrophe | 22 | ЇЖАК, ЄНОТ, ЄДИНОРІГ, КЛЮЧ, М’ЯЧ, СІМ’Я · «Мишко читає книгу.» «Я люблю маму і тата.» | «Я ЧИТАЮ!» |
-| 7 | Вежа Дзвонів | Ц Щ Ф Ґ ДЖ ДЗ | 24 | ЦЕ, БОРЩ, ФЕЯ, ШАРФ, ФОНТАН, ҐУДЗИК, ДЖМІЛЬ, ДЗВОНИК · «Це мій шарф.» «Мама варить борщ.» | «Я МИШКО З ХАРКОВА.» |
-| 8 | Дзеркальне Озеро | lowercase letters, sentence case | 25 | familiar words re-read in lowercase | — |
-| 9 | Кам’яні Мости | clusters, long words, stress marks | 25 | СТІЛ, СНІГ, КВІТКА, ЛАСТІВКА, ВЕЛОСИПЕД | — |
-| 10 | Кімната Питань | Хто? Що? Де? Куди?, «?» and «!», dialogues | 25 | «— Де Іскрик? — Тут!» | — |
-| 11 | Пошта Сов | 2–4 sentence stories plus a question | 35 | each level is a letter with a micro-story | — |
-| 12 | Бібліотека Казок | simplified folk tales | 35 | Колобок, Рукавичка, Ріпка, Котик і Півник | — |
-| 13 | Мій Харків | real-world reading: signs, labels, a trip across the city | 25 | МЕТРО, ВХІД, ВИХІД, ЗООПАРК · Держпром, Дзеркальний струмінь, Сад Шевченка | — |
-
-Totals: about 115 levels to all 33 letters, then about 175 levels of fluency and comprehension. About 1,200 words and 900 sentences, at 4 to 8 new words per level.
-
-**Sentence frames,** each unlocked by the letters it needs:
-
-1. where: «Оса на носі.»;
-2. has / and: «У мами мило.»;
-3. -е verbs: «Риба пливе.» (needs Е);
-4. -ить verbs, adjectives and the first person: «Кіт спить.», «Я Мишко!» (needs Й Ь Я);
-5. objects: «Мама варить суп.»;
-6. -ає / -ює verbs: «Я читаю.»;
-7. «Це …»;
-8. questions and dialogue, then micro-stories, then tales.
-
-**Realistic Ukrainian (the native-speaker checklist).**
-
-- **Word choice:**
-  - Everyday words of a 5-year-old's life first: family, home, food, toys, animals, body, clothes, nature. Then the magic school, the city and Ukraine.
-  - Only picturable words until scenes can show actions and attributes.
-  - Plain standard Ukrainian, no surzhyk or Russianisms; natural diminutives.
-- **Grammar:**
-  - Correct case forms (на дивані, у лісі, з Харкова) and agreement (малий кіт, мала мишка); vocative when addressing him.
-  - Present tense first.
-- **Spelling and pronunciation:** early worlds avoid words whose spelling and sound part ways (‑ться, легко), and stress homographs (за́мок / замо́к) unless the picture decides. Stress is stored per word.
-- **Sentences:** what a parent would actually say, never primer nonsense; nothing scary or sad. Silly sentences only in «Правда чи жарт?».
-- **Culture, lightly:**
-  - борщ, вареники, пиріжки;
-  - соняшник, калина, лелека, вишиванка, писанка, рушник, бандура;
-  - Різдво, Великдень, Святий Миколай;
-  - public-domain folk tales.
-- **Personal:** first names and Kharkiv appear at milestones; surname, patronymic and birthday never appear.
-
-**Pictures at this scale.**
-
-- **Words:** emoji placeholders stay for now; one consistent free icon set and hand-drawn hero pictures come later.
-- **Sentences:** no per-sentence illustration. A scene composer draws each scene from its spec, `who [rel what] [does action] [is attr]`:
-  - relations: on, in, under, near, and, has;
-  - actions: sleeps, flies, eats, reads, cooks…;
-  - attributes: big, small, colours.
-- **Generated distractors:** each wrong scene changes exactly one slot to another known value. Every slot is written in the sentence, so a wrong scene always differs in what he must read.
-
-**Audio at this scale.**
-
-- About 2,500 clips: you record syllables, Соня's lines and family messages.
-- Words and sentences are recorded one world at a time (about 100–150 clips per world), or pre-generated with a Ukrainian neural TTS script and checked by ear. Decide before Phase 8.
-- Browser speech covers anything missing.
 
 ### New and extended game flows
 
@@ -446,214 +293,9 @@ The whole app is one responsive "stage": a parchment card for the reading conten
 
 **Screen and fonts.**
 
-- Installed as a PWA, the app opens full screen without browser bars. Otherwise a full-screen button appears where the browser supports it.
+- Installed as a PWA (Phase 10), the app opens full screen without browser bars. Otherwise a full-screen button appears where the browser supports it.
 - Reading text uses one clear rounded sans with full Cyrillic and unambiguous letter shapes (for example Nunito). A decorative font is allowed for titles only. Fonts are self-hosted so the app works offline.
 - On weak devices (low CPU core count, or reduced-motion preference) particle counts drop automatically.
-
-## Tech stack & architecture
-
-The app is a static single-page site built with Vite, React and TypeScript, hosted on GitHub Pages, with Firebase for login and cloud save. There is no server to run.
-
-| Concern | Choice | Why |
-| --- | --- | --- |
-| Build | Vite + TypeScript | Fast dev server, static output for GitHub Pages |
-| UI | React | Component per screen and per task type |
-| UI animation | Motion (`motion/react`) | Spring physics, layout and exit animations |
-| Particles | tsParticles (confetti and fireworks presets) on one canvas; ambient embers use a tiny custom canvas loop | Sparkles, fireworks, confetti without heavy DOM; embers stay light enough for the 3-second first load |
-| Audio | Howler.js | Sound sprites, separate channels, unlocks audio on iOS |
-| State | Zustand | Small stores for game, progress and settings |
-| Routing | React Router with hash URLs | GitHub Pages has no fallback for deep links |
-| Content validation | Zod schemas | A typo in a level file fails the build, not the game |
-| Login + cloud save | Firebase Auth (email/password) + Firestore | Free tier, works from a static site |
-| Offline + install | vite-plugin-pwa | Installable, caches app and audio |
-| Tests | Vitest (logic), Playwright (screens on phone/tablet/laptop sizes) | Catch layout and flow regressions |
-| Scripts | Node 24's built-in TypeScript support | Runs `scripts/*.ts` such as `validate-content` with no extra tool |
-
-**Layers.** Content (JSON) feeds a pure TypeScript engine. The engine feeds stores, which feed the UI. Audio, sync and effects are services the UI calls. The engine has no React and no browser APIs, so it is fully unit-tested.
-
-- **Engine:** builds a session from a level file, picks items (favouring weak ones), picks distractors, scores answers, and computes stars, sparks and unlocks.
-- **Task registry:** maps a type id to its plug-in.
-- **Stores:** the progress store is the single source of truth and is mirrored to local storage and Firestore by the sync service.
-
-**Folder structure.**
-
-```text
-public/
-  audio/uk/voice/      syllables, words, sentences, Соня's lines
-  audio/sfx/  audio/music/
-  img/                 word pictures, scenes, characters, map
-content/
-  config.json  templates.json  strings.uk.json  voice.uk.json  cards.json
-  worlds/tower-of-syllables/world.json     units of levels
-  worlds/tower-of-syllables/lexicon.json   items first taught there
-src/
-  app/                 main.tsx, router.tsx
-  core/                the game-agnostic shell, shared later with the English and maths games
-    engine/            session, picker, run, rewards, progress (pure TS)
-    screens/           Door Login Map LevelIntro TaskRunner Celebration Book Album Parent
-    characters/        Sonya, Iskryk (layered SVG + animation states)
-    fx/ audio/ ui/ store/ sync/ styles/
-    game.ts            the seam to the active game ('@game', '@game-ui')
-  reading/             this game's domain pack: lexicon, letters, distractors, task types, intro demos
-scripts/validate-content.ts
-.github/workflows/deploy.yml
-```
-
-**Task plug-in contract.** Every task type implements the same interface, so adding one never touches the game loop:
-
-```ts
-interface TaskType<Config> {
-  id: string;                                   // e.g. 'readPickPicture'
-  configSchema: ZodType<Config>;                // validates its entry in a level file
-  scored: boolean;
-  build(ctx: BuildContext, config: Config): TaskInstance;  // target + distractors
-  Component: React.FC<TaskProps>;               // renders it, reports onAnswer(result)
-}
-```
-
-## Login & cross-device progress
-
-Use Firebase Authentication with email/password, plus one Firestore document per player. It's free at this scale, works from GitHub Pages, and never pauses, unlike Supabase's free tier, which pauses after a week without use. The [Firebase Spark plan](https://firebase.google.com/pricing) covers 20,000 writes and 50,000 reads a day; one session uses a few dozen.
-
-**The account.**
-
-- You create the single account yourself in the Firebase console (Authentication → Users → Add user). The app has a login screen but no sign-up screen.
-- The login screen asks for a username and password. The app turns the username into an internal email, for example `sashko` → `sashko@magic-reading.local`, because Firebase logins are email-shaped. If you'd rather have password reset by email, use your real email as the login instead.
-- Firebase keeps the device logged in, so you type the password once per device.
-- Add your `<username>.github.io` domain and `localhost` to Firebase's authorised domains.
-
-**Security rules.** The Firebase web config (including its API key) is public by design. What protects the data is the rule that each signed-in user can touch only their own document:
-
-```text
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /players/{uid}/{document=**} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
-    }
-  }
-}
-```
-
-**Data model.** `players/{uid}` holds the private profile, shared by all of his games (the English and maths games come later). Each game's progress is one small document under it, `players/{uid}/games/reading-uk`; the security rule above matches `players/{uid}/{document=**}`. Items are keyed by lexicon id rather than by Cyrillic text, so field paths stay simple. To stay far below Firestore's 1 MiB limit at 300 levels (about 2,500 items), an item keeps only its last `mastery.distinctDays` okDays, dates are day keys, and writes update changed field paths only (under 350 KB in total, checked by a unit test).
-
-```json
-{
-  "schemaVersion": 1,
-  "updatedAt": "<server timestamp>",
-  "profile":  { "surname": "…", "patronymic": "…", "birthday": "YYYY-MM-DD" },
-  "settings": { "parentNearby": true, "lowercaseSentences": false, "music": 0.3, "sfx": 0.8, "voice": 1.0 },
-  "levels":   { "tower-of-syllables/01": { "bestStars": 3, "plays": 4, "completedAt": "…" } },
-  "items":    { "syl-ma": { "box": 3, "seen": 12, "firstTryOk": 9, "wrong": 3, "lastSeen": "…", "okDays": ["…"] } },
-  "rewards":  { "sparksEarned": 152, "sparksSpent": 15, "cards": ["card-hedgehog"], "litWindows": ["…"], "milestones": ["firstThreeStars"] },
-  "easterEggs": { "found": ["moon-star"] }
-}
-```
-
-**Sync rules.**
-
-1. **Local first.** Every answer updates the progress store and is written to local storage immediately, so nothing is lost offline or if the tab closes.
-2. **Cloud write, batched.** The cloud copy is written after each task (debounced to at most one write per 5 seconds) and at level end. Firestore's offline cache queues writes made without internet.
-3. **Merge on login and app start.** Load the cloud and local copies and merge them field by field:
-   - Counters only ever go up and take the higher value (sparksEarned, sparksSpent, plays, best stars). The spark balance he sees is sparksEarned − sparksSpent, so spending sparks later (hats, wand colours) still merges safely.
-   - The private profile (surname, patronymic, birthday) keeps the most recently edited version.
-   - Lists take the union (cards, lit windows, found eggs, okDays).
-   - Each item keeps the version with the later `lastSeen`.
-   - The merged result is written back.
-4. **Play without cloud.** Progress is kept under a local guest key and merged into the account at the next login.
-
-These merge rules are enough because one child plays on one device at a time. A `schemaVersion` field lets later versions migrate old saves. Іскрик's growth stage is derived from completed levels and `sparksEarned`, never stored, so devices can't disagree about it.
-
-## Content format & adding levels
-
-All learning content lives in JSON under `content/`. A new word is one line in a lexicon, a new level is one line in a world, and a new world is a folder. None of it needs code changes.
-
-**Files.**
-
-- `config.json`: every tunable number, plus the letter rules (vowels, Latin spellings for ids, the soft sign and digraphs).
-- `templates.json`: what each kind of level does.
-- `voice.uk.json`: Соня's lines, with placeholders such as `{nameVoc}` and `{topic}` (a level's letter).
-- `strings.uk.json`, `cards.json`.
-- Per world: `worlds/<world>/world.json` and `worlds/<world>/lexicon.json`.
-
-**Lexicon (`worlds/<world>/lexicon.json`).** It holds the items first taught in that world, one compact row each. Syllable splits are written by hand, never auto-hyphenated, and every syllable has exactly one vowel. Everything else is derived:
-
-- a word's text and syllables come from its split;
-- syllable ids come from their letters (`МИШ` → `syl-mysh`);
-- every audio and picture path comes from the id (`w-mama` → `voice/words/mama.mp3`, `img/words/mama.webp`);
-- drill syllables are one string;
-- closed syllables come from the splits.
-
-Each sentence lists what its scene `depicts`, so a wrong scene can never also fit the sentence.
-
-```json
-{
-  "syllables": "МА МО МУ МИ МІ ЛА ЛО ЛУ ЛИ ЛІ",
-  "words": [
-    { "id": "w-mama", "split": "МА-МА", "emoji": "👩", "tags": ["family"] },
-    { "id": "w-myshka", "split": "МИШ-КА", "emoji": "🐭", "stress": 0 }
-  ],
-  "sentences": [
-    { "id": "s-u-mamy-mylo", "text": "У мами мило.", "depicts": ["mama", "mylo"], "emoji": "👩🧼", "wordStartsSec": [0.0, 0.35, 0.9] }
-  ]
-}
-```
-
-`wordStartsSec` lets Соня read a sentence while each word lights up in turn.
-
-**World (`worlds/<world>/world.json`).** A world is a list of units. Each unit names the letters it teaches and a row of level templates:
-
-```json
-{
-  "id": "garden", "order": 3, "title": "Сад Соняшників", "look": "garden",
-  "units": [
-    { "key": "practice", "levels": ["words", "sentences"] },
-    { "key": "e", "letters": "Е", "card": "card-stork", "levels": ["letters", "words", "words", "sentences"] },
-    { "key": "rev1", "levels": ["review"] },
-    { "key": "finale", "levels": [{ "t": "finale", "door": "w-oleksandr", "line": "magicDoor.dadName" }] }
-  ]
-}
-```
-
-**What each level gets.** Expanding the units gives every level:
-
-- the letters known by then;
-- the items that just became readable, shared evenly over the unit's levels that teach that kind;
-- review from every earlier level;
-- Соня's intro about its letter;
-- its Magic Door;
-- a card (the unit's last level);
-- what unlocks it.
-
-**Level ids and overrides.**
-
-- Generated ids are `world/unitkey-template` (`garden/e-words-2` for a repeat), so a played unit key is never renamed.
-- A finale's door item stays out of every pool before its door.
-- Any level can override its pool, tasks or door, or be written out in full. The first 11 levels are written out in full, keeping their ids, which his saved progress is keyed by.
-
-**Item picking (spaced repetition).** Each item sits in a box from 1 to 5, and each box has an interval in days (same day, 1, 3, 7, 21).
-
-- A first-try correct answer moves an item up one box; a wrong answer sends it back to box 1.
-- The picker favours low boxes and overdue items.
-- About 25% of tasks review earlier levels, drawing from their 50 most overdue items.
-
-**Adding content, step by step.**
-
-1. Add the new words and sentences to the world's `lexicon.json`, and the unit to its `world.json`.
-2. Run `npm run validate-content -- --report`. It checks:
-   - the schemas, ids and splits;
-   - that every level uses only letters taught by then;
-   - the pace: a letter unit brings at least 6 new words, and no level more than 12 new items;
-   - every task config and pool size;
-   - Соня's lines and the assets.
-
-   It prints the progress curve, so you can see that progress stays steady.
-3. Add the audio and pictures with the filenames the validator lists as missing.
-4. Commit and push; GitHub Actions validates, builds and deploys.
-
-**Adding a task type.** Create a folder in `src/reading/tasks/` that implements the plug-in contract and register it. Level files can then use its id.
-
-**Content roadmap (later worlds).** See "Growth plan": about 300 levels over 13 worlds, written in waves just before he reaches them.
 
 ## Audio production
 
@@ -723,7 +365,7 @@ The parent area holds progress, settings, the recording studio and the account. 
 
 ## Build phases for Claude Code
 
-Build in 9 phases, plus the growth steps after Phase 6, each ending in something you can open and try on a real device. Ask Claude Code to finish one phase, show you the result and pass its "done when" checks before starting the next.
+Build in 10 phases, plus the growth steps after Phase 6 and the clean-up after Phase 7, each ending in something you can open and try on a real device. Ask Claude Code to finish one phase, show you the result and pass its "done when" checks before starting the next.
 
 1. **Scaffold & deploy.** Set up Vite + React + TypeScript, linting, the folder structure, hash routing, and a GitHub Actions workflow that deploys to GitHub Pages with the right base path. A placeholder magic-door screen goes live.
    - Done when: a push to `main` deploys automatically and the page opens on a phone.
@@ -758,79 +400,41 @@ Build in 9 phases, plus the growth steps after Phase 6, each ending in something
 
 Later waves (worlds 6 to 13) are written just in time, after Phase 9. `caseMatch` and `story` arrive with worlds 8 and 11.
 
-**Order: 7 → 9 → 8.** Phase 8 is postponed to the very end (decided 22 Oct 2026). Until it exists, the private profile (surname, patronymic, birthday) is typed by hand in the Firestore console under `players/{uid}` → `profile`.
+**Order from Phase 7: 7 → clean-up → 9 → 8 → 10** (decided 22 Oct 2026). Phase 8 comes after Phase 9, and the installable offline app (formerly part of Phase 9) is last, as Phase 10. Until Phase 8 exists, the private profile (surname, patronymic, birthday) is typed by hand in the Firestore console under `players/{uid}` → `profile`.
 
 7. **Login & cloud sync.** Write step-by-step Firebase setup notes for you. Build the login screen, the security rules file and the sync engine with merge and play-without-cloud mode, and show sync status.
    - Done when: progress made on the laptop appears on the phone after login, offline play uploads once back online, and a rules test in the Firebase emulator shows another user can't read the document.
    - Done (22 Oct 2026): `src/core/sync/cloud.ts` (Firebase loads lazily; per-account local copies; field-path writes at most every 5 s and right after a level; merge on login, app start, return to the tab and coming back online), `src/core/engine/merge.ts` (unit-tested), the login screen with «Грати без входу» (a guest's progress joins the account at login), the cloud state on the door, `firestore.rules` with an emulator test (`npm run test:rules`, also in CI). Checked with two browser profiles against the emulators: laptop → phone, offline → online.
 
-9\. **Collections, Easter eggs & PWA.** Build the Book of Spells (one chapter per letter, opening with «Сузір’я літер»), card album (one page per world), castle windows (lit by the daily warm-up) and every Easter egg (ambient ones use the props system), including the seasonal ones with the Orthodox Easter date calculation and all Personal touches (Чарівна пошта, family portraits, formal Соня; Kharkiv on the horizon is done in G6). Make the app installable and offline-capable.
-   - Done when: it installs on a tablet and phone and launches offline, and a debug date override (`?date=YYYY-MM-DD`, already there for props) can trigger each seasonal surprise.
+**Clean-up (after Phase 7, done 22 Oct 2026).** Smaller, faster and ready to carry the English and maths games, with his progress and every feature kept:
 
-Then, last:
+- O1. CI in parallel jobs, e2e inside Playwright's image (no 12-minute browser install).
+- O2. `npm run bundle-report`; size budgets in `check-prod-build` (CI).
+- O3. Effects and music as small MP3s (2.86 MB → 0.48 MB), loops cut to their exact length.
+- O4. Firestore Lite, lazy screens, `reviewEarlier` instead of long review lists. The site went from 4.8 to 1.8 MB, first-load JS from 220 to 207 KB gzip.
+- O6. Speech Chrome refuses before the first tap is said on that tap; a stale-test-cache fix; dead code removed; a saved-progress fixture test guarding every level, item and card id.
+- O7. The core is game-agnostic: locale, audio folder and strings come from `@game`, and a tiny second game (`src/core/engine/fixtures/countStars/`) runs on core alone.
+- O8. `npm run review-list -- <world>` writes the native-speaker review of a world.
+- O9. These docs split into PLAN, curriculum and architecture.
+- Kept on purpose: React Router and Zod. Replacing the router (about −28 KB gzip) or moving to `zod/mini` (about −20 KB gzip) isn't worth the rewrite.
+
+9\. **Collections & Easter eggs.** Build the Book of Spells (one chapter per letter, opening with «Сузір’я літер»), card album (one page per world), castle windows (lit by the daily warm-up) and every Easter egg (ambient ones use the props system), including the seasonal ones with the Orthodox Easter date calculation and all Personal touches (Чарівна пошта, family portraits, formal Соня; Kharkiv on the horizon is done in G6). The Book and the album are lazy screens, within the size budgets.
+   - Done when: a debug date override (`?date=YYYY-MM-DD`, already there for props) can trigger each seasonal surprise.
 
 8\. **Parent area & recording studio.** Build the gate, progress views and settings, including the private child profile.
    - Progress views are grouped by world and letter, with a "words he can read" curve.
    - Add the recording studio (with family messages). It works one world at a time ("record the next world") and has zip export.
-   - Add JSON export/import and the `audio:prepare` script.
+   - Add JSON export/import and the `audio:prepare` script (ffmpeg, like `audio:generate`).
    - Done when: dropping your recorded zip into the project replaces the placeholder voice with no code change.
 
-After phases 7, 9 and 8, run a final check: a Playwright playthrough of every level at phone, tablet and laptop sizes, a Lighthouse audit, credits complete, and a real session with your son.
+10\. **Install & offline (PWA).** `vite-plugin-pwa`: precache the app shell, fonts and effects; cache music and voice clips on first play; a manifest (name, icons from the door art, standalone, both orientations). A new version is applied at the next start, never mid-level; the parent area shows the app version.
+   - Done when: it installs on a tablet and phone and launches offline, a whole level plays in airplane mode, and a Lighthouse PWA audit passes.
 
-## Testing & deployment
+After phases 9, 8 and 10, run a final check: a Playwright playthrough of every level at phone, tablet and laptop sizes, a Lighthouse audit, credits complete, and a real session with your son.
 
-Every push to `main` runs validation and tests, and only a green build is deployed to GitHub Pages.
+**Later.**
 
-**Deployment.**
-
-- In the repo, set Settings → Pages → Source to **GitHub Actions**. In `vite.config.ts`, set `base` to `'/<repo-name>/'`.
-- Workflow steps on push to `main`: `npm ci` → `validate-content` → `test` → `build` → upload the Pages artifact → deploy.
-- Firebase web config goes in `VITE_FIREBASE_*` variables: `.env.local` on your laptop, and repository variables in GitHub Actions. These values are public by design; keeping them out of the code just makes switching projects easy.
-- Deploy the security rules from the repo with the Firebase CLI (`firebase deploy --only firestore:rules`), so the rules are versioned with the code.
-- The PWA updates itself on the next launch after a deploy. The parent area shows the app version, so you can confirm which build is running.
-
-**Automated tests.**
-
-| Kind | Tool | Covers |
-| --- | --- | --- |
-| Unit | Vitest | Engine (session, picker, scoring, rewards), sync merge rules, Orthodox Easter date, content schemas |
-| Security rules | Firebase emulator | A user can read and write only their own document |
-| End to end | Playwright | Every level played start to finish on iPhone-, iPad- (landscape) and laptop-sized viewports; no overflow; tap-target sizes |
-
-Test builds mark the correct option with a `data-correct` attribute so Playwright can play through levels. Production builds strip it.
-
-**On-device checklist (manual, before showing him a new version).**
-
-- [ ] iPhone Safari: audio starts after the door tap, and nothing zooms on double-tap.
-- [ ] iPad in landscape: layout is roomy, and drag and tap-to-place both work.
-- [ ] Android Chrome: installs as an app and opens full screen.
-- [ ] Laptop: mouse drag and the keyboard shortcuts work.
-- [ ] Airplane mode: a whole level plays, and progress uploads afterwards.
-- [ ] Two devices: progress from one appears on the other after a reload.
-
-## Kick-off prompt for Claude Code
-
-Export this doc as Markdown and save it in a new repo as `docs/PLAN.md`. Then open Claude Code in that repo and paste the prompt below.
-
-```text
-Read docs/PLAN.md fully. It is the implementation plan for "Чарівні пригоди Мишка", a Ukrainian
-reading game for a 5-year-old (syllables → words → sentences), hosted on GitHub Pages with
-Firebase login and cloud save.
-
-Before writing code:
-1. Create CLAUDE.md with the key conventions from the plan: stack, folder structure, the task
-   plug-in contract, content lives in content/*.json validated by Zod, the engine is pure TS
-   with unit tests, minimum tap target 64 px, reading tasks never play the target audio
-   before the answer, and no Harry Potter names, characters, logos, fonts or music.
-2. List anything in the plan that is ambiguous or that you would change, and ask me.
-
-Then implement Phase 1 only. When it is done:
-- run its "Done when" checks and show me the results;
-- tell me exactly what to try on my phone;
-- stop and wait for my go-ahead before Phase 2.
-
-Keep to the libraries in the plan unless you ask first. Keep all Ukrainian text in
-content/ or strings files, never hard-coded in components.
-```
-
-For each later phase, tell Claude Code: "Implement Phase N from docs/PLAN.md, run its Done-when checks, then stop."
+- **Android app (Play Market)** with Capacitor, which wraps this web build. A web-app wrapper (TWA) won't do: it needs a file at the domain root, which a `/magic-reading/` project site can't serve, and Android's WebView has no Ukrainian browser speech. Capacitor brings native text-to-speech and full offline play.
+  - Needs: a Google Play developer account (25 USD once), Android Studio, an icon, screenshots and a feature graphic, a privacy-policy page, and the Data safety form (one login email and his progress; no ads, no tracking). A closed testing track (up to 100 testers, the family) avoids the full "Designed for Families" review; a public release needs it.
+  - iOS later: the same Capacitor project, with an Apple developer account (99 USD a year).
+- **Shared core and the next games.** `src/core` moves to `packages/core` (npm workspaces); the games become `apps/reading-uk`, `apps/english`, `apps/maths`, each with its own `content/` and domain pack, sharing Соня, Іскрик, the journey, rewards, sync and the parent area. One login serves all of them (`players/{uid}/games/{gameId}`).

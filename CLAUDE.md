@@ -2,8 +2,9 @@
 
 A Ukrainian reading game made personally for one almost-5-year-old, Михайло (Мишко):
 syllables → words → sentences, set in an original magic school. Static SPA on GitHub Pages, Firebase Auth + Firestore for cloud save.
-The full spec is `docs/PLAN.md`. Build it phase by phase (section "Build phases"). Finish one
-phase, run its "Done when" checks, then stop and wait for the go-ahead.
+The vision and roadmap are `docs/PLAN.md` (section "Build phases" says where things stand); what he
+learns and how content is written, `docs/curriculum.md`; how the code works, `docs/architecture.md`.
+Build phase by phase. Finish one phase, run its "Done when" checks, then stop and wait for the go-ahead.
 
 ## Stack (do not add libraries without asking)
 
@@ -18,7 +19,7 @@ phase, run its "Done when" checks, then stop and wait for the go-ahead.
 | Routing | React Router with **hash** URLs (`createHashRouter`) |
 | Content validation | Zod |
 | Login + cloud save | Firebase Auth (email/password) + Firestore |
-| Offline + install | vite-plugin-pwa |
+| Offline + install | vite-plugin-pwa (Phase 10, not installed yet) |
 | Tests | Vitest (logic), Playwright (screens at the plan's test viewports) |
 | Lint | ESLint (flat config, typescript-eslint, react-hooks) |
 | Scripts | `scripts/*.ts` run with Node 24's built-in type stripping (no tsx); use `.ts` import extensions there |
@@ -51,8 +52,8 @@ src/
     intro/               the level intro demos
     content/             loads content/ (files.ts, load.ts)
     game.ts gameUi.ts    what '@game' and '@game-ui' resolve to
-scripts/validate-content.ts
-docs/PLAN.md
+scripts/                 validate-content, review-list, make-audio, bundle-report, check-prod-build
+docs/                    PLAN.md (vision, roadmap), curriculum.md, architecture.md, review/ (native-speaker lists)
 ```
 
 ## Architecture rules
@@ -273,7 +274,9 @@ npm run deploy:rules      # publish firestore.rules to the Firebase project (fir
 
 ## Deployment
 
-Push to `main` → GitHub Actions: `npm ci` → lint → validate-content → test → build →
-check-prod-build → e2e → deploy to GitHub Pages. `base` in `vite.config.ts` must match the repo name.
+Push to `main` → GitHub Actions (`.github/workflows/deploy.yml`), three jobs: **checks** (`npm ci` →
+lint → validate-content → test → test:rules → build → check-prod-build), **e2e** (in Playwright's
+image, `mcr.microsoft.com/playwright:v<version>-noble`: keep its tag equal to `@playwright/test`'s
+pinned version) and **deploy** to GitHub Pages after both. `base` in `vite.config.ts` must match the repo name.
 Firebase web config comes from `VITE_FIREBASE_*` env vars (`.env.local` locally, repository
 variables in Actions); never commit `.env.local`.
