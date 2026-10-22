@@ -316,7 +316,7 @@ function makeSfx() {
   }
   mkdirSync(join(OUT, 'sfx'), { recursive: true });
   writeWav(join(OUT, 'sfx', 'sfx.wav'), normalize(track.data, -2), SFX_RATE);
-  writeFileSync(join(import.meta.dirname, '..', 'src', 'audio', 'sfx-sprite.json'), `${JSON.stringify(sprite, null, 2)}\n`);
+  writeFileSync(join(import.meta.dirname, '..', 'src', 'core', 'audio', 'sfx-sprite.json'), `${JSON.stringify(sprite, null, 2)}\n`);
 }
 
 // ---------- music ----------

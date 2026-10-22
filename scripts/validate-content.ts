@@ -4,8 +4,8 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { validateContent, type Issue, type RawBundle, type RawFile } from '../src/engine/validate.ts';
-import { taskLogics } from '../src/tasks/logicRegistry.ts';
+import { validateContent, type Issue, type RawBundle, type RawFile } from '../src/reading/engine/validate.ts';
+import { taskLogics } from '../src/reading/tasks/logicRegistry.ts';
 
 const args = process.argv.slice(2);
 const rootArg = args.indexOf('--root');

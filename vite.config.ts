@@ -1,6 +1,7 @@
 import react from '@vitejs/plugin-react';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { Plugin } from 'vite';
 import { defineConfig } from 'vitest/config';
 
@@ -54,6 +55,13 @@ function audioManifest(): Plugin {
 export default defineConfig({
   base: REPO_BASE,
   plugins: [react(), htmlStrings(), audioManifest()],
+  // The active game's domain pack (see src/core/game.ts): swap these two to build another game.
+  resolve: {
+    alias: {
+      '@game': fileURLToPath(new URL('./src/reading/game.ts', import.meta.url)),
+      '@game-ui': fileURLToPath(new URL('./src/reading/gameUi.ts', import.meta.url)),
+    },
+  },
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
     __BUILD_ID__: JSON.stringify(process.env.GITHUB_SHA?.slice(0, 7) ?? 'dev'),

@@ -1,0 +1,36 @@
+.intro-screen {
+  justify-content: space-between;
+}
+
+.intro-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(16px, 4vmin, 40px);
+  flex: 1;
+  width: 100%;
+}
+
+@media (orientation: landscape) {
+  .intro-stage {
+    flex-direction: row;
+  }
+}
+
+.intro-sonya {
+  width: clamp(110px, 26vmin, 220px);
+}
+
+.intro-demo {
+  display: grid;
+  place-items: center;
+  min-width: min(100%, clamp(260px, 60vmin, 560px));
+  min-height: clamp(150px, 30vmin, 280px);
+}
+
+.intro-play {
+  position: relative;
+  margin-bottom: 8px;
+}

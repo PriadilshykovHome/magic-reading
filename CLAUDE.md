@@ -35,15 +35,19 @@ content/
   worlds/<world>/world.json
   worlds/<world>/levels/NN-name.json
 src/
-  engine/                pure TS: session, picker, scoring, rewards
-  tasks/                 registry.ts + one folder per task type
-  screens/               Door Login Map LevelIntro TaskRunner Celebration Book Album Parent
-  characters/            Sonya, Iskryk (layered SVG, animated in code)
-  fx/                    particles, sparkles, fireworks, transitions
-  audio/                 audio manager
-  store/                 progress, settings (Zustand)
-  sync/                  firebase.ts syncEngine.ts localCache.ts
-  easter-eggs/
+  app/                   main.tsx, router.tsx (wiring)
+  core/                  the game-agnostic shell (shared later with the English and maths games)
+    engine/              pure TS: session, picker, run, rewards, progress, calendar, validate framework
+    game.ts              the seam: GameData ('@game') and GameUi ('@game-ui') interfaces
+    screens/             Door Map LevelIntro TaskRunner Celebration (later Login Book Album Parent)
+    tasks/               TaskProps/TaskType, useChoice, useDrag
+    audio/ characters/ fx/ ui/ store/ sync/ styles/
+  reading/               this game's domain pack
+    engine/              lexicon schema, content index, distractors, display, domain engine, validate
+    tasks/               logicRegistry.ts, registry.ts + one folder per task type
+    intro/               the level intro demos
+    content/             loads content/ (files.ts, load.ts)
+    game.ts gameUi.ts    what '@game' and '@game-ui' resolve to
 scripts/validate-content.ts
 docs/PLAN.md
 ```
@@ -57,18 +61,25 @@ docs/PLAN.md
 - **The progress store is the single source of truth.** The sync service mirrors it to
   localStorage and Firestore (`players/{uid}`); components never talk to Firebase directly.
 - Items are keyed by lexicon id (`syl-ma`), never by Cyrillic text.
-- **The engine decides, the UI choreographs.** In-level feedback comes from `src/engine/run.ts`
+- **The engine decides, the UI choreographs.** In-level feedback comes from `src/core/engine/run.ts`
   as `FeedbackEvent`s (wrong + hint, correct with chime pitch / sparks / golden spark / praise,
   streak wand / wave, door open) and the celebration's running order from `finishLevel` in
-  `src/engine/rewards.ts` (`CelebrationStep`s). Animations, sounds and Соня's lines react to
+  `src/core/engine/rewards.ts` (`CelebrationStep`s). Animations, sounds and Соня's lines react to
   those events; never re-derive game rules in components.
-- Code that Node runs directly (`src/engine/`, `src/tasks/*/logic.ts`, `scripts/`) uses explicit
-  `.ts` import extensions and only erasable TypeScript; it must not import JSON, CSS or React.
+- Code that Node runs directly (`src/core/engine/`, `src/reading/engine/`,
+  `src/reading/tasks/*/logic.ts`, `scripts/`) uses explicit `.ts` import extensions and only
+  erasable TypeScript; it must not import JSON, CSS or React.
+- **Core vs domain.** `src/core/` never imports `src/reading/` (ESLint enforces it; tests may use
+  the real content as a fixture). It reaches the active game only through the `@game` and
+  `@game-ui` aliases (`vite.config.ts`, `tsconfig.app.json`), typed by `src/core/game.ts`.
+  Anything about letters, syllables, words or sentences belongs in `src/reading/`. A domain pack
+  implements `DomainEngine` (`kindOf`, `hasItem`, `createBuildContext`: candidates, review,
+  distractors); core owns ordering, spaced repetition, fallbacks, the Magic Door and rewards.
 
 ## Content
 
 - All learning content lives in `content/*.json` and is validated by Zod schemas
-  (`src/engine/schema.ts`): `lexicon.json`, `worlds/<world>/world.json` + `levels/*.json`,
+  (`src/core/engine/schema.ts`, extended in `src/reading/engine/schema.ts`): `lexicon.json`, `worlds/<world>/world.json` + `levels/*.json`,
   `cards.json`, `config.json` (every tunable number: boxes, stars, sparks, streaks, creature
   thresholds, Easter egg dates), `voice.uk.json` (Соня's lines, with `{nameVoc}`-style
   placeholders filled from `strings.uk.json` and the private profile) and `strings.uk.json`.
@@ -85,10 +96,11 @@ docs/PLAN.md
 
 ## Task plug-in contract
 
-Every task type lives in `src/tasks/<typeId>/`. Its pure half, `logic.ts`, implements
-`TaskLogic` (`src/engine/taskLogic.ts`) and is listed in `src/tasks/logicRegistry.ts`; from
-Phase 3 its React `Component` sits next to it and `src/tasks/registry.ts` pairs the two.
-The engine, session builder and validator only talk to the logic:
+Every task type lives in `src/reading/tasks/<typeId>/`. Its pure half, `logic.ts`, implements
+`TaskLogic` (`src/core/engine/taskLogic.ts`; reading tasks use `ReadingTaskLogic`) and is listed
+in `src/reading/tasks/logicRegistry.ts`; its React `Component` sits next to it and
+`src/reading/tasks/registry.ts` pairs the two. The engine, session builder and validator only
+talk to the logic:
 
 ```ts
 interface TaskLogic<Config, Data> {
@@ -97,11 +109,13 @@ interface TaskLogic<Config, Data> {
   scored: boolean;                    // counts toward stars
   reading: boolean;                   // target audio only after the answer
   needsParent: boolean;               // readAloud: replaced when no parent is nearby
+  manyOptions?: boolean;              // bubblePop: may show more than 3 options
+  instructionVariants?: Partial<Config>[];  // configs whose instruction line must exist
   instruction(config): string;        // voice line id for Соня's instruction
   eligible(ctx, config): string[];    // every item it could ask about
   build(ctx, config, target): { target; options; data: Data };  // ctx.distractors() etc.
 }
-// Phase 3 adds: Component: React.FC<TaskProps>  (renders it, reports misses and completion)
+// + Component: React.FC<TaskProps>  (renders it, reports misses and completion)
 ```
 
 `magicDoor` is a wrapper around any scored type, not a separate mechanic: the session builder
@@ -111,7 +125,7 @@ builds the level's `boss.inner` type on the weakest/newest (or fixed) item and m
 
 - UI motion: Motion via `LazyMotion` + `strict`, so use `m.div` (not `motion.div`); springs for
   anything that lands or pops. Simple loops stay in CSS. `MotionConfig reducedMotion="user"`.
-- Particles: `particles` in `src/fx/particles.ts` (tsParticles on one tap-through canvas, loaded
+- Particles: `particles` in `src/core/fx/particles.ts` (tsParticles on one tap-through canvas, loaded
   lazily, ~150 alive on phones, off under reduced motion / "reduced effects"). Sparks flying to
   the jar: `SparkFlights`. Never add another canvas or particle loop.
 - Characters: `Sonya` (moods idle/happy/shrug/talk/celebrate) and `Iskryk` (stages 0–3, moods
@@ -120,16 +134,16 @@ builds the level's `boss.inner` type on the weakest/newest (or fixed) item and m
 
 ## Audio
 
-- Everything goes through `src/audio/`: `voice` (Соня's lines and items), `sfx` (effects by
+- Everything goes through `src/core/audio/`: `voice` (Соня's lines and items), `sfx` (effects by
   meaning), `useMusic(track)` per screen. Never use `speechSynthesis`, `Audio` or Howler directly.
-- `VoiceScheduler` (`src/audio/scheduler.ts`, unit-tested) keeps voice calm: one clip at a time,
+- `VoiceScheduler` (`src/core/audio/scheduler.ts`, unit-tested) keeps voice calm: one clip at a time,
   never cut mid-word. Pick a policy: `interrupt` (replay buttons), `after` (default), `ifIdle`
   ("Спробуй ще!"). Music ducks to 30% while she speaks; `SfxGate` stops effects stacking.
 - Recorded clips live at the lexicon's `audio` path under `public/audio/uk/`, Соня's lines at
   `public/audio/uk/voice/sonya/<line id>[.<n>].mp3`; anything missing falls back to browser
   speech (`virtual:audio-manifest` lists what exists).
 - Effects and music are generated by `npm run audio:generate` (`scripts/make-audio.ts`): original,
-  CC0, deterministic. Edit the script, don't hand-edit the WAVs or `src/audio/sfx-sprite.json`.
+  CC0, deterministic. Edit the script, don't hand-edit the WAVs or `src/core/audio/sfx-sprite.json`.
 - Audio unlocks on the door tap (iOS). Check with `npx playwright test --config e2e/audio.config.ts`.
 
 ## Hard rules
@@ -161,10 +175,10 @@ builds the level's `boss.inner` type on the weakest/newest (or fixed) item and m
 
 ## Art direction (see "Art direction" in docs/PLAN.md)
 
-Cozy and sophisticated, never busy: a candlelit night. Use the tokens in `src/styles/global.css`
+Cozy and sophisticated, never busy: a candlelit night. Use the tokens in `src/core/styles/global.css`
 (`--night` #0e0b14, `--stone`, `--dusk`, antique `--gold` #c9a24a / `--gold-light`, `--parchment`,
 `--ink`); don't introduce saturated blues, violets or oranges. The shared backdrop is
-`src/fx/ambient/Scene.tsx` (sky, stars, moon, floating candles, mist, embers, vignette).
+`src/core/fx/ambient/Scene.tsx` (sky, stars, moon, floating candles, mist, embers, vignette).
 
 - Ambient layers are quiet: low contrast, slow drift, small amplitude; farther = smaller,
   dimmer, slower. Flames may flicker faster, but in uneven steps and only slightly.

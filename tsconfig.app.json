@@ -23,7 +23,13 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true
+    "noUncheckedIndexedAccess": true,
+
+    /* The active game's domain pack (see src/core/game.ts) */
+    "paths": {
+      "@game": ["./src/reading/game.ts"],
+      "@game-ui": ["./src/reading/gameUi.ts"]
+    }
   },
   "include": ["src"],
   "exclude": ["src/**/*.test.ts"]

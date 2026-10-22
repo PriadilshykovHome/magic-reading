@@ -487,15 +487,14 @@ content/
   worlds/tower-of-syllables/world.json
   worlds/tower-of-syllables/levels/01-syllables.json  02-words.json  03-sentences.json
 src/
-  engine/              session.ts picker.ts scoring.ts rewards.ts (pure TS)
-  tasks/               registry.ts + one folder per task type
-  screens/             Door Login Map LevelIntro TaskRunner Celebration Book Album Parent
-  characters/          Sonya, Iskryk (layered SVG + animation states)
-  fx/                  particles, sparkles, fireworks, transitions
-  audio/               audio manager (channels, ducking, sprites)
-  store/               progress, settings
-  sync/                firebase.ts syncEngine.ts localCache.ts
-  easter-eggs/
+  app/                 main.tsx, router.tsx
+  core/                the game-agnostic shell, shared later with the English and maths games
+    engine/            session, picker, run, rewards, progress (pure TS)
+    screens/           Door Login Map LevelIntro TaskRunner Celebration Book Album Parent
+    characters/        Sonya, Iskryk (layered SVG + animation states)
+    fx/ audio/ ui/ store/ sync/ styles/
+    game.ts            the seam to the active game ('@game', '@game-ui')
+  reading/             this game's domain pack: lexicon, letters, distractors, task types, intro demos
 scripts/validate-content.ts
 .github/workflows/deploy.yml
 ```
@@ -630,7 +629,7 @@ All learning content lives in JSON under `content/`. A new level is a new JSON f
    - each pool has enough items for the requested number of choices.
 5. Commit and push; GitHub Actions validates, builds and deploys.
 
-**Adding a task type.** Create a folder in `src/tasks/` that implements the plug-in contract and register it. Level files can then use its id.
+**Adding a task type.** Create a folder in `src/reading/tasks/` that implements the plug-in contract and register it. Level files can then use its id.
 
 **Content roadmap (later worlds).** See "Growth plan": about 300 levels over 13 worlds, written in waves just before he reaches them.
 
